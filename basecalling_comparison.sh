@@ -1,5 +1,13 @@
 #!/bin/bash
-set -e
+
+
+gather_fast5s_files=false
+albacore_v2_0_0=false
+albacore_v1_2_6=false
+albacore_v1_1_2=false
+albacore_v1_0_4=false
+albacore_v0_9_1=false
+albacore_v0_8_4=false
 
 threads=40
 
@@ -13,18 +21,19 @@ albacore_whl_dir=/home/UNIMELB/inouye-hpc-sa
 nanopolish_scripts_dir=/home/UNIMELB/inouye-hpc-sa/nanopolish/scripts
 
 
-# Starting with the binned set of reads for this isolate, get a nice subset (with Filtlong) and
-# copy all of the corresponding fast5 files to a local directory.
-mkdir gather_reads
-filtlong --min_length 1000 --target_bases 500000000 $all_reads > gather_reads/subsampled_reads.fastq
-grep "^@" gather_reads/subsampled_reads.fastq | grep -P -o "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}" > gather_reads/read_ids
-grep -F -f gather_reads/read_ids $albacore_table | grep -o -P "[\w_]+\.fast5" > gather_reads/read_filenames
-find $raw_fast5 -name "*.fast5" > gather_reads/all_read_filenames
-grep -F -f gather_reads/read_filenames gather_reads/all_read_filenames > gather_reads/read_filenames_with_path
-mkdir raw_fast5
-for read in $(cat gather_reads/read_filenames_with_path); do cp $read raw_fast5; done
-rm -r gather_reads
-
+if $gather_fast5s_files; then
+    # Starting with the binned set of reads for this isolate, get a nice subset (with Filtlong) and
+    # copy all of the corresponding fast5 files to a local directory.
+    mkdir gather_reads
+    filtlong --min_length 1000 --target_bases 500000000 $all_reads > gather_reads/subsampled_reads.fastq
+    grep "^@" gather_reads/subsampled_reads.fastq | grep -P -o "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}" > gather_reads/read_ids
+    grep -F -f gather_reads/read_ids $albacore_table | grep -o -P "[\w_]+\.fast5" > gather_reads/read_filenames
+    find $raw_fast5 -name "*.fast5" > gather_reads/all_read_filenames
+    grep -F -f gather_reads/read_filenames gather_reads/all_read_filenames > gather_reads/read_filenames_with_path
+    mkdir raw_fast5
+    for read in $(cat gather_reads/read_filenames_with_path); do cp $read raw_fast5; done
+    rm -r gather_reads
+fi
 
 # This is the reference used to assess the reads and assemblies.
 cp $reference reference.fasta
@@ -71,37 +80,38 @@ extract_map_and_assemble () {
 }
 
 
-# Albacore v2.0.0
-pip3 install $albacore_whl_dir/ont_albacore-2.0.0-cp35-cp35m-manylinux1_x86_64.whl
-read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v2.0.0 -o fast5 --disable_filtering
-extract_map_and_assemble "albacore_v2.0.0"
+if $albacore_v2_0_0; then
+    pip3 install $albacore_whl_dir/ont_albacore-2.0.0-cp35-cp35m-manylinux1_x86_64.whl
+    read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v2.0.0 -o fast5 --disable_filtering
+    extract_map_and_assemble "albacore_v2.0.0"
+fi
 
+if $albacore_v1_2_6; then
+    pip3 install $albacore_whl_dir/ont_albacore-1.2.6-cp35-cp35m-manylinux1_x86_64.whl
+    read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.2.6 -o fast5
+    extract_map_and_assemble "albacore_v1.2.6"
+fi
 
-# Albacore v1.2.6
-pip3 install $albacore_whl_dir/ont_albacore-1.2.6-cp35-cp35m-manylinux1_x86_64.whl
-read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.2.6 -o fast5
-extract_map_and_assemble "albacore_v1.2.6"
+if $albacore_v1_1_2; then
+    pip3 install $albacore_whl_dir/ont_albacore-1.1.2-cp35-cp35m-manylinux1_x86_64.whl
+    read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.1.2 -o fast5
+    extract_map_and_assemble "albacore_v1.1.2"
+fi
 
+if $albacore_v1_0_4; then
+    pip3 install $albacore_whl_dir/ont_albacore-1.0.4-cp35-cp35m-manylinux1_x86_64.whl
+    read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.0.4
+    extract_map_and_assemble "albacore_v1.0.4"
+fi
 
-# Albacore v1.1.2
-pip3 install $albacore_whl_dir/ont_albacore-1.1.2-cp35-cp35m-manylinux1_x86_64.whl
-read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.1.2 -o fast5
-extract_map_and_assemble "albacore_v1.1.2"
+if $albacore_v0_9_1; then
+    pip3 install $albacore_whl_dir/ont_albacore-0.9.1-cp35-cp35m-manylinux1_x86_64.whl
+    read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5 -t $threads -s albacore_v0.9.1
+    extract_map_and_assemble "albacore_v0.9.1"
+fi
 
-
-# Albacore v1.0.4
-pip3 install $albacore_whl_dir/ont_albacore-1.0.4-cp35-cp35m-manylinux1_x86_64.whl
-read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.0.4
-extract_map_and_assemble "albacore_v1.0.4"
-
-
-# Albacore v0.9.1
-pip3 install $albacore_whl_dir/ont_albacore-0.9.1-cp35-cp35m-manylinux1_x86_64.whl
-read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5 -t $threads -s albacore_v0.9.1
-extract_map_and_assemble "albacore_v0.9.1"
-
-
-# Albacore v0.8.4
-pip3 install $albacore_whl_dir/ont_albacore-0.8.4-cp35-cp35m-manylinux1_x86_64.whl
-read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5 -t $threads -s albacore_v0.8.4
-extract_map_and_assemble "albacore_v0.8.4"
+if $albacore_v0_8_4; then
+    pip3 install $albacore_whl_dir/ont_albacore-0.8.4-cp35-cp35m-manylinux1_x86_64.whl
+    read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5 -t $threads -s albacore_v0.8.4
+    extract_map_and_assemble "albacore_v0.8.4"
+fi
