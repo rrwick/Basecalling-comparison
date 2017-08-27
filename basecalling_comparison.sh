@@ -33,10 +33,10 @@ cp $nanopolish_scripts_dir/nanopolish_merge.py .
 
 
 assembly_identity_distribution() {
-    python3 chop_up_assembly.py "$1" 10000 > "$1".pieces.fasta
-    minimap2 -x map10k -t $threads -c reference.fasta "$1".fastq.gz > "$1".paf
-    python3 read_length_identity.py "$1".paf > "$1".tsv
-    python3 histograms.py "$1".tsv 0.1 0.1 "$1".identity_histogram "$1".relative_length_histogram
+    python3 chop_up_assembly.py "$1" 10000 > "$2"_pieces.fasta
+    minimap2 -x map10k -t $threads -c reference.fasta "$2"_pieces.fasta > "$2".paf
+    python3 read_length_identity.py "$2".paf > "$2".tsv
+    python3 histograms.py "$2".tsv 0.1 0.1 "$2"_identity_histogram "$2"_relative_length_histogram
 }
 
 
@@ -49,22 +49,25 @@ extract_map_and_assemble () {
     minimap2 -x map10k -t $threads -c reference.fasta "$1".fastq.gz > "$1".paf
     python3 read_length_identity.py "$1".paf > "$1"_reads.tsv
     (head -n 1 "$1"_reads.tsv && tail -n +2 "$1"_reads.tsv | sort) > "$1"_reads_sorted.tsv; mv "$1"_reads_sorted.tsv "$1"_reads.tsv
+    python3 histograms.py "$1"_reads.tsv 0.1 0.1 "$1"_read_identity_histogram "$1"_read_relative_length_histogram
 
     # Trim reads for assembly
     porechop -i "$1".fastq.gz -o "$1"_trimmed.fastq.gz --no_split --threads $threads --check_reads 1000
 
     # Do a Nanopore-only assembly and get assembly identities
     unicycler -l "$1"_trimmed.fastq.gz -o "$1"_assembly --threads $threads
-    assembly_identity_distribution "$1"_assembly/assembly.fasta
+    cp "$1"_assembly/assembly.fasta "$1"_assembly.fasta
+    assembly_identity_distribution "$1"_assembly.fasta "$1"_assembly
 
     # Improve the assembly with Nanopolish and get assembly identities again
     mkdir "$1"_nanopolish
-    nanopolish extract --type template "$1"/workspace > "$1"_nanopolish/reads.fa
-    bwa mem -x ont2d -t $threads "$1"_assembly/assembly.fasta "$1"_nanopolish/reads.fa | samtools sort -o "$1"_nanopolish/reads.sorted.bam -T reads.tmp -
+    nanopolish extract --type template --recurse "$1"/workspace > "$1"_nanopolish/reads.fa
+    bwa index "$1"_assembly.fasta
+    bwa mem -x ont2d -t $threads "$1"_assembly.fasta "$1"_nanopolish/reads.fa | samtools sort -o "$1"_nanopolish/reads.sorted.bam -T reads.tmp -
     samtools index "$1"_nanopolish/reads.sorted.bam
-    python nanopolish_makerange.py "$1"_assembly/assembly.fasta | parallel --results nanopolish.results -P 10 nanopolish variants --consensus "$1"_nanopolish/polished.{1}.fa -w {1} -r "$1"_nanopolish/reads.fa -b "$1"_nanopolish/reads.sorted.bam -g "$1"_assembly/assembly.fasta -t 4 --min-candidate-frequency 0.1
-    python nanopolish_merge.py "$1"_nanopolish/polished.*.fa > "$1"_nanopolish/polished_genome.fa
-    assembly_identity_distribution "$1"_nanopolish/assembly.fasta
+    python nanopolish_makerange.py "$1"_assembly.fasta | parallel --results "$1"_nanopolish/nanopolish.results -P 10 nanopolish variants --consensus "$1"_nanopolish/polished.{1}.fa -w {1} -r "$1"_nanopolish/reads.fa -b "$1"_nanopolish/reads.sorted.bam -g "$1"_assembly.fasta -t 4 --min-candidate-frequency 0.1
+    python nanopolish_merge.py "$1"_nanopolish/polished.*.fa > "$1"_nanopolished_assembly.fasta
+    assembly_identity_distribution "$1"_nanopolished_assembly.fasta "$1"_nanopolished_assembly
 }
 
 
