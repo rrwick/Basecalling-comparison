@@ -18,9 +18,10 @@ def main():
         seq = contig[1]
         for i in range(0, len(seq), piece_size):
             piece_seq = seq[i:i+piece_size]
-            read_num += 1
-            print('>' + str(read_num))
-            print(piece_seq)
+            if len(piece_seq) == piece_size:
+                read_num += 1
+                print('>' + str(read_num))
+                print(piece_seq)
 
 
 def load_fasta(fasta_filename):

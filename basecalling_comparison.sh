@@ -1,16 +1,32 @@
 #!/bin/bash
 set -e
 
-# Starting with the binned set of reads for this isolate, copy all of the corresponding fast5 files to a local directory.
-cd /home/UNIMELB/inouye-hpc-sa/nanopore-data/albacore_comparison
-zcat /MDHS/Research/SysGen-Lab/MinION/2017-04-24_Kleb_barcode/nanopore_reads/fastq/2_trimmed/barcode08/BC08.fastq.gz | grep "^@" | grep -P -o "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}" > read_ids
-grep -F -f read_ids /MDHS/Research/SysGen-Lab/MinION/2017-04-24_Kleb_barcode/nanopore_reads/basecalling/to_fastq/sequencing_summary.txt | grep -o -P "[\w_]+\.fast5" > read_filenames
-find /MDHS/Research/SysGen-Lab/MinION/2017-04-24_Kleb_barcode/nanopore_reads/raw_fast5 -name "*.fast5" > all_read_filenames
-grep -F -f read_filenames all_read_filenames > read_filenames_with_path
-mkdir raw_fast5
-for read in $(cat read_filenames_with_path); do cp $read raw_fast5; done
+threads=32
+
+
+# Local paths specific to this server.
+raw_fast5=/MDHS/Research/SysGen-Lab/MinION/2017-04-24_Kleb_barcode/nanopore_reads/raw_fast5
+all_reads=/MDHS/Research/SysGen-Lab/MinION/2017-04-24_Kleb_barcode/nanopore_reads/fastq/2_trimmed/barcode01/BC01.fastq.gz
+albacore_table=/MDHS/Research/SysGen-Lab/MinION/2017-04-24_Kleb_barcode/nanopore_reads/basecalling/to_fastq/sequencing_summary.txt
+reference=/MDHS/Research/SysGen-Lab/Long_read_assembly/Kleb_INF042/Kleb_INF042.fasta
+albacore_whl_dir=/home/UNIMELB/inouye-hpc-sa
+
+
+# Starting with the binned set of reads for this isolate, get a nice subset (with Filtlong) and
+# copy all of the corresponding fast5 files to a local directory.
 mkdir gather_reads
-albacore_comparison mv all_read_filenames read_filenames read_filenames_with_path read_ids read_names gather_reads
+filtlong --min_length 1000 --target_bases 500000000 $all_reads > gather_reads/subsampled_reads.fastq
+grep "^@" gather_reads/subsampled_reads.fastq | grep -P -o "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}" > gather_reads/read_ids
+grep -F -f gather_reads/read_ids $albacore_table | grep -o -P "[\w_]+\.fast5" > gather_reads/read_filenames
+find $raw_fast5 -name "*.fast5" > gather_reads/all_read_filenames
+grep -F -f gather_reads/read_filenames gather_reads/all_read_filenames > gather_reads/read_filenames_with_path
+mkdir raw_fast5
+for read in $(cat gather_reads/read_filenames_with_path); do cp $read raw_fast5; done
+rm -r gather_reads
+
+
+# This is the reference used to assess the reads and assemblies.
+cp $reference reference.fasta
 
 
 assembly_identity_distribution() {
@@ -22,10 +38,9 @@ assembly_identity_distribution() {
 
 
 extract_map_and_assemble () {
-    threads=32
 
     # Extract fastq from fast5 files
-    ~/Fast5-to-Fastq/fast5_to_fastq.py "$1" | gzip > "$1".fastq.gz
+    fast5_to_fastq.py "$1" | gzip > "$1".fastq.gz
 
     # Align reads to reference and get reads identities
     minimap2 -x map10k -t $threads -c Kleb_KSB1_7J.fasta "$1".fastq.gz > albacore_v2.0.0.paf
@@ -52,48 +67,36 @@ extract_map_and_assemble () {
 
 
 # Albacore v2.0.0
-cd /home/UNIMELB/inouye-hpc-sa
-pip3 install ont_albacore-2.0.0-cp35-cp35m-manylinux1_x86_64.whl
-cd /home/UNIMELB/inouye-hpc-sa/nanopore-data/albacore_comparison
+pip3 install $albacore_whl_dir/ont_albacore-2.0.0-cp35-cp35m-manylinux1_x86_64.whl
 read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v2.0.0 -o fast5 --disable_filtering
 extract_map_and_assemble("albacore_v2.0.0")
 
 
 # Albacore v1.2.6
-cd /home/UNIMELB/inouye-hpc-sa
-pip3 install ont_albacore-1.2.6-cp35-cp35m-manylinux1_x86_64.whl
-cd /home/UNIMELB/inouye-hpc-sa/nanopore-data/albacore_comparison
+pip3 install $albacore_whl_dir/ont_albacore-1.2.6-cp35-cp35m-manylinux1_x86_64.whl
 read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.2.6 -o fast5
 extract_map_and_assemble("albacore_v1.2.6")
 
 
 # Albacore v1.1.2
-cd /home/UNIMELB/inouye-hpc-sa
-pip3 install ont_albacore-1.1.2-cp35-cp35m-manylinux1_x86_64.whl
-cd /home/UNIMELB/inouye-hpc-sa/nanopore-data/albacore_comparison
+pip3 install $albacore_whl_dir/ont_albacore-1.1.2-cp35-cp35m-manylinux1_x86_64.whl
 read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.1.2 -o fast5
 extract_map_and_assemble("albacore_v1.1.2")
 
 
 # Albacore v1.0.4
-cd /home/UNIMELB/inouye-hpc-sa
-pip3 install ont_albacore-1.0.4-cp35-cp35m-manylinux1_x86_64.whl
-cd /home/UNIMELB/inouye-hpc-sa/nanopore-data/albacore_comparison
+pip3 install $albacore_whl_dir/ont_albacore-1.0.4-cp35-cp35m-manylinux1_x86_64.whl
 read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v1.0.4
 extract_map_and_assemble("albacore_v1.0.4")
 
 
 # Albacore v0.9.1
-cd /home/UNIMELB/inouye-hpc-sa
-pip3 install ont_albacore-0.9.1-cp35-cp35m-manylinux1_x86_64.whl
-cd /home/UNIMELB/inouye-hpc-sa/nanopore-data/albacore_comparison
+pip3 install $albacore_whl_dir/ont_albacore-0.9.1-cp35-cp35m-manylinux1_x86_64.whl
 read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5 -t $threads -s albacore_v0.9.1
 extract_map_and_assemble("albacore_v0.9.1")
 
 
 # Albacore v0.8.4
-cd /home/UNIMELB/inouye-hpc-sa
-pip3 install ont_albacore-0.8.4-cp35-cp35m-manylinux1_x86_64.whl
-cd /home/UNIMELB/inouye-hpc-sa/nanopore-data/albacore_comparison
+pip3 install $albacore_whl_dir/ont_albacore-0.8.4-cp35-cp35m-manylinux1_x86_64.whl
 read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5 -t $threads -s albacore_v0.8.4
 extract_map_and_assemble("albacore_v0.8.4")
