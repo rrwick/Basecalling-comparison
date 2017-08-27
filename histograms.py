@@ -40,11 +40,15 @@ def write_histogram_to_file(filename, bins, bin_size):
     max_bin = max(bins.keys())
     with open(filename, 'wt') as histogram_file:
         histogram_file.write('Bin\tValue\n')
-        for i in range(min_bin, max_bin + bin_size):
-            histogram_file.write(str(i))
+
+        current_bin = min_bin
+        while current_bin <= max_bin:
+            histogram_file.write(str(current_bin))
             histogram_file.write('\t')
-            histogram_file.write(str(bins[i]))
+            histogram_file.write(str(bins[current_bin]))
             histogram_file.write('\n')
+            current_bin += bin_size
+            current_bin = float('%.4f' % current_bin)  # deal with floating point error
 
 
 def round_down(num, step):
