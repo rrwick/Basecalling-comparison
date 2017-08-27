@@ -23,7 +23,10 @@ def main():
             line_parts = line.rstrip().split()
             if line_parts[0] == 'Name':
                 continue
-            name, length, identity, relative_length = line_parts
+            name = line_parts[0]
+            length = int(line_parts[1])
+            identity = float(line_parts[2])
+            relative_length = float(line_parts[3])
 
             identity_bins[round_down(identity, identity_bin_size)] += length
             relative_length_bins[round_down(relative_length, relative_length_bin_size)] += length
