@@ -8,6 +8,10 @@ albacore_v1_1_2=false
 albacore_v1_0_4=false
 albacore_v0_9_1=false
 albacore_v0_8_4=false
+scrappie=false
+nanonet=false
+chiron=false
+
 
 threads=40
 
@@ -22,18 +26,20 @@ nanopolish_scripts_dir=/home/UNIMELB/inouye-hpc-sa/nanopolish/scripts
 
 
 if $gather_fast5s_files; then
-    # Starting with the binned set of reads for this isolate, get a nice subset (with Filtlong) and
-    # copy all of the corresponding fast5 files to a local directory.
+
+    # Starting with the binned set of reads for this isolate, copy all of the corresponding fast5
+    # files to a local directory and then delete the smaller ones.
     mkdir gather_reads
-    filtlong --min_length 1000 --target_bases 500000000 $all_reads > gather_reads/subsampled_reads.fastq
-    grep "^@" gather_reads/subsampled_reads.fastq | grep -P -o "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}" > gather_reads/read_ids
+    zgrep "^@" $all_reads | grep -P -o "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}" > gather_reads/read_ids
     grep -F -f gather_reads/read_ids $albacore_table | grep -o -P "[\w_]+\.fast5" > gather_reads/read_filenames
     find $raw_fast5 -name "*.fast5" > gather_reads/all_read_filenames
     grep -F -f gather_reads/read_filenames gather_reads/all_read_filenames > gather_reads/read_filenames_with_path
     mkdir raw_fast5
     for read in $(cat gather_reads/read_filenames_with_path); do cp $read raw_fast5; done
+    find raw_fast5 -name "*.fast5" -size -100k -delete
     rm -r gather_reads
 fi
+
 
 # This is the reference used to assess the reads and assemblies.
 cp $reference reference.fasta
@@ -60,11 +66,12 @@ extract_map_and_assemble () {
     (head -n 1 "$1"_reads.tsv && tail -n +2 "$1"_reads.tsv | sort) > "$1"_reads_sorted.tsv; mv "$1"_reads_sorted.tsv "$1"_reads.tsv
     python3 histograms.py "$1"_reads.tsv 0.1 0.1 "$1"_read_identity_histogram "$1"_read_relative_length_histogram
 
-    # Trim reads for assembly
+    # Trim and subsample reads for assembly
     porechop -i "$1".fastq.gz -o "$1"_trimmed.fastq.gz --no_split --threads $threads --check_reads 1000
+    filtlong --min_length 1000 --target_bases 500000000 "$1"_trimmed.fastq.gz | gzip > "$1"_subsampled.fastq.gz
 
     # Do a Nanopore-only assembly and get assembly identities
-    unicycler -l "$1"_trimmed.fastq.gz -o "$1"_assembly --threads $threads
+    unicycler -l "$1"_subsampled.fastq.gz -o "$1"_assembly --threads $threads
     cp "$1"_assembly/assembly.fasta "$1"_assembly.fasta
     assembly_identity_distribution "$1"_assembly.fasta "$1"_assembly
 
@@ -114,4 +121,18 @@ if $albacore_v0_8_4; then
     pip3 install $albacore_whl_dir/ont_albacore-0.8.4-cp35-cp35m-manylinux1_x86_64.whl
     read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5 -t $threads -s albacore_v0.8.4
     extract_map_and_assemble "albacore_v0.8.4"
+fi
+
+if $scrappie; then
+    :
+fi
+
+if $nanonet; then
+    cp -r raw_fast5 nanonet
+    nanonetcall --chemistry r9.4 --write_events --min_len 100 --max_len 1000000 --jobs $threads nanonet > /dev/null
+    extract_map_and_assemble "nanonet"
+fi
+
+if $chiron; then
+    :
 fi
