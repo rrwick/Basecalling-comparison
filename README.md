@@ -8,7 +8,7 @@ The included scripts aren't intended for general use (i.e. this isn't a clone-it
 
 If you'd like to try this analysis using the same data, here are the relevant links:
 * [Reference hybrid assembly](https://ndownloader.figshare.com/files/8810704)
-* [Raw fast5 files](https://ndownloader.figshare.com/files/)
+* [Raw fast5 files](https://ndownloader.figshare.com/files/9199063)
 * [Relevant repo/paper](https://github.com/rrwick/Bacterial-genome-assemblies-with-multiplex-MinION-sequencing)
 
 
@@ -19,9 +19,7 @@ If you'd like to try this analysis using the same data, here are the relevant li
 
 I tried a range of versions: 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6, 2.0.0, 2.0.1
 
-The transducer basecaller (helps with homopolymers) was added in v1.0. Event-free basecalling first appears in v2.0. 
-
-I'm not aware of publicly available download links for Albacore – I think you need an account with the [Nanopore community](https://community.nanoporetech.com/) to get them.
+The transducer basecaller (helps with homopolymers) was added in v1.0. Event-free basecalling first appears in v2.0. I think you need an account with the [Nanopore community](https://community.nanoporetech.com/) to get the download links for Albacore.
 
 
 ### Scrappie
