@@ -58,17 +58,23 @@ assembly_identity_distribution() {
 
 extract_map_and_assemble () {
 
-    # Extract fastq from fast5 files
-    fast5_to_fastq.py "$1"/workspace | gzip > "$1".fastq.gz
+     # Some basecallers (e.g. Albacore) produce a directory of fast5s from which we need to extract
+     # a fastq. Others (e.g. Chiron and Scrappie) just produce a fasta.
+    if [ -d "$1" ]; then
+        fast5_to_fastq.py "$1"/workspace | gzip > "$1".fastq.gz
+        basecalled_reads="$1".fastq.gz
+    else
+        basecalled_reads="$1".fasta
+    fi
 
     # Align reads to reference and get reads identities
-    minimap2 -x map10k -t $threads -c reference.fasta "$1".fastq.gz > "$1".paf
+    minimap2 -x map10k -t $threads -c reference.fasta $basecalled_reads > "$1".paf
     python3 read_length_identity.py "$1".paf > "$1"_reads.tsv
     (head -n 1 "$1"_reads.tsv && tail -n +2 "$1"_reads.tsv | sort) > "$1"_reads_sorted.tsv; mv "$1"_reads_sorted.tsv "$1"_reads.tsv
     python3 histograms.py "$1"_reads.tsv 0.1 0.1 "$1"_read_identity_histogram "$1"_read_relative_length_histogram
 
     # Trim and subsample reads for assembly
-    porechop -i "$1".fastq.gz -o "$1"_trimmed.fastq.gz --no_split --threads $threads --check_reads 1000
+    porechop -i $basecalled_reads -o "$1"_trimmed.fastq.gz --no_split --threads $threads --check_reads 1000
     filtlong --min_length 1000 --target_bases 500000000 "$1"_trimmed.fastq.gz | gzip > "$1"_subsampled.fastq.gz
 
     # Do a Nanopore-only assembly and get assembly identities
@@ -131,7 +137,12 @@ if $albacore_v0_8_4; then
 fi
 
 if $scrappie; then
-    :
+    export OMP_NUM_THREADS=$threads
+    export OPENBLAS_NUM_THREADS=1
+    scrappie events albacore_v1.2.6/workspace --threads=$threads --albacore > scrappie_events.fasta
+    extract_map_and_assemble "scrappie_events"
+    scrappie raw raw_fast5 --threads=$threads > scrappie_raw.fasta
+    extract_map_and_assemble "scrappie_raw"
 fi
 
 if $nanonet; then
@@ -141,5 +152,9 @@ if $nanonet; then
 fi
 
 if $chiron; then
-    :
+    source /home/UNIMELB/inouye-hpc-sa/chiron/chiron/bin/activate
+    chiron call -i raw_fast5 -o chiron -t $threads
+    paste --delimiter=\\n --serial chiron/result/*.fasta > chiron.fasta
+    deactivate
+    extract_map_and_assemble "chiron"
 fi
