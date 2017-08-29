@@ -9,7 +9,8 @@ albacore_v1_1_2=false
 albacore_v1_0_4=false
 albacore_v0_9_1=false
 albacore_v0_8_4=false
-scrappie=false
+scrappie_raw=false
+scrappie_events=false
 nanonet=false
 chiron=false
 
@@ -136,13 +137,20 @@ if $albacore_v0_8_4; then
     extract_map_and_assemble "albacore_v0.8.4"
 fi
 
-if $scrappie; then
+if $scrappie_raw; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
-    scrappie events albacore_v1.2.6/workspace --threads=$threads --albacore > scrappie_events.fasta
-    extract_map_and_assemble "scrappie_events"
     scrappie raw raw_fast5 --threads=$threads > scrappie_raw.fasta
     extract_map_and_assemble "scrappie_raw"
+fi
+
+if $scrappie_events; then
+    export OMP_NUM_THREADS=$threads
+    export OPENBLAS_NUM_THREADS=1
+    mkdir albacore_v1.2.6_fast5s
+    for f in $(find albacore_v1.2.6/workspace -name "*.fast5"); do cp $f albacore_v1.2.6_fast5s; done
+    scrappie events albacore_v1.2.6_fast5s --threads=$threads --albacore > scrappie_events.fasta
+    extract_map_and_assemble "scrappie_events"
 fi
 
 if $nanonet; then
