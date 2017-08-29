@@ -15,6 +15,8 @@ If you'd like to try this analysis using the same data, here are the relevant li
 
 # Basecallers tested
 
+For each basecaller I have only used the training models included with the program. Custom training of the neural net is out of scope for this analysis.
+
 ### Albacore
 
 I tried a range of versions: 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6, 2.0.0, 2.0.1
@@ -27,6 +29,8 @@ The transducer basecaller (helps with homopolymers) was added in v1.0. Event-fre
 [Scrappie](https://github.com/nanoporetech/scrappie) is ONT's research basecaller. Successful developments here seem to eventually work their way into Albacore.
 
 I used the [latest commit](https://github.com/nanoporetech/scrappie/commit/16b9f366694689cd51ba1c134444bccc31aa4b80) on the master branch at the time of writing this.
+
+Scrappie can be run as `scrappie raw` or as `scrappie events`. The former can run on a raw fast5s, but the latter relies on preexisting event data in the fast5s. For `scrappie events` I therefore used the fast5s as produced by Albacore 1.2.6 – the last Albacore version to actually define events.
 
 
 ### Nanonet
