@@ -35,19 +35,22 @@ albacore_v2_0_1_nanopolish <- data.frame(Name = numeric(), Length_2.0.1 = numeri
 
 
 # Merge the tables together
-all_reads <- albacore_v1_0_4_reads
+all_reads <- data.frame(Name = character())
+all_reads <- merge(all_reads, albacore_v1_0_4_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v1_1_2_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v1_2_6_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v2_0_0_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v2_0_1_reads, by=1, all=TRUE)
 
-all_assemblies <- albacore_v1_0_4_assembly
+all_assemblies <- data.frame(Name = numeric())
+all_assemblies <- merge(all_assemblies, albacore_v1_0_4_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, albacore_v1_1_2_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, albacore_v1_2_6_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, albacore_v2_0_0_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, albacore_v2_0_1_assembly, by=1, all=TRUE)
 
-all_nanopolish <- albacore_v1_0_4_nanopolish
+all_nanopolish <- data.frame(Name = numeric())
+all_nanopolish <- merge(all_nanopolish, albacore_v1_0_4_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, albacore_v1_1_2_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, albacore_v1_2_6_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, albacore_v2_0_0_nanopolish, by=1, all=TRUE)
@@ -111,6 +114,7 @@ ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + theme_bw() + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(70, 100)) +
   labs(title = "Read identities", x = "", y = "")
 
@@ -118,6 +122,7 @@ ggplot(aligned_proportion, aes(x = Basecaller, y = Unaligned, fill = Basecaller)
   geom_bar(stat="identity", colour="black") +
   fill_scale + theme_bw() + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(0, 0.5)) +
   labs(title = "Unaligned reads", x = "", y = "")
 
@@ -126,20 +131,23 @@ ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Lengt
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + theme_bw() + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 2), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(92, 108)) +
   labs(title = "Relative read lengths", x = "", y = "")
 
 ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(draw_quantiles = c(0.5)) +
-  theme_bw() + guides(fill=FALSE) + 
+  fill_scale + theme_bw() + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(98, 100)) +
   labs(title = "Assembly identities (pre-Nanopolish)", x = "", y = "")
 
 ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(draw_quantiles = c(0.5)) +
-  theme_bw() + guides(fill=FALSE) + 
+  fill_scale + theme_bw() + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(98, 100)) +
   labs(title = "Assembly identities (post-Nanopolish)", x = "", y = "")
 
