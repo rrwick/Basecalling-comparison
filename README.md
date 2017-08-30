@@ -89,6 +89,11 @@ The absolute read lengths from one basecaller to another are quite similar, as y
 ### Post-Nanopolish assembly identity
 
 
+### Performance
+
+I didn't try to quantify CPU time or memory, but roughly speaking, Albacore versions 1.1 and later were the fastest. Chiron was by far the slowest, but that is largely because I ran it using CPUs – the [Chiron paper](http://www.biorxiv.org/content/early/2017/08/24/179531) shows that it runs significantly faster on GPUs.
+
+
 
 # Conclusions
 
