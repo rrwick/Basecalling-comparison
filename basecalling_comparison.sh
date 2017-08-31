@@ -53,7 +53,8 @@ assembly_identity_distribution() {
     python3 chop_up_assembly.py "$1" 10000 > "$2"_pieces.fasta
     minimap2 -x map10k -t $threads -c reference.fasta "$2"_pieces.fasta > "$2".paf
     python3 read_length_identity.py "$2".paf > "$2".tsv
-    python3 histograms.py "$2".tsv 0.1 0.1 "$2"_identity_histogram "$2"_relative_length_histogram
+    # python3 histograms.py "$2".tsv 0.1 0.1 "$2"_identity_histogram "$2"_relative_length_histogram
+    rm "$2"_pieces.fasta
 }
 
 
@@ -88,6 +89,7 @@ extract_map_and_assemble () {
     nanopolish extract --type template --recurse "$1"/workspace > "$1"_nanopolish/reads.fa
     bwa index "$1"_assembly.fasta
     bwa mem -x ont2d -t $threads "$1"_assembly.fasta "$1"_nanopolish/reads.fa | samtools sort -o "$1"_nanopolish/reads.sorted.bam -T reads.tmp -
+    rm "$1"_assembly.fasta.*  # clean up BWA index files
     samtools index "$1"_nanopolish/reads.sorted.bam
     python nanopolish_makerange.py "$1"_assembly.fasta | parallel --results "$1"_nanopolish/nanopolish.results -P 10 nanopolish variants --consensus "$1"_nanopolish/polished.{1}.fa -w {1} -r "$1"_nanopolish/reads.fa -b "$1"_nanopolish/reads.sorted.bam -g "$1"_assembly.fasta -t 4 --min-candidate-frequency 0.1
     python nanopolish_merge.py "$1"_nanopolish/polished.*.fa > "$1"_nanopolished_assembly.fasta
@@ -154,8 +156,8 @@ if $scrappie_events; then
 fi
 
 if $nanonet; then
-    cp -r raw_fast5 nanonet
-    nanonetcall --chemistry r9.4 --write_events --min_len 100 --max_len 1000000 --jobs $threads nanonet > /dev/null
+    cp -r raw_fast5 nanonet  # Nanonet adds data to the fast5s, so we first make a copy.
+    nanonetcall --chemistry r9.4 --write_events --min_len 1 --max_len 1000000 --jobs $threads nanonet > /dev/null
     extract_map_and_assemble "nanonet"
 fi
 
