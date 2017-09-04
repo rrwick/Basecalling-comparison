@@ -77,6 +77,11 @@ colnames(assembly_identities) <- c("Name", "Length", basecaller_names)
 assembly_identities <- melt(assembly_identities, id=c("Name", "Length"))
 colnames(assembly_identities) <- c("Read_name", "Length", "Basecaller", "Identity")
 
+assembly_rel_lengths <- all_assemblies[,c("Name", "Length_2.0.1", basecaller_rel_lengths)]
+colnames(assembly_rel_lengths) <- c("Name", "Length", basecaller_names)
+assembly_rel_lengths <- melt(assembly_rel_lengths, id=c("Name", "Length"))
+colnames(assembly_rel_lengths) <- c("Read_name", "Length", "Basecaller", "Relative_length")
+
 nanopolish_identities <- all_nanopolish[,c("Name", "Length_1.2.6", basecaller_identities)]
 colnames(nanopolish_identities) <- c("Name", "Length", basecaller_names)
 nanopolish_identities <- melt(nanopolish_identities, id=c("Name", "Length"))
@@ -108,16 +113,7 @@ aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Albacore v2.0.1"), Aligned = albacore_v2_0_1_aligned, Unaligned = albacore_v2_0_1_unaligned))
 
 
-
-# Plots!
-ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(draw_quantiles = c(0.5)) +
-  fill_scale + theme_bw() + guides(fill=FALSE) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
-  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(70, 100)) +
-  labs(title = "Read identities", x = "", y = "")
-
+# Bar plot of unaligned fraction
 ggplot(aligned_proportion, aes(x = Basecaller, y = Unaligned, fill = Basecaller)) +
   geom_bar(stat="identity", colour="black") +
   fill_scale + theme_bw() + guides(fill=FALSE) +
@@ -125,6 +121,17 @@ ggplot(aligned_proportion, aes(x = Basecaller, y = Unaligned, fill = Basecaller)
   scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(0, 0.5)) +
   labs(title = "Unaligned reads", x = "", y = "")
+
+
+
+# Violin plots
+ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  geom_violin(draw_quantiles = c(0.5)) +
+  fill_scale + theme_bw() + guides(fill=FALSE) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
+  coord_cartesian(ylim=c(70, 100)) +
+  labs(title = "Read identities", x = "", y = "")
 
 ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
   geom_hline(yintercept = 100) + 
@@ -143,6 +150,15 @@ ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, f
   coord_cartesian(ylim=c(98, 100)) +
   labs(title = "Assembly identities (pre-Nanopolish)", x = "", y = "")
 
+ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
+  geom_hline(yintercept = 100) + 
+  geom_violin(draw_quantiles = c(0.5)) +
+  fill_scale + theme_bw() + guides(fill=FALSE) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 2), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
+  coord_cartesian(ylim=c(98, 102)) +
+  labs(title = "Relative assembly lengths", x = "", y = "")
+
 ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + theme_bw() + guides(fill=FALSE) + 
@@ -151,3 +167,33 @@ ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight =
   coord_cartesian(ylim=c(98, 100)) +
   labs(title = "Assembly identities (post-Nanopolish)", x = "", y = "")
 
+
+
+
+# # Joyplots
+#
+# library(ggjoy)
+#
+# ggplot(read_identities, aes(x = Identity, y = Basecaller, weight = Length, fill = Basecaller)) +
+#   geom_joy(scale = 0.9, draw_quantiles = c(0.5)) +
+#   fill_scale + theme_bw() + guides(fill=FALSE) + theme(axis.text.y = element_text(vjust = 0)) +
+#   scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+#   scale_y_discrete(expand = c(0.05, 0)) +
+#   coord_cartesian(xlim=c(70, 100)) +
+#   labs(title = "Read identities", x = "", y = "")
+#
+# ggplot(assembly_identities, aes(x = Identity, y = Basecaller, weight = Length, fill = Basecaller)) +
+#   geom_joy(scale = 1.0, draw_quantiles = c(0.5)) +
+#   fill_scale + theme_bw() + guides(fill=FALSE) + theme(axis.text.y = element_text(vjust = 0)) +
+#   scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+#   scale_y_discrete(expand = c(0.05, 0)) +
+#   coord_cartesian(xlim=c(98, 100)) +
+#   labs(title = "Assembly identities (pre-Nanopolish)", x = "", y = "")
+#
+# ggplot(nanopolish_identities, aes(x = Identity, y = Basecaller, weight = Length, fill = Basecaller)) +
+#   geom_joy(scale = 0.9, draw_quantiles = c(0.5)) +
+#   fill_scale + theme_bw() + guides(fill=FALSE) + theme(axis.text.y = element_text(vjust = 0)) +
+#   scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+#   scale_y_discrete(expand = c(0.05, 0)) +
+#   coord_cartesian(xlim=c(98, 100)) +
+#   labs(title = "Assembly identities (post-Nanopolish)", x = "", y = "")
