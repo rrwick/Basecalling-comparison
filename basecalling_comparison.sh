@@ -9,8 +9,10 @@ albacore_v1_1_2=false
 albacore_v1_0_4=false
 albacore_v0_9_1=false
 albacore_v0_8_4=false
-scrappie_raw=false
-scrappie_events=false
+scrappie_v1_1_0_raw=false
+scrappie_v1_1_0_events=false
+scrappie_v1_0_0_raw=false
+scrappie_v1_0_0_events=false
 nanonet=false
 chiron=false
 
@@ -25,6 +27,8 @@ albacore_table=/MDHS/Research/SysGen-Lab/MinION/2017-04-24_Kleb_barcode/nanopore
 reference=/MDHS/Research/SysGen-Lab/Long_read_assembly/Kleb_INF042/Kleb_INF042.fasta
 albacore_whl_dir=/home/UNIMELB/inouye-hpc-sa
 nanopolish_scripts_dir=/home/UNIMELB/inouye-hpc-sa/nanopolish/scripts
+scrappie_v1_0_0_path=/home/UNIMELB/inouye-hpc-sa/scrappie-release-1.0.0/build
+scrappie_v1_1_0_path=/home/UNIMELB/inouye-hpc-sa/scrappie-release-1.1.0/build
 
 
 if $gather_fast5s_files; then
@@ -53,7 +57,6 @@ assembly_identity_distribution() {
     python3 chop_up_assembly.py "$1" 10000 > "$2"_pieces.fasta
     minimap2 -x map10k -t $threads -c reference.fasta "$2"_pieces.fasta > "$2".paf
     python3 read_length_identity.py "$2".paf > "$2".tsv
-    # python3 histograms.py "$2".tsv 0.1 0.1 "$2"_identity_histogram "$2"_relative_length_histogram
     rm "$2"_pieces.fasta
 }
 
@@ -77,10 +80,10 @@ extract_map_and_assemble () {
 
     # Trim and subsample reads for assembly
     porechop -i $basecalled_reads -o "$1"_trimmed.fastq.gz --no_split --threads $threads --check_reads 1000
-    filtlong --min_length 1000 --target_bases 500000000 "$1"_trimmed.fastq.gz | gzip > "$1"_subsampled.fastq.gz
+    # filtlong --min_length 1000 --target_bases 500000000 "$1"_trimmed.fastq.gz | gzip > "$1"_subsampled.fastq.gz
 
     # Do a Nanopore-only assembly and get assembly identities
-    unicycler -l "$1"_subsampled.fastq.gz -o "$1"_assembly --threads $threads
+    unicycler -l "$1"_trimmed.fastq.gz -o "$1"_assembly --threads $threads
     cp "$1"_assembly/assembly.fasta "$1"_assembly.fasta
     assembly_identity_distribution "$1"_assembly.fasta "$1"_assembly
 
@@ -139,20 +142,34 @@ if $albacore_v0_8_4; then
     extract_map_and_assemble "albacore_v0.8.4"
 fi
 
-if $scrappie_raw; then
+if $scrappie_v1_0_0_raw; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
-    scrappie raw raw_fast5 --threads=$threads > scrappie_raw.fasta
-    extract_map_and_assemble "scrappie_raw"
+    $scrappie_v1_0_0_path/scrappie raw raw_fast5 --threads=$threads > scrappie_v1_0_0_raw.fasta
+    extract_map_and_assemble "scrappie_v1_0_0_raw"
 fi
 
-if $scrappie_events; then
+if $scrappie_v1_0_0_events; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
     mkdir albacore_v1.2.6_fast5s
     for f in $(find albacore_v1.2.6/workspace -name "*.fast5"); do cp $f albacore_v1.2.6_fast5s; done
-    scrappie events albacore_v1.2.6_fast5s --threads=$threads --albacore > scrappie_events.fasta
-    extract_map_and_assemble "scrappie_events"
+    $scrappie_v1_0_0_path/scrappie events albacore_v1.2.6_fast5s --threads=$threads --albacore > scrappie_v1_0_0_events.fasta
+    extract_map_and_assemble "scrappie_v1_0_0_events"
+fi
+
+if $scrappie_v1_1_0_raw; then
+    export OMP_NUM_THREADS=$threads
+    export OPENBLAS_NUM_THREADS=1
+    $scrappie_v1_1_0_path/scrappie raw raw_fast5 --threads=$threads > scrappie_v1_1_0_raw.fasta
+    extract_map_and_assemble "scrappie_v1_1_0_raw"
+fi
+
+if $scrappie_v1_1_0_events; then
+    export OMP_NUM_THREADS=$threads
+    export OPENBLAS_NUM_THREADS=1
+    $scrappie_v1_1_0_path/scrappie events raw_fast5 --threads=$threads --albacore > scrappie_v1_1_0_events.fasta
+    extract_map_and_assemble "scrappie_v1_1_0_events"
 fi
 
 if $nanonet; then
