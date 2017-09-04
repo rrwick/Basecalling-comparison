@@ -154,9 +154,9 @@ ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = L
   geom_hline(yintercept = 100) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + theme_bw() + guides(fill=FALSE) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 2), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 0.5), minor_breaks = seq(0, 200, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) sub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(98, 102)) +
+  coord_cartesian(ylim=c(99, 101)) +
   labs(title = "Relative assembly lengths", x = "", y = "")
 
 ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight = Length, fill = Basecaller)) + 
