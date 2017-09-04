@@ -80,7 +80,7 @@ extract_map_and_assemble () {
 
     # Trim and subsample reads for assembly
     porechop -i $basecalled_reads -o "$1"_trimmed.fastq.gz --no_split --threads $threads --check_reads 1000
-    filtlong -1 illumina_1.fastq.gz -2 illumina_2.fastq.gz --min_length 1000 --target_bases 500000000 "$1"_trimmed.fastq.gz | gzip > "$1"_subsampled.fastq.gz
+    filtlong -1 illumina_1.fastq.gz -2 illumina_2.fastq.gz --min_length 1000 --target_bases 500000000 --trim --split 250 "$1"_trimmed.fastq.gz | gzip > "$1"_subsampled.fastq.gz
 
     # Do a Nanopore-only assembly and get assembly identities
     unicycler -l "$1"_subsampled.fastq.gz -o "$1"_assembly --threads $threads
