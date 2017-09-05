@@ -17,32 +17,29 @@ If you'd like to try this analysis using the same data, here are the relevant li
 
 For each basecaller I have only used the training models included with the program. Custom training of the neural net is out of scope for this analysis.
 
+
+### Nanonet
+
+[Nanonet](https://github.com/nanoporetech/nanonet) is ONT's first generation neural network basecaller. I used the most [latest commit](https://github.com/nanoporetech/nanonet/commit/a5a832bb3c82fbde091554142fab491d4bec2664) (at the time of writing) on the master branch. This seems to be functionally identical to v2.0.0, so that's what I've called it below. Nanonet no longer appears to be under active development, so this may be the last version.
+
+
 ### Albacore
 
-Versions tested: 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6, 2.0.0, 2.0.1
+Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6 and 2.0.1.
 
 The transducer basecaller (helps with homopolymers) was added in v1.0. Event-free basecalling first appears in v2.0. I think you need an account with the [Nanopore community](https://community.nanoporetech.com/) to get the download links for Albacore.
 
 
 ### Scrappie
 
-[Scrappie](https://github.com/nanoporetech/scrappie) is ONT's research basecaller. Successful developments here seem to eventually work their way into Albacore.
+[Scrappie](https://github.com/nanoporetech/scrappie) is ONT's research basecaller. Successful developments here seem to eventually work their way into Albacore. I tested versions 1.0.0 and 1.1.0.
 
-Versions tested: 1.0.0, 1.1.0
-
-Scrappie can be run as `scrappie raw` or as `scrappie events`. For Scrappie v1.0.0, running as `scrappie events` relies on preexisting event data in the fast5s. I therefore used the fast5s as produced by Albacore 1.2.6 – the last Albacore version to actually define events.
-
-
-### Nanonet
-
-[Nanonet](https://github.com/nanoporetech/nanonet) is ONT's first generation neural network basecaller.
-
-I used the [latest commit](https://github.com/nanoporetech/nanonet/commit/a5a832bb3c82fbde091554142fab491d4bec2664) on the master branch at the time of writing this.
+Scrappie can be run as `scrappie events` (where it basecalls from event segmentation) or as `scrappie raw` (where it basecalls directly from the raw signal). For Scrappie v1.0.0, running as `scrappie events` relies on preexisting event data in the fast5s. For that test I used the fast5s as produced by Albacore 1.2.6 – the last Albacore version to do event segmentation.
 
 
 ### Chiron
 
-[Chiron](https://github.com/haotianteng/chiron) is a new third-party neural-network basecaller. I used the [latest commit](https://github.com/haotianteng/chiron/commit/5914d6cdfa59e8b7299c55ca9ed4d0115d3a3626) on the master branch at the time of writing this.
+[Chiron](https://github.com/haotianteng/chiron) is a third-party neural-network basecaller. The first release (v0.1) did not work on my reads (`extract_sig_ref.py` failed to get the signal from the fast5 files) so I instead used the [latest commit](https://github.com/haotianteng/chiron/commit/847ad101d338a253a7dfed2023c3ed8758886e7e) (at the time of writing) on the master branch.
 
 
 
@@ -50,9 +47,9 @@ I used the [latest commit](https://github.com/nanoporetech/nanonet/commit/a5a832
 
 ### Basecalling
 
-My sample data is from a barcoded run, so I first collected just the fast5 files which I had previously binned to the appropriate sample. I also tossed out any fast5 files less than 100 kb in size – this was to subsample for longer reads in a manner that's hopefully not biased towards any particular basecaller.
+My sample data is from a barcoded run, so I first collected the fast5 files which I had previously binned to the appropriate sample. I also tossed out any fast5 files less than 100 kb in size – this was to subsample for longer reads in a manner that's hopefully not biased towards any particular basecaller.
 
-The commands to do basecalling vary depending on the program. Where possible I basecalled to fast5 files so I could later use Nanopolish. To extract a fastq from the fast5s, I used my own script [`fast5_to_fastq.py`](https://github.com/rrwick/Fast5-to-Fastq), but many other tools exist to do the same job.
+The commands to do basecalling vary depending on the program. Where possible I basecalled to fast5 files so I could later use Nanopolish. Whenever low-level tuning parameters were available, I stuck with the defaults. To extract a fastq from the fast5s, I used my own script [`fast5_to_fastq.py`](https://github.com/rrwick/Fast5-to-Fastq), but many other tools exist to do the same job.
 
 
 ### Read identity
@@ -62,12 +59,11 @@ To assess read identity, I aligned the reads to the reference using [minimap2](h
 
 ### Assembly identity
 
-Before assembly, I used [Porechop](https://github.com/rrwick/Porechop) and [Filtlong](https://github.com/rrwick/Filtlong) to clean up the read set. I then assembled with [Unicycler](https://github.com/rrwick/Unicycler). Unicycler conducts multiple rounds of [Racon](https://github.com/isovic/racon), so the final assembly accuracy is defined by the Racon consensus (which in my experience is a bit higher accuracy than a [Canu](https://github.com/marbl/canu) assembly).
+Before assembly, I used [Porechop](https://github.com/rrwick/Porechop) and [Filtlong](https://github.com/rrwick/Filtlong) to clean up the read set*. I then assembled with [Unicycler](https://github.com/rrwick/Unicycler). Unicycler conducts multiple rounds of [Racon](https://github.com/isovic/racon), so the final assembly accuracy is defined by the Racon consensus (which in my experience is a bit higher accuracy than a [Canu](https://github.com/marbl/canu) assembly).
 
-To get a distribution of assembly identity, I used [`chop_up_assembly.py`](chop_up_assembly.py) to divide the assembly into 10 kbp 'reads' which were assessed in the same way as the actual reads ([`read_length_identity.py`](read_length_identity.py)).
+To get a distribution of assembly identity, I used [`chop_up_assembly.py`](chop_up_assembly.py) to divide the assembly into 10 kbp 'reads' which were assessed in the same way as the actual reads ([`read_length_identity.py`](read_length_identity.py)). When possible, I then used [Nanopolish](https://github.com/jts/nanopolish) [v0.7.1](https://github.com/jts/nanopolish/releases/tag/v0.7.1) to improve the assembly and assessed identity again.
 
-When possible, I then used [Nanopolish](https://github.com/jts/nanopolish) [v0.7.1](https://github.com/jts/nanopolish/releases/tag/v0.7.1) to improve the assembly and assessed identity again. This was only possible with some of the basecallers.
-
+> <sup>* I did use Filtlong's reference-based mode (using Illumina reads) with trimming and splitting, so this assembly isn't _truly_ ONT-only. However, I found that doing so led to more consistent assemblies (always getting one contig per replicon) which made it a lot easier to compare them.</sup>
 
 
 # Results
@@ -91,7 +87,7 @@ The absolute read lengths from one basecaller to another are quite similar, as y
 
 ### Performance
 
-I didn't try to quantify CPU time or memory, but roughly speaking, Albacore versions 1.1 and later were the fastest. Chiron was by far the slowest, but that is largely because I ran it using CPUs – the [Chiron paper](http://www.biorxiv.org/content/early/2017/08/24/179531) shows that it runs significantly faster on GPUs.
+I didn't try to quantify CPU time or memory, but roughly speaking, Albacore versions 1.1 and later were the fastest. Chiron was the slowest, but that is largely because I ran it using CPUs – the [Chiron paper](http://www.biorxiv.org/content/early/2017/08/24/179531) shows that it runs significantly faster on GPUs.
 
 
 
