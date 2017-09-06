@@ -11,18 +11,18 @@ basecaller_names <- c("Nanonet v2.0.0",
                       "Scrappie events v1.0.0", "Scrappie raw v1.0.0", "Scrappie events v1.1.0", "Scrappie raw v1.1.0",
                       "Chiron (847ad10)")
 basecaller_colours <- c("#73B165",                                   # Nanonet colour
-                        brewer.pal(6, "YlOrRd"),                     # Albacore colours
+                        brewer.pal(9, "Reds")[2:7],                  # Albacore colours
                         "#9E9AC8", "#C09AC8", "#7F77B1", "#A56BB1",  # Scrappie colours
                         "#639CB1")                                   # Chiron colour
-names(basecaller_colours) <- levels(as.factor(basecaller_names))
+names(basecaller_colours) <- basecaller_names
 fill_scale <- scale_fill_manual(name = "Basecaller", values = basecaller_colours)
 
 
 
 # Load the tables
 nanonet_reads <- data.frame(Name = numeric(), Length_Nanonet = numeric(), Identity_Nanonet = numeric(), Rel_len_Nanonet = numeric())  # temporary empty table
-albacore_v0.8.4_reads <- data.frame(Name = numeric(), Length_0.8.4 = numeric(), Identity_0.8.4 = numeric(), Rel_len_0.8.4 = numeric())  # temporary empty table
-albacore_v0.9.1_reads <- data.frame(Name = numeric(), Length_0.9.1 = numeric(), Identity_0.9.1 = numeric(), Rel_len_0.9.1 = numeric())  # temporary empty table
+albacore_v0.8.4_reads <- read_tsv("results/albacore_v0.8.4_reads.tsv", skip = 1, col_names = c("Name", "Length_0.8.4", "Identity_0.8.4", "Rel_len_0.8.4"))
+albacore_v0.9.1_reads <- read_tsv("results/albacore_v0.9.1_reads.tsv", skip = 1, col_names = c("Name", "Length_0.9.1", "Identity_0.9.1", "Rel_len_0.9.1"))
 albacore_v1.0.4_reads <- read_tsv("results/albacore_v1.0.4_reads.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
 albacore_v1.1.2_reads <- read_tsv("results/albacore_v1.1.2_reads.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
 albacore_v1.2.6_reads <- read_tsv("results/albacore_v1.2.6_reads.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
@@ -34,8 +34,8 @@ scrappie_raw_v1.1.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_1.
 chiron_reads <- data.frame(Name = numeric(), Length_Chiron = numeric(), Identity_Chiron = numeric(), Rel_len_Chiron = numeric())  # temporary empty table
 
 nanonet_assembly <- data.frame(Name = numeric(), Length_Nanonet = numeric(), Identity_Nanonet = numeric(), Rel_len_Nanonet = numeric())  # temporary empty table
-albacore_v0.8.4_assembly <- data.frame(Name = numeric(), Length_0.8.4 = numeric(), Identity_0.8.4 = numeric(), Rel_len_0.8.4 = numeric())  # temporary empty table
-albacore_v0.9.1_assembly <- data.frame(Name = numeric(), Length_0.9.1 = numeric(), Identity_0.9.1 = numeric(), Rel_len_0.9.1 = numeric())  # temporary empty table
+albacore_v0.8.4_assembly <- read_tsv("results/albacore_v0.8.4_assembly.tsv", skip = 1, col_names = c("Name", "Length_0.8.4", "Identity_0.8.4", "Rel_len_0.8.4"))
+albacore_v0.9.1_assembly <- read_tsv("results/albacore_v0.9.1_assembly.tsv", skip = 1, col_names = c("Name", "Length_0.9.1", "Identity_0.9.1", "Rel_len_0.9.1"))
 albacore_v1.0.4_assembly <- read_tsv("results/albacore_v1.0.4_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
 albacore_v1.1.2_assembly <- read_tsv("results/albacore_v1.1.2_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
 albacore_v1.2.6_assembly <- read_tsv("results/albacore_v1.2.6_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
@@ -203,9 +203,9 @@ my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
 ggplot(aligned_proportion, aes(x = Basecaller, y = Unaligned, fill = Basecaller)) +
   geom_bar(stat="identity", colour="black") +
   fill_scale + my_theme + guides(fill=FALSE) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.1), minor_breaks = seq(0, 100, 0.01), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(0, 0.5)) +
+  coord_cartesian(ylim=c(0, 5.0)) +
   labs(title = "Unaligned reads", x = "", y = "")
 
 
@@ -216,7 +216,7 @@ ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill 
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(70, 100)) +
+  coord_cartesian(ylim=c(65, 100)) +
   labs(title = "Read identities", x = "", y = "")
 
 ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
@@ -225,7 +225,7 @@ ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Lengt
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 2), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(92, 108)) +
+  coord_cartesian(ylim=c(90, 110)) +
   labs(title = "Relative read lengths", x = "", y = "")
 
 ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
@@ -233,7 +233,7 @@ ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, f
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(98, 100)) +
+  coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "Assembly identities (pre-Nanopolish)", x = "", y = "")
 
 ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
@@ -242,7 +242,7 @@ ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = L
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 0.5), minor_breaks = seq(0, 200, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(99, 101)) +
+  coord_cartesian(ylim=c(98.5, 101.5)) +
   labs(title = "Relative assembly lengths", x = "", y = "")
 
 ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight = Length, fill = Basecaller)) + 
@@ -250,7 +250,7 @@ ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight =
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(98, 100)) +
+  coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "Assembly identities (post-Nanopolish)", x = "", y = "")
 
 
@@ -283,3 +283,38 @@ ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight =
 #   scale_y_discrete(expand = c(0.05, 0)) +
 #   coord_cartesian(xlim=c(98, 100)) +
 #   labs(title = "Assembly identities (post-Nanopolish)", x = "", y = "")
+
+
+
+
+
+
+# This code produces a single plot made of two violin plots:
+# * one for the majority of the read identity at the top of the range
+# * one for the unaligned reads at the bottom of the range
+
+library(gridExtra)
+
+p1 <- ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  geom_violin(draw_quantiles = c(0.5)) +
+  fill_scale + my_theme + guides(fill=FALSE) +
+  theme(axis.ticks.x = element_blank()) + 
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=NULL) +
+  coord_cartesian(ylim=c(65, 100)) +
+  labs(title = "Read identities", x = "", y = "")
+
+p2 <- ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  geom_violin(draw_quantiles = c(0.5)) +
+  fill_scale + my_theme + guides(fill=FALSE) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
+  coord_cartesian(ylim=c(0, 5)) +
+  labs(x = "", y = "")
+
+gA <- ggplot_gtable(ggplot_build(p1))
+gB <- ggplot_gtable(ggplot_build(p2))
+maxWidth = grid::unit.pmax(gA$widths[2:3], gB$widths[2:3])
+gA$widths[2:3] <- as.list(maxWidth)
+gB$widths[2:3] <- as.list(maxWidth)
+grid.arrange(gA, gB, ncol=1, heights=c(3.5, 1))
