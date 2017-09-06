@@ -2,6 +2,7 @@
 
 
 gather_fast5s_files=false
+albacore_v2_0_2=false
 albacore_v2_0_1=false
 albacore_v2_0_0=false
 albacore_v1_2_6=false
