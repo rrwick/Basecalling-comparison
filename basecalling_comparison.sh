@@ -100,6 +100,13 @@ extract_map_and_assemble () {
 }
 
 
+
+if $albacore_v2_0_2; then
+    pip3 install $albacore_whl_dir/ont_albacore-2.0.2-cp35-cp35m-manylinux1_x86_64.whl
+    read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v2.0.1 -o fast5 --disable_filtering
+    extract_map_and_assemble "albacore_v2.0.2"
+fi
+
 if $albacore_v2_0_1; then
     pip3 install $albacore_whl_dir/ont_albacore-2.0.1-cp35-cp35m-manylinux1_x86_64.whl
     read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5 -t $threads -s albacore_v2.0.1 -o fast5 --disable_filtering

@@ -1,6 +1,8 @@
 <p align="center"><img src="images/logo.png" alt="logo" width="100%"></p>
 
-This repo is something of a blog plot and aims to compare available basecallers for Oxford Nanopore data. Basecallers, for those not familiar, are the programs which translate the raw electrical signal from an Oxford Nanopore sequencer to a sequence. It's not an easy task, and modern basecallers all seem to tackle this problem using neural networks.
+This repo aims to compare available basecallers for Oxford Nanopore data. Basecallers, for those not familiar, are the programs which translate the raw electrical signal from an Oxford Nanopore sequencer to a sequence. It's not an easy task, and modern basecallers all seem to tackle this problem using neural networks.
+
+In particular, I'm hoping to answer the question: _Should I go back to old reads and re-basecall them?_ If basecallers improve enough, it might be worth it for the better reads. But that would take a lot of CPU time, so I don't want to do it unless there's a real benefit to be had.
 
 For each basecaller, I assess the accuracy of the reads and the accuracy of an assembly. Read accuracy is interesting for obvious reasons – more accurate reads are nice! Assembly accuracy is also interesting because it provides a window into the nature of the basecalling errors. For example, consider a hypothetical set of reads with a mediocre accuracy of 85% but a truly random error profile (i.e. no systematic error). Despite their error rate, these reads could result in a perfect assembly because their errors are all 'averaged out' in the consensus. In contrast, now consider a set of reads with an excellent 98% accuracy but they all make the _same mistakes_ (i.e. error is all systematic, not random). The resulting assembly will also have a 98% error rate. Which read set is better? That probably depends on how you're using them, but in my line of work (assembly), I'd much prefer the first.
 
@@ -93,3 +95,4 @@ I didn't try to quantify CPU time or memory, but roughly speaking, Albacore vers
 
 # Conclusions
 
+Did I miss 
