@@ -24,12 +24,34 @@ For each basecaller I have only used the training models included with the progr
 
 [Nanonet](https://github.com/nanoporetech/nanonet) is ONT's first generation neural network basecaller. I used the most [latest commit](https://github.com/nanoporetech/nanonet/commit/a5a832bb3c82fbde091554142fab491d4bec2664) (at the time of writing) on the master branch. This seems to be functionally identical to v2.0.0, so that's what I've called it below. Nanonet no longer appears to be under active development, so this may be the last version.
 
+```
+nanonetcall --chemistry r9.4 --write_events --min_len 1 --max_len 1000000 --jobs 40 raw_fast5_dir > /dev/null
+```
+The `--min_len` and `--max_len` options were set so Nanonet wouldn't skip any reads. While Nanonet outputs its basecalls to stdout in fasta format, I've ignored that and instead used the `--write_events` options so it stores fastq basecalls in the fast5 files, which I can extract later. Unlike Albacore, which makes a copy of fast5 files, Nanonet modifies the original ones in the `raw_fast5_dir` directory.
+
+
 
 ### Albacore
 
-Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6 and 2.0.1.
+Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6 and 2.0.1. The transducer basecaller (helps with homopolymers) was added in v1.0. Event-free basecalling first appears in v2.0. I think you need an account with the [Nanopore community](https://community.nanoporetech.com/) to get the download links for Albacore.
 
-The transducer basecaller (helps with homopolymers) was added in v1.0. Event-free basecalling first appears in v2.0. I think you need an account with the [Nanopore community](https://community.nanoporetech.com/) to get the download links for Albacore.
+The command used depends a bit on the version:
+```
+# Albacore v0.8.4 and v0.9.1:
+read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5_dir -t 40 -s output_dir
+
+# Albacore v1.0.4:
+read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5_dir -t 40 -s output_dir
+
+# Albacore v1.1.2 and v1.2.6:
+read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5_dir -t 40 -s output_dir -o fast5
+
+# Albacore v2.0.2:
+read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5_dir -t 40 -s output_dir -o fast5 --disable_filtering
+```
+
+Albacore v1.1 and later can basecall directly to fastq file (with `-o fastq`, which is usually a lot more convenient. For this experiment I continued to basecall to fast5 files just to keep my analysis options open.
+
 
 
 ### Scrappie
@@ -69,6 +91,12 @@ To get a distribution of assembly identity, I used [`chop_up_assembly.py`](chop_
 
 
 # Results
+
+
+### Basecaller differences
+
+Nanonet is screwy: usually giving very truncated versions of reads. Example: d2e65643-98b4-4a61-ad36-119e55250b28. It produced a 518 bp sequence. All versions of Albacore produced a sequence over 30 kbp.
+
 
 ### Read identity
 

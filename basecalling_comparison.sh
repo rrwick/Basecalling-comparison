@@ -64,7 +64,7 @@ assembly_identity_distribution() {
 
 extract_map_and_assemble () {
 
-     # Some basecallers (e.g. Albacore) produce a directory of fast5s from which we need to extract
+     # Some basecallers (e.g. Albacore, Nanonet) produce a directory of fast5s from which we need to extract
      # a fastq. Others (e.g. Chiron and Scrappie) just produce a fasta.
     if [ -d "$1" ]; then
         fast5_to_fastq.py "$1"/workspace | gzip > "$1".fastq.gz
@@ -76,8 +76,7 @@ extract_map_and_assemble () {
     # Align reads to reference and get reads identities
     minimap2 -x map10k -t $threads -c reference.fasta $basecalled_reads > "$1".paf
     python3 read_length_identity.py "$1".paf > "$1"_reads.tsv
-    (head -n 1 "$1"_reads.tsv && tail -n +2 "$1"_reads.tsv | sort) > "$1"_reads_sorted.tsv; mv "$1"_reads_sorted.tsv "$1"_reads.tsv
-    python3 histograms.py "$1"_reads.tsv 0.1 0.1 "$1"_read_identity_histogram "$1"_read_relative_length_histogram
+    (head -n 1 "$1"_reads.tsv && tail -n +2 "$1"_reads.tsv | sort) > "$1"_reads_sorted.tsv; mv "$1"_reads_sorted.tsv "$1"_reads.tsv  # Sort reads.tsv
 
     # Trim and subsample reads for assembly
     porechop -i $basecalled_reads -o "$1"_trimmed.fastq.gz --no_split --threads $threads --check_reads 1000
@@ -90,14 +89,16 @@ extract_map_and_assemble () {
 
     # Improve the assembly with Nanopolish and get assembly identities again
     mkdir "$1"_nanopolish
-    nanopolish extract --type template --recurse "$1"/workspace > "$1"_nanopolish/reads.fa
+    nanopolish index -d raw_fast5 $basecalled_reads
+    nanopolish_reads="$basecalled_reads".fa.gz
     bwa index "$1"_assembly.fasta
-    bwa mem -x ont2d -t $threads "$1"_assembly.fasta "$1"_nanopolish/reads.fa | samtools sort -o "$1"_nanopolish/reads.sorted.bam -T reads.tmp -
+    bwa mem -x ont2d -t $threads "$1"_assembly.fasta $nanopolish_reads | samtools sort -o "$nanopolish_reads".bam -T reads.tmp -
     rm "$1"_assembly.fasta.*  # clean up BWA index files
     samtools index "$1"_nanopolish/reads.sorted.bam
     python nanopolish_makerange.py "$1"_assembly.fasta | parallel --results "$1"_nanopolish/nanopolish.results -P 10 nanopolish variants --consensus "$1"_nanopolish/polished.{1}.fa -w {1} -r "$1"_nanopolish/reads.fa -b "$1"_nanopolish/reads.sorted.bam -g "$1"_assembly.fasta -t 4 --min-candidate-frequency 0.1
     python nanopolish_merge.py "$1"_nanopolish/polished.*.fa > "$1"_nanopolished_assembly.fasta
     assembly_identity_distribution "$1"_nanopolished_assembly.fasta "$1"_nanopolished_assembly
+    rm $nanopolish_reads "$nanopolish_reads".*  # Clean up Nanopolish files
 }
 
 
@@ -184,6 +185,19 @@ if $nanonet; then
     cp -r raw_fast5 nanonet  # Nanonet adds data to the fast5s, so we first make a copy.
     nanonetcall --chemistry r9.4 --write_events --min_len 1 --max_len 1000000 --jobs $threads nanonet > /dev/null
     extract_map_and_assemble "nanonet"
+
+    # Nanonet names its reads differently from Albacore. It uses fast5 filenames while Albacore uses read ids.
+    # This messes up merging tables in R, so replace the names in the Nanonet read table.
+    while read line; do
+        old_name=$(echo $line | awk '{print $1;}')
+        if [[ "$old_name" == "Name" ]]; then echo $line; continue; fi
+        fast5_file=raw_fast5/"$old_name".fast5
+        read_id=$(h5dump -N read_id $fast5_file | grep -oP "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}"); new_name="$read_id"_Basecall_1D_template
+        echo $line | sed "s|$old_name|$new_name|"
+    done < nanonet_reads.tsv > nanonet_reads_fixed.tsv
+    (head -n 1 "$1"_reads.tsv && tail -n +2 nanonet_reads_fixed.tsv | sort) > nanonet_reads_fixed_sorted.tsv
+    mv nanonet_reads_fixed_sorted.tsv nanonet_reads_fixed.tsv
+    mv nanonet_reads_fixed.tsv nanonet_reads.tsv
 fi
 
 if $chiron; then

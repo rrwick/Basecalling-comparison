@@ -7,7 +7,7 @@ library(RColorBrewer)
 
 # Prepare colours for ggplot
 basecaller_names <- c("Nanonet v2.0.0",
-                      "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.1",
+                      "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2",
                       "Scrappie events v1.0.0", "Scrappie raw v1.0.0", "Scrappie events v1.1.0", "Scrappie raw v1.1.0",
                       "Chiron (847ad10)")
 basecaller_colours <- c("#73B165",                                   # Nanonet colour
@@ -20,26 +20,26 @@ fill_scale <- scale_fill_manual(name = "Basecaller", values = basecaller_colours
 
 
 # Load the tables
-nanonet_reads <- data.frame(Name = numeric(), Length_Nanonet = numeric(), Identity_Nanonet = numeric(), Rel_len_Nanonet = numeric())  # temporary empty table
+nanonet_reads <- read_tsv("results/nanonet_reads.tsv", skip = 1, col_names = c("Name", "Length_Nanonet", "Identity_Nanonet", "Rel_len_Nanonet"))
 albacore_v0.8.4_reads <- read_tsv("results/albacore_v0.8.4_reads.tsv", skip = 1, col_names = c("Name", "Length_0.8.4", "Identity_0.8.4", "Rel_len_0.8.4"))
 albacore_v0.9.1_reads <- read_tsv("results/albacore_v0.9.1_reads.tsv", skip = 1, col_names = c("Name", "Length_0.9.1", "Identity_0.9.1", "Rel_len_0.9.1"))
 albacore_v1.0.4_reads <- read_tsv("results/albacore_v1.0.4_reads.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
 albacore_v1.1.2_reads <- read_tsv("results/albacore_v1.1.2_reads.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
 albacore_v1.2.6_reads <- read_tsv("results/albacore_v1.2.6_reads.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
-albacore_v2.0.1_reads <- read_tsv("results/albacore_v2.0.1_reads.tsv", skip = 1, col_names = c("Name", "Length_2.0.1", "Identity_2.0.1", "Rel_len_2.0.1"))
+albacore_v2.0.2_reads <- read_tsv("results/albacore_v2.0.2_reads.tsv", skip = 1, col_names = c("Name", "Length_2.0.2", "Identity_2.0.2", "Rel_len_2.0.2"))
 scrappie_events_v1.0.0_reads <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
 scrappie_raw_v1.0.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_events_v1.1.0_reads <- data.frame(Name = numeric(), Length_Scrappie_events_1.1.0 = numeric(), Identity_Scrappie_events_1.1.0 = numeric(), Rel_len_Scrappie_events_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_v1.1.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_1.1.0 = numeric(), Identity_Scrappie_raw_1.1.0 = numeric(), Rel_len_Scrappie_raw_1.1.0 = numeric())  # temporary empty table
 chiron_reads <- data.frame(Name = numeric(), Length_Chiron = numeric(), Identity_Chiron = numeric(), Rel_len_Chiron = numeric())  # temporary empty table
 
-nanonet_assembly <- data.frame(Name = numeric(), Length_Nanonet = numeric(), Identity_Nanonet = numeric(), Rel_len_Nanonet = numeric())  # temporary empty table
+nanonet_assembly <- read_tsv("results/nanonet_assembly.tsv", skip = 1, col_names = c("Name", "Length_Nanonet", "Identity_Nanonet", "Rel_len_Nanonet"))
 albacore_v0.8.4_assembly <- read_tsv("results/albacore_v0.8.4_assembly.tsv", skip = 1, col_names = c("Name", "Length_0.8.4", "Identity_0.8.4", "Rel_len_0.8.4"))
 albacore_v0.9.1_assembly <- read_tsv("results/albacore_v0.9.1_assembly.tsv", skip = 1, col_names = c("Name", "Length_0.9.1", "Identity_0.9.1", "Rel_len_0.9.1"))
 albacore_v1.0.4_assembly <- read_tsv("results/albacore_v1.0.4_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
 albacore_v1.1.2_assembly <- read_tsv("results/albacore_v1.1.2_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
 albacore_v1.2.6_assembly <- read_tsv("results/albacore_v1.2.6_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
-albacore_v2.0.1_assembly <- read_tsv("results/albacore_v2.0.1_assembly.tsv", skip = 1, col_names = c("Name", "Length_2.0.1", "Identity_2.0.1", "Rel_len_2.0.1"))
+albacore_v2.0.2_assembly <- read_tsv("results/albacore_v2.0.2_assembly.tsv", skip = 1, col_names = c("Name", "Length_2.0.2", "Identity_2.0.2", "Rel_len_2.0.2"))
 scrappie_events_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
 scrappie_raw_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_events_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_events_1.1.0 = numeric(), Identity_Scrappie_events_1.1.0 = numeric(), Rel_len_Scrappie_events_1.1.0 = numeric())  # temporary empty table
@@ -52,7 +52,7 @@ albacore_v0.9.1_nanopolish <- data.frame(Name = numeric(), Length_0.9.1 = numeri
 albacore_v1.0.4_nanopolish <- read_tsv("results/albacore_v1.0.4_nanopolished_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
 albacore_v1.1.2_nanopolish <- read_tsv("results/albacore_v1.1.2_nanopolished_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
 albacore_v1.2.6_nanopolish <- read_tsv("results/albacore_v1.2.6_nanopolished_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
-albacore_v2.0.1_nanopolish <- data.frame(Name = numeric(), Length_2.0.1 = numeric(), Identity_2.0.1 = numeric(), Rel_len_2.0.1 = numeric())  # temporary empty table, until Nanopolish supports Albacore v2
+albacore_v2.0.2_nanopolish <- data.frame(Name = numeric(), Length_2.0.2 = numeric(), Identity_2.0.2 = numeric(), Rel_len_2.0.2 = numeric())  # temporary empty table, until Nanopolish supports Albacore v2
 scrappie_events_v1.0.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
 scrappie_raw_v1.0.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_events_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_events_1.1.0 = numeric(), Identity_Scrappie_events_1.1.0 = numeric(), Rel_len_Scrappie_events_1.1.0 = numeric())  # temporary empty table
@@ -69,7 +69,7 @@ all_reads <- merge(all_reads, albacore_v0.9.1_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v1.0.4_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v1.1.2_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v1.2.6_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, albacore_v2.0.1_reads, by=1, all=TRUE)
+all_reads <- merge(all_reads, albacore_v2.0.2_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_events_v1.0.0_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_raw_v1.0.0_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_events_v1.1.0_reads, by=1, all=TRUE)
@@ -83,7 +83,7 @@ all_assemblies <- merge(all_assemblies, albacore_v0.9.1_assembly, by=1, all=TRUE
 all_assemblies <- merge(all_assemblies, albacore_v1.0.4_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, albacore_v1.1.2_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, albacore_v1.2.6_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, albacore_v2.0.1_assembly, by=1, all=TRUE)
+all_assemblies <- merge(all_assemblies, albacore_v2.0.2_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_events_v1.0.0_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_raw_v1.0.0_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_events_v1.1.0_assembly, by=1, all=TRUE)
@@ -97,7 +97,7 @@ all_nanopolish <- merge(all_nanopolish, albacore_v0.9.1_nanopolish, by=1, all=TR
 all_nanopolish <- merge(all_nanopolish, albacore_v1.0.4_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, albacore_v1.1.2_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, albacore_v1.2.6_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, albacore_v2.0.1_nanopolish, by=1, all=TRUE)
+all_nanopolish <- merge(all_nanopolish, albacore_v2.0.2_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_events_v1.0.0_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_raw_v1.0.0_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_events_v1.1.0_nanopolish, by=1, all=TRUE)
@@ -106,38 +106,64 @@ all_nanopolish <- merge(all_nanopolish, chiron_nanopolish, by=1, all=TRUE)
 
 
 
+# Each read's length is the median value of the different basecallers' lengths.
+read_lengths <- all_reads[grepl("Length_", names(all_reads))]
+all_reads["Length"] <- round(apply(read_lengths, 1, median, na.rm = TRUE))
+
+assembly_lengths <- all_assemblies[grepl("Length_", names(all_assemblies))]
+all_assemblies["Length"] <- round(apply(assembly_lengths, 1, median, na.rm = TRUE))
+
+nanopolish_lengths <- all_nanopolish[grepl("Length_", names(all_nanopolish))]
+all_nanopolish["Length"] <- round(apply(nanopolish_lengths, 1, median, na.rm = TRUE))
+
+
+
+# If a read lacks an identity, then it's an unaligned read.
+# Replace NA with 0.0 in identity columns (unless the whole column is NA, which implies that it's a basecaller for which I don't have data).
+for(col_name in names(all_reads)){
+  if (startsWith(col_name, "Identity_")) {
+    identities <- all_reads[,col_name]
+    if (!(all(is.na(identities)))) {
+      identities[is.na(identities)] <- 0
+      all_reads[,col_name] <- identities
+    }
+  }
+}
+
+
+
 # Reformat data frames for ggplot
 basecaller_identities <- c("Identity_Nanonet",
-                           "Identity_0.8.4", "Identity_0.9.1", "Identity_1.0.4", "Identity_1.1.2", "Identity_1.2.6", "Identity_2.0.1",
+                           "Identity_0.8.4", "Identity_0.9.1", "Identity_1.0.4", "Identity_1.1.2", "Identity_1.2.6", "Identity_2.0.2",
                            "Identity_Scrappie_events_1.0.0", "Identity_Scrappie_raw_1.0.0", "Identity_Scrappie_events_1.1.0", "Identity_Scrappie_raw_1.1.0",
                            "Identity_Chiron")
 
 basecaller_rel_lengths <- c("Rel_len_Nanonet",
-                            "Rel_len_0.8.4", "Rel_len_0.9.1", "Rel_len_1.0.4", "Rel_len_1.1.2", "Rel_len_1.2.6", "Rel_len_2.0.1",
+                            "Rel_len_0.8.4", "Rel_len_0.9.1", "Rel_len_1.0.4", "Rel_len_1.1.2", "Rel_len_1.2.6", "Rel_len_2.0.2",
                             "Rel_len_Scrappie_events_1.0.0", "Rel_len_Scrappie_raw_1.0.0", "Rel_len_Scrappie_events_1.1.0", "Rel_len_Scrappie_raw_1.1.0",
                             "Rel_len_Chiron")
 
-read_identities <- all_reads[,c("Name", "Length_2.0.1", basecaller_identities)]
+read_identities <- all_reads[,c("Name", "Length", basecaller_identities)]
 colnames(read_identities) <- c("Name", "Length", basecaller_names)
 read_identities <- melt(read_identities, id=c("Name", "Length"))
 colnames(read_identities) <- c("Read_name", "Length", "Basecaller", "Identity")
 
-read_rel_lengths <- all_reads[,c("Name", "Length_2.0.1", basecaller_rel_lengths)]
+read_rel_lengths <- all_reads[,c("Name", "Length", basecaller_rel_lengths)]
 colnames(read_rel_lengths) <- c("Name", "Length", basecaller_names)
 read_rel_lengths <- melt(read_rel_lengths, id=c("Name", "Length"))
 colnames(read_rel_lengths) <- c("Read_name", "Length", "Basecaller", "Relative_length")
 
-assembly_identities <- all_assemblies[,c("Name", "Length_2.0.1", basecaller_identities)]
+assembly_identities <- all_assemblies[,c("Name", "Length", basecaller_identities)]
 colnames(assembly_identities) <- c("Name", "Length", basecaller_names)
 assembly_identities <- melt(assembly_identities, id=c("Name", "Length"))
 colnames(assembly_identities) <- c("Read_name", "Length", "Basecaller", "Identity")
 
-assembly_rel_lengths <- all_assemblies[,c("Name", "Length_2.0.1", basecaller_rel_lengths)]
+assembly_rel_lengths <- all_assemblies[,c("Name", "Length", basecaller_rel_lengths)]
 colnames(assembly_rel_lengths) <- c("Name", "Length", basecaller_names)
 assembly_rel_lengths <- melt(assembly_rel_lengths, id=c("Name", "Length"))
 colnames(assembly_rel_lengths) <- c("Read_name", "Length", "Basecaller", "Relative_length")
 
-nanopolish_identities <- all_nanopolish[,c("Name", "Length_1.2.6", basecaller_identities)]
+nanopolish_identities <- all_nanopolish[,c("Name", "Length", basecaller_identities)]
 colnames(nanopolish_identities) <- c("Name", "Length", basecaller_names)
 nanopolish_identities <- melt(nanopolish_identities, id=c("Name", "Length"))
 colnames(nanopolish_identities) <- c("Read_name", "Length", "Basecaller", "Identity")
@@ -145,41 +171,43 @@ colnames(nanopolish_identities) <- c("Read_name", "Length", "Basecaller", "Ident
 
 
 # Make aligned proportion data frame
-nanonet_aligned = 100.0 * sum(nanonet_reads[nanonet_reads$Identity_Nanonet != 0.0,]$Length_Nanonet) / sum(nanonet_reads$Length_Nanonet)
-nanonet_unaligned = 100.0 * sum(nanonet_reads[nanonet_reads$Identity_Nanonet == 0.0,]$Length_Nanonet) / sum(nanonet_reads$Length_Nanonet)
+total_length <- sum(all_reads$Length)
 
-albacore_v0.8.4_aligned = 100.0 * sum(albacore_v0.8.4_reads[albacore_v0.8.4_reads$Identity_0.8.4 != 0.0,]$Length_0.8.4) / sum(albacore_v0.8.4_reads$Length_0.8.4)
-albacore_v0.8.4_unaligned = 100.0 * sum(albacore_v0.8.4_reads[albacore_v0.8.4_reads$Identity_0.8.4 == 0.0,]$Length_0.8.4) / sum(albacore_v0.8.4_reads$Length_0.8.4)
+nanonet_aligned <- 100.0 * sum(all_reads[all_reads$Identity_Nanonet != 0.0,]$Length) / total_length
+nanonet_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_Nanonet == 0.0,]$Length) / total_length
 
-albacore_v0.9.1_aligned = 100.0 * sum(albacore_v0.9.1_reads[albacore_v0.9.1_reads$Identity_0.9.1 != 0.0,]$Length_0.9.1) / sum(albacore_v0.9.1_reads$Length_0.9.1)
-albacore_v0.9.1_unaligned = 100.0 * sum(albacore_v0.9.1_reads[albacore_v0.9.1_reads$Identity_0.9.1 == 0.0,]$Length_0.9.1) / sum(albacore_v0.9.1_reads$Length_0.9.1)
+albacore_v0.8.4_aligned <- 100.0 * sum(all_reads[all_reads$Identity_0.8.4 != 0.0,]$Length) / total_length
+albacore_v0.8.4_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_0.8.4 == 0.0,]$Length) / total_length
 
-albacore_v1.0.4_aligned = 100.0 * sum(albacore_v1.0.4_reads[albacore_v1.0.4_reads$Identity_1.0.4 != 0.0,]$Length_1.0.4) / sum(albacore_v1.0.4_reads$Length_1.0.4)
-albacore_v1.0.4_unaligned = 100.0 * sum(albacore_v1.0.4_reads[albacore_v1.0.4_reads$Identity_1.0.4 == 0.0,]$Length_1.0.4) / sum(albacore_v1.0.4_reads$Length_1.0.4)
+albacore_v0.9.1_aligned <- 100.0 * sum(all_reads[all_reads$Identity_0.9.1 != 0.0,]$Length) / total_length
+albacore_v0.9.1_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_0.9.1 == 0.0,]$Length) / total_length
 
-albacore_v1.1.2_aligned = 100.0 * sum(albacore_v1.1.2_reads[albacore_v1.1.2_reads$Identity_1.1.2 != 0.0,]$Length_1.1.2) / sum(albacore_v1.1.2_reads$Length_1.1.2)
-albacore_v1.1.2_unaligned = 100.0 * sum(albacore_v1.1.2_reads[albacore_v1.1.2_reads$Identity_1.1.2 == 0.0,]$Length_1.1.2) / sum(albacore_v1.1.2_reads$Length_1.1.2)
+albacore_v1.0.4_aligned <- 100.0 * sum(all_reads[all_reads$Identity_1.0.4 != 0.0,]$Length) / total_length
+albacore_v1.0.4_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_1.0.4 == 0.0,]$Length) / total_length
 
-albacore_v1.2.6_aligned = 100.0 * sum(albacore_v1.2.6_reads[albacore_v1.2.6_reads$Identity_1.2.6 != 0.0,]$Length_1.2.6) / sum(albacore_v1.2.6_reads$Length_1.2.6)
-albacore_v1.2.6_unaligned = 100.0 * sum(albacore_v1.2.6_reads[albacore_v1.2.6_reads$Identity_1.2.6 == 0.0,]$Length_1.2.6) / sum(albacore_v1.2.6_reads$Length_1.2.6)
+albacore_v1.1.2_aligned <- 100.0 * sum(all_reads[all_reads$Identity_1.1.2 != 0.0,]$Length) / total_length
+albacore_v1.1.2_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_1.1.2 == 0.0,]$Length) / total_length
 
-albacore_v2.0.1_aligned = 100.0 * sum(albacore_v2.0.1_reads[albacore_v2.0.1_reads$Identity_2.0.1 != 0.0,]$Length_2.0.1) / sum(albacore_v2.0.1_reads$Length_2.0.1)
-albacore_v2.0.1_unaligned = 100.0 * sum(albacore_v2.0.1_reads[albacore_v2.0.1_reads$Identity_2.0.1 == 0.0,]$Length_2.0.1) / sum(albacore_v2.0.1_reads$Length_2.0.1)
+albacore_v1.2.6_aligned <- 100.0 * sum(all_reads[all_reads$Identity_1.2.6 != 0.0,]$Length) / total_length
+albacore_v1.2.6_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_1.2.6 == 0.0,]$Length) / total_length
 
-scrappie_events_v1.0.0_aligned = 100.0 * sum(scrappie_events_v1.0.0_reads[scrappie_events_v1.0.0_reads$Identity_Scrappie_events_1.0.0 != 0.0,]$Length_Scrappie_events_1.0.0) / sum(scrappie_events_v1.0.0_reads$Length_Scrappie_events_1.0.0)
-scrappie_events_v1.0.0_unaligned = 100.0 * sum(scrappie_events_v1.0.0_reads[scrappie_events_v1.0.0_reads$Identity_Scrappie_events_1.0.0 == 0.0,]$Length_Scrappie_events_1.0.0) / sum(scrappie_events_v1.0.0_reads$Length_Scrappie_events_1.0.0)
+albacore_v2.0.2_aligned <- 100.0 * sum(all_reads[all_reads$Identity_2.0.2 != 0.0,]$Length) / total_length
+albacore_v2.0.2_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_2.0.2 == 0.0,]$Length) / total_length
 
-scrappie_raw_v1.0.0_aligned = 100.0 * sum(scrappie_raw_v1.0.0_reads[scrappie_raw_v1.0.0_reads$Identity_Scrappie_raw_1.0.0 != 0.0,]$Length_Scrappie_raw_1.0.0) / sum(scrappie_raw_v1.0.0_reads$Length_Scrappie_raw_1.0.0)
-scrappie_raw_v1.0.0_unaligned = 100.0 * sum(scrappie_raw_v1.0.0_reads[scrappie_raw_v1.0.0_reads$Identity_Scrappie_raw_1.0.0 == 0.0,]$Length_Scrappie_raw_1.0.0) / sum(scrappie_raw_v1.0.0_reads$Length_Scrappie_raw_1.0.0)
+scrappie_events_v1.0.0_aligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_events_1.0.0 != 0.0,]$Length) / total_length
+scrappie_events_v1.0.0_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_events_1.0.0 == 0.0,]$Length) / total_length
 
-scrappie_events_v1.1.0_aligned = 100.0 * sum(scrappie_events_v1.1.0_reads[scrappie_events_v1.1.0_reads$Identity_Scrappie_events_1.1.0 != 0.0,]$Length_Scrappie_events_1.1.0) / sum(scrappie_events_v1.1.0_reads$Length_Scrappie_events_1.1.0)
-scrappie_events_v1.1.0_unaligned = 100.0 * sum(scrappie_events_v1.1.0_reads[scrappie_events_v1.1.0_reads$Identity_Scrappie_events_1.1.0 == 0.0,]$Length_Scrappie_events_1.1.0) / sum(scrappie_events_v1.1.0_reads$Length_Scrappie_events_1.1.0)
+scrappie_raw_v1.0.0_aligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_raw_1.0.0 != 0.0,]$Length) / total_length
+scrappie_raw_v1.0.0_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_raw_1.0.0 == 0.0,]$Length) / total_length
 
-scrappie_raw_v1.1.0_aligned = 100.0 * sum(scrappie_raw_v1.1.0_reads[scrappie_raw_v1.1.0_reads$Identity_Scrappie_raw_1.1.0 != 0.0,]$Length_Scrappie_raw_1.1.0) / sum(scrappie_raw_v1.1.0_reads$Length_Scrappie_raw_1.1.0)
-scrappie_raw_v1.1.0_unaligned = 100.0 * sum(scrappie_raw_v1.1.0_reads[scrappie_raw_v1.1.0_reads$Identity_Scrappie_raw_1.1.0 == 0.0,]$Length_Scrappie_raw_1.1.0) / sum(scrappie_raw_v1.1.0_reads$Length_Scrappie_raw_1.1.0)
+scrappie_events_v1.1.0_aligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_events_1.1.0 != 0.0,]$Length) / total_length
+scrappie_events_v1.1.0_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_events_1.1.0 == 0.0,]$Length) / total_length
 
-chiron_aligned = 100.0 * sum(chiron_reads[chiron_reads$Identity_Chiron != 0.0,]$Length_Chiron) / sum(chiron_reads$Length_Chiron)
-chiron_unaligned = 100.0 * sum(chiron_reads[chiron_reads$Identity_Chiron == 0.0,]$Length_Chiron) / sum(chiron_reads$Length_Chiron)
+scrappie_raw_v1.1.0_aligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_raw_1.1.0 != 0.0,]$Length) / total_length
+scrappie_raw_v1.1.0_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_Scrappie_raw_1.1.0 == 0.0,]$Length) / total_length
+
+chiron_aligned <- 100.0 * sum(all_reads[all_reads$Identity_Chiron != 0.0,]$Length) / total_length
+chiron_unaligned <- 100.0 * sum(all_reads[all_reads$Identity_Chiron == 0.0,]$Length) / total_length
 
 aligned_proportion <- data.frame(Basecaller = factor(), Aligned = numeric(), Unaligned = numeric())
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Nanonet v2.0.0"), Aligned = nanonet_aligned, Unaligned = nanonet_unaligned))
@@ -188,7 +216,7 @@ aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Albacore v1.0.4"), Aligned = albacore_v1.0.4_aligned, Unaligned = albacore_v1.0.4_unaligned))
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Albacore v1.1.2"), Aligned = albacore_v1.1.2_aligned, Unaligned = albacore_v1.1.2_unaligned))
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Albacore v1.2.6"), Aligned = albacore_v1.2.6_aligned, Unaligned = albacore_v1.2.6_unaligned))
-aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Albacore v2.0.1"), Aligned = albacore_v2.0.1_aligned, Unaligned = albacore_v2.0.1_unaligned))
+aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Albacore v2.0.2"), Aligned = albacore_v2.0.2_aligned, Unaligned = albacore_v2.0.2_unaligned))
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Scrappie events v1.0.0"), Aligned = scrappie_events_v1.0.0_aligned, Unaligned = scrappie_events_v1.0.0_unaligned))
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Scrappie raw v1.0.0"), Aligned = scrappie_raw_v1.0.0_aligned, Unaligned = scrappie_raw_v1.0.0_unaligned))
 aligned_proportion <- rbind(aligned_proportion, data.frame(Basecaller = factor("Scrappie events v1.1.0"), Aligned = scrappie_events_v1.1.0_aligned, Unaligned = scrappie_events_v1.1.0_unaligned))
@@ -203,9 +231,9 @@ my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
 ggplot(aligned_proportion, aes(x = Basecaller, y = Unaligned, fill = Basecaller)) +
   geom_bar(stat="identity", colour="black") +
   fill_scale + my_theme + guides(fill=FALSE) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 2), minor_breaks = seq(0, 100, 0.5), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(0, 5.0)) +
+  coord_cartesian(ylim=c(0, 16.0)) +
   labs(title = "Unaligned reads", x = "", y = "")
 
 
