@@ -8,13 +8,14 @@ library(gridExtra)
 # Prepare stuff for ggplot
 basecaller_names <- c("Nanonet v2.0.0",
                       "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2",
-                      "Scrappie events v1.0.0", "Scrappie raw v1.0.0",
-                      "Scrappie events v1.1.0", "Scrappie raw v1.1.0 raw_r94", "Scrappie raw v1.1.0 rgr_r94", "Scrappie raw v1.1.0 rgrgr_r94",
+                      "Scrappie events v1.0.0", "Scrappie events v1.1.0",
+                      "Scrappie raw v1.0.0", "Scrappie raw v1.1.0 raw_r94", "Scrappie raw v1.1.0 rgr_r94", "Scrappie raw v1.1.0 rgrgr_r94",
                       "Chiron 847ad10")
-basecaller_colours <- c("#73B165",                                                         # Nanonet colour
-                        brewer.pal(9, "Reds")[2:7],                                        # Albacore colours
-                        "#9E9AC8", "#C09AC8", "#7F77B1", "#A56BB1", "#A56BB1", "#A56BB1",  # Scrappie colours
-                        "#639CB1")                                                         # Chiron colour
+basecaller_colours <- c("#F0E57F",                                   # Nanonet colour
+                        brewer.pal(9, "Reds")[2:7],                  # Albacore colours
+                        "#788CC8", "#6175B1",                        # Scrappie event colours
+                        "#C09AC8", "#A56BB1", "#A56BB1", "#A56BB1",  # Scrappie raw colours
+                        "#43B164")                                   # Chiron colour
 names(basecaller_colours) <- basecaller_names
 fill_scale <- scale_fill_manual(name = "Basecaller", values = basecaller_colours)
 my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
@@ -30,8 +31,8 @@ albacore_v1.1.2_reads <- read_tsv("results/albacore_v1.1.2_reads.tsv", skip = 1,
 albacore_v1.2.6_reads <- read_tsv("results/albacore_v1.2.6_reads.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
 albacore_v2.0.2_reads <- read_tsv("results/albacore_v2.0.2_reads.tsv", skip = 1, col_names = c("Name", "Length_2.0.2", "Identity_2.0.2", "Rel_len_2.0.2"))
 scrappie_events_v1.0.0_reads <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
-scrappie_raw_v1.0.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_events_v1.1.0_reads <- read_tsv("results/scrappie_v1.1.0_events_reads.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_events_1.1.0", "Identity_Scrappie_events_1.1.0", "Rel_len_Scrappie_events_1.1.0"))
+scrappie_raw_v1.0.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_raw_raw_r94_v1.1.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_raw_r94_1.1.0 = numeric(), Identity_Scrappie_raw_raw_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_raw_r94_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_rgr_r94_v1.1.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgr_r94_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_rgrgr_r94_v1.1.0_reads <- read_tsv("results/scrappie_v1.1.0_raw_rgrgr_r94_reads.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_raw_rgrgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0"))
@@ -45,8 +46,8 @@ albacore_v1.1.2_assembly <- read_tsv("results/albacore_v1.1.2_assembly.tsv", ski
 albacore_v1.2.6_assembly <- read_tsv("results/albacore_v1.2.6_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
 albacore_v2.0.2_assembly <- read_tsv("results/albacore_v2.0.2_assembly.tsv", skip = 1, col_names = c("Name", "Length_2.0.2", "Identity_2.0.2", "Rel_len_2.0.2"))
 scrappie_events_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
-scrappie_raw_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_events_v1.1.0_assembly <- read_tsv("results/scrappie_v1.1.0_events_assembly.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_events_1.1.0", "Identity_Scrappie_events_1.1.0", "Rel_len_Scrappie_events_1.1.0"))
+scrappie_raw_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_raw_raw_r94_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_raw_r94_1.1.0 = numeric(), Identity_Scrappie_raw_raw_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_raw_r94_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_rgr_r94_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgr_r94_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_rgrgr_r94_v1.1.0_assembly <- read_tsv("results/scrappie_v1.1.0_raw_rgrgr_r94_assembly.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_raw_rgrgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0"))
@@ -60,8 +61,8 @@ albacore_v1.1.2_nanopolish <- read_tsv("results/albacore_v1.1.2_nanopolished_ass
 albacore_v1.2.6_nanopolish <- read_tsv("results/albacore_v1.2.6_nanopolished_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
 albacore_v2.0.2_nanopolish <- data.frame(Name = numeric(), Length_2.0.2 = numeric(), Identity_2.0.2 = numeric(), Rel_len_2.0.2 = numeric())  # temporary empty table, until Nanopolish supports Albacore v2
 scrappie_events_v1.0.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
-scrappie_raw_v1.0.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_events_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_events_1.1.0 = numeric(), Identity_Scrappie_events_1.1.0 = numeric(), Rel_len_Scrappie_events_1.1.0 = numeric())  # temporary empty table
+scrappie_raw_v1.0.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
 scrappie_raw_raw_r94_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_raw_r94_1.1.0 = numeric(), Identity_Scrappie_raw_raw_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_raw_r94_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_rgr_r94_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgr_r94_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_rgrgr_r94_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_rgrgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgrgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgrgr_r94_1.1.0 = numeric())  # temporary empty table
@@ -79,8 +80,8 @@ all_reads <- merge(all_reads, albacore_v1.1.2_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v1.2.6_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, albacore_v2.0.2_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_events_v1.0.0_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, scrappie_raw_v1.0.0_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_events_v1.1.0_reads, by=1, all=TRUE)
+all_reads <- merge(all_reads, scrappie_raw_v1.0.0_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_raw_raw_r94_v1.1.0_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_raw_rgr_r94_v1.1.0_reads, by=1, all=TRUE)
 all_reads <- merge(all_reads, scrappie_raw_rgrgr_r94_v1.1.0_reads, by=1, all=TRUE)
@@ -95,8 +96,8 @@ all_assemblies <- merge(all_assemblies, albacore_v1.1.2_assembly, by=1, all=TRUE
 all_assemblies <- merge(all_assemblies, albacore_v1.2.6_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, albacore_v2.0.2_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_events_v1.0.0_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, scrappie_raw_v1.0.0_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_events_v1.1.0_assembly, by=1, all=TRUE)
+all_assemblies <- merge(all_assemblies, scrappie_raw_v1.0.0_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_raw_raw_r94_v1.1.0_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_raw_rgr_r94_v1.1.0_assembly, by=1, all=TRUE)
 all_assemblies <- merge(all_assemblies, scrappie_raw_rgrgr_r94_v1.1.0_assembly, by=1, all=TRUE)
@@ -111,8 +112,8 @@ all_nanopolish <- merge(all_nanopolish, albacore_v1.1.2_nanopolish, by=1, all=TR
 all_nanopolish <- merge(all_nanopolish, albacore_v1.2.6_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, albacore_v2.0.2_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_events_v1.0.0_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, scrappie_raw_v1.0.0_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_events_v1.1.0_nanopolish, by=1, all=TRUE)
+all_nanopolish <- merge(all_nanopolish, scrappie_raw_v1.0.0_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_raw_raw_r94_v1.1.0_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_raw_rgr_r94_v1.1.0_nanopolish, by=1, all=TRUE)
 all_nanopolish <- merge(all_nanopolish, scrappie_raw_rgrgr_r94_v1.1.0_nanopolish, by=1, all=TRUE)
@@ -149,14 +150,14 @@ for(col_name in names(all_reads)){
 # Reformat data frames for ggplot
 basecaller_identities <- c("Identity_Nanonet",
                            "Identity_0.8.4", "Identity_0.9.1", "Identity_1.0.4", "Identity_1.1.2", "Identity_1.2.6", "Identity_2.0.2",
-                           "Identity_Scrappie_events_1.0.0", "Identity_Scrappie_raw_1.0.0",
-                           "Identity_Scrappie_events_1.1.0", "Identity_Scrappie_raw_raw_r94_1.1.0", "Identity_Scrappie_raw_rgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0",
+                           "Identity_Scrappie_events_1.0.0", "Identity_Scrappie_events_1.1.0",
+                           "Identity_Scrappie_raw_1.0.0", "Identity_Scrappie_raw_raw_r94_1.1.0", "Identity_Scrappie_raw_rgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0",
                            "Identity_Chiron")
 
 basecaller_rel_lengths <- c("Rel_len_Nanonet",
                             "Rel_len_0.8.4", "Rel_len_0.9.1", "Rel_len_1.0.4", "Rel_len_1.1.2", "Rel_len_1.2.6", "Rel_len_2.0.2",
-                            "Rel_len_Scrappie_events_1.0.0", "Rel_len_Scrappie_raw_1.0.0",
-                            "Rel_len_Scrappie_events_1.1.0", "Rel_len_Scrappie_raw_raw_r94_1.1.0", "Rel_len_Scrappie_raw_rgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0",
+                            "Rel_len_Scrappie_events_1.0.0", "Rel_len_Scrappie_events_1.1.0",
+                            "Rel_len_Scrappie_raw_1.0.0", "Rel_len_Scrappie_raw_raw_r94_1.1.0", "Rel_len_Scrappie_raw_rgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0",
                             "Rel_len_Chiron")
 
 read_identities <- all_reads[,c("Name", "Length", basecaller_identities)]
@@ -211,11 +212,11 @@ albacore_v2.0.2_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identi
 scrappie_events_v1.0.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_events_1.0.0, all_reads$Length, na.rm = TRUE)
 scrappie_events_v1.0.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_events_1.0.0, all_assemblies$Length, na.rm = TRUE)
 
-scrappie_raw_v1.0.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_raw_1.0.0, all_reads$Length, na.rm = TRUE)
-scrappie_raw_v1.0.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_raw_1.0.0, all_assemblies$Length, na.rm = TRUE)
-
 scrappie_events_v1.1.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_events_1.1.0, all_reads$Length, na.rm = TRUE)
 scrappie_events_v1.1.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_events_1.1.0, all_assemblies$Length, na.rm = TRUE)
+
+scrappie_raw_v1.0.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_raw_1.0.0, all_reads$Length, na.rm = TRUE)
+scrappie_raw_v1.0.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_raw_1.0.0, all_assemblies$Length, na.rm = TRUE)
 
 scrappie_raw_raw_r94_v1.1.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_raw_raw_r94_1.1.0, all_reads$Length, na.rm = TRUE)
 scrappie_raw_raw_r94_v1.1.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_raw_raw_r94_1.1.0, all_assemblies$Length, na.rm = TRUE)
@@ -238,8 +239,8 @@ read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecal
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v1.2.6"), Read_identity = albacore_v1.2.6_read_id, Assembly_identity = albacore_v1.2.6_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v2.0.2"), Read_identity = albacore_v2.0.2_read_id, Assembly_identity = albacore_v2.0.2_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie events v1.0.0"), Read_identity = scrappie_events_v1.0.0_read_id, Assembly_identity = scrappie_events_v1.0.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.0.0"), Read_identity = scrappie_raw_v1.0.0_read_id, Assembly_identity = scrappie_raw_v1.0.0_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie events v1.1.0"), Read_identity = scrappie_events_v1.1.0_read_id, Assembly_identity = scrappie_events_v1.1.0_assembly_id))
+read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.0.0"), Read_identity = scrappie_raw_v1.0.0_read_id, Assembly_identity = scrappie_raw_v1.0.0_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 raw_r94"), Read_identity = scrappie_raw_raw_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_raw_r94_v1.1.0_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 rgr_r94"), Read_identity = scrappie_raw_rgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgr_r94_v1.1.0_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 rgrgr_r94"), Read_identity = scrappie_raw_rgrgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgrgr_r94_v1.1.0_assembly_id))
@@ -343,10 +344,13 @@ grid.arrange(gA, gB, ncol=1, heights=c(3.5, 1))
 
 # Scatter plot
 ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
-  geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.8) +
+  geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.85) +
   fill_scale + theme_bw() +
-  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  # scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.5), labels = scales::unit_format("%")) +
+  # scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  # coord_cartesian(xlim=c(80, 90), ylim=c(98.5, 100)) +
+  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 2), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   coord_cartesian(xlim=c(80, 100), ylim=c(98.5, 100)) +
   labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
 
@@ -355,7 +359,7 @@ ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, 
 poly <- data.frame(x=c(0, 100, 100), y=c(0, 0, 100))
 ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
   geom_polygon(data=poly, aes(x=x,y=y),alpha=0.5,fill="black") +
-  geom_point(shape = 21, size = 2, stroke = 0.5, alpha = 0.8) +
+  geom_point(shape = 21, size = 2, stroke = 0.5, alpha = 0.85) +
   fill_scale + theme_bw() + theme(aspect.ratio=1) +
   scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
