@@ -5,18 +5,19 @@ library(RColorBrewer)
 library(gridExtra)
 
 
-# Prepare colours for ggplot
+# Prepare stuff for ggplot
 basecaller_names <- c("Nanonet v2.0.0",
                       "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2",
                       "Scrappie events v1.0.0", "Scrappie raw v1.0.0",
-                      "Scrappie events v1.1.0", "Scrappie raw v1.1.0 (raw_r94)", "Scrappie raw v1.1.0 (rgr_r94)", "Scrappie raw v1.1.0 (rgrgr_r94)",
-                      "Chiron (847ad10)")
+                      "Scrappie events v1.1.0", "Scrappie raw v1.1.0 raw_r94", "Scrappie raw v1.1.0 rgr_r94", "Scrappie raw v1.1.0 rgrgr_r94",
+                      "Chiron 847ad10")
 basecaller_colours <- c("#73B165",                                                         # Nanonet colour
                         brewer.pal(9, "Reds")[2:7],                                        # Albacore colours
                         "#9E9AC8", "#C09AC8", "#7F77B1", "#A56BB1", "#A56BB1", "#A56BB1",  # Scrappie colours
                         "#639CB1")                                                         # Chiron colour
 names(basecaller_colours) <- basecaller_names
 fill_scale <- scale_fill_manual(name = "Basecaller", values = basecaller_colours)
+my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
 
 
 
@@ -45,10 +46,10 @@ albacore_v1.2.6_assembly <- read_tsv("results/albacore_v1.2.6_assembly.tsv", ski
 albacore_v2.0.2_assembly <- read_tsv("results/albacore_v2.0.2_assembly.tsv", skip = 1, col_names = c("Name", "Length_2.0.2", "Identity_2.0.2", "Rel_len_2.0.2"))
 scrappie_events_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
 scrappie_raw_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
-scrappie_events_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_events_1.1.0 = numeric(), Identity_Scrappie_events_1.1.0 = numeric(), Rel_len_Scrappie_events_1.1.0 = numeric())  # temporary empty table
+scrappie_events_v1.1.0_assembly <- read_tsv("results/scrappie_v1.1.0_events_assembly.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_events_1.1.0", "Identity_Scrappie_events_1.1.0", "Rel_len_Scrappie_events_1.1.0"))
 scrappie_raw_raw_r94_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_raw_r94_1.1.0 = numeric(), Identity_Scrappie_raw_raw_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_raw_r94_1.1.0 = numeric())  # temporary empty table
 scrappie_raw_rgr_r94_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgr_r94_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_rgrgr_r94_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_rgrgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgrgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgrgr_r94_1.1.0 = numeric())  # temporary empty table
+scrappie_raw_rgrgr_r94_v1.1.0_assembly <- read_tsv("results/scrappie_v1.1.0_raw_rgrgr_r94_assembly.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_raw_rgrgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0"))
 chiron_assembly <- data.frame(Name = numeric(), Length_Chiron = numeric(), Identity_Chiron = numeric(), Rel_len_Chiron = numeric())  # temporary empty table
 
 nanonet_nanopolish <- data.frame(Name = numeric(), Length_Nanonet = numeric(), Identity_Nanonet = numeric(), Rel_len_Nanonet = numeric())  # temporary empty table
@@ -239,10 +240,10 @@ read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecal
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie events v1.0.0"), Read_identity = scrappie_events_v1.0.0_read_id, Assembly_identity = scrappie_events_v1.0.0_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.0.0"), Read_identity = scrappie_raw_v1.0.0_read_id, Assembly_identity = scrappie_raw_v1.0.0_assembly_id))
 read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie events v1.1.0"), Read_identity = scrappie_events_v1.1.0_read_id, Assembly_identity = scrappie_events_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 (raw_r94)"), Read_identity = scrappie_raw_raw_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_raw_r94_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 (rgr_r94)"), Read_identity = scrappie_raw_rgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgr_r94_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 (rgrgr_r94)"), Read_identity = scrappie_raw_rgrgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgrgr_r94_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Chiron (847ad10)"), Read_identity = chiron_read_id, Assembly_identity = chiron_assembly_id))
+read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 raw_r94"), Read_identity = scrappie_raw_raw_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_raw_r94_v1.1.0_assembly_id))
+read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 rgr_r94"), Read_identity = scrappie_raw_rgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgr_r94_v1.1.0_assembly_id))
+read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 rgrgr_r94"), Read_identity = scrappie_raw_rgrgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgrgr_r94_v1.1.0_assembly_id))
+read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Chiron 847ad10"), Read_identity = chiron_read_id, Assembly_identity = chiron_assembly_id))
 
 
 
@@ -261,9 +262,6 @@ read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecal
 
 
 
-
-# Finally, time for plots!
-my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
 
 
 
@@ -281,9 +279,9 @@ ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Lengt
   geom_hline(yintercept = 100) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + my_theme + guides(fill=FALSE) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 2), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 4), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(86, 114)) +
+  coord_cartesian(ylim=c(84, 116)) +
   labs(title = "Relative read lengths", x = "", y = "")
 
 ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
@@ -313,16 +311,6 @@ ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight =
 
 
 
-# Scatter plot
-ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
-  geom_point(shape = 21, size = 5, stroke = 0.5, alpha = 0.8) +
-  fill_scale + theme_bw() +
-  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
-  coord_cartesian(xlim=c(80, 100), ylim=c(98.5, 100)) +
-  labs(title = "Read and assembly identities", x = "", y = "")
-
-
 
 # This code produces a single plot made of two violin plots:
 # * one for the majority of the read identity at the top of the range
@@ -349,6 +337,30 @@ gA$widths[2:3] <- as.list(maxWidth)
 gB$widths[2:3] <- as.list(maxWidth)
 grid.arrange(gA, gB, ncol=1, heights=c(3.5, 1))
 
+
+
+
+
+# Scatter plot
+ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
+  geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.8) +
+  fill_scale + theme_bw() +
+  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  coord_cartesian(xlim=c(80, 100), ylim=c(98.5, 100)) +
+  labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
+
+
+# This one is square and has the diagonal line.
+poly <- data.frame(x=c(0, 100, 100), y=c(0, 0, 100))
+ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
+  geom_polygon(data=poly, aes(x=x,y=y),alpha=0.5,fill="black") +
+  geom_point(shape = 21, size = 2, stroke = 0.5, alpha = 0.8) +
+  fill_scale + theme_bw() + theme(aspect.ratio=1) +
+  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  coord_cartesian(xlim=c(80, 100), ylim=c(80, 100)) +
+  labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
 
 
 # # Joyplots
