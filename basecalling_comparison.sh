@@ -62,7 +62,7 @@ assembly_identity_distribution() {
 }
 
 
-extract_map_and_assemble () {
+extract_map_and_assemble() {
 
      # Some basecallers (e.g. Albacore, Nanonet) produce a directory of fast5s from which we need to extract
      # a fastq. Others (e.g. Chiron and Scrappie) just produce a fasta.
@@ -99,6 +99,35 @@ extract_map_and_assemble () {
     python nanopolish_merge.py "$1"_nanopolish/polished.*.fa > "$1"_nanopolished_assembly.fasta
     assembly_identity_distribution "$1"_nanopolished_assembly.fasta "$1"_nanopolished_assembly
     rm $nanopolish_reads "$nanopolish_reads".*  # Clean up Nanopolish files
+}
+
+
+# Nanonet and Scrappie name reads differently from Albacore. They use fast5 filenames while Albacore uses read ids.
+# This messes up merging tables in R, so thes functions replace the names in the Nanonet/Scrappie read table.
+change_nanonet_read_names() {
+    while read line; do
+        old_name=$(echo $line | awk '{print $1;}')
+        if [[ "$old_name" == "Name" ]]; then echo $line; continue; fi
+        fast5_file=raw_fast5/"$old_name".fast5
+        read_id=$(h5dump -N read_id $fast5_file | grep -oP "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}"); new_name="$read_id"_Basecall_1D_template
+        echo $line | sed "s|$old_name|$new_name|"
+    done < "$1"_reads.tsv > "$1"_reads_fixed.tsv
+    (head -n 1 "$1"_reads_fixed.tsv && tail -n +2 "$1"_reads_fixed.tsv | sort) > "$1"_reads_fixed_sorted.tsv
+    mv "$1"_reads_fixed_sorted.tsv "$1"_reads_fixed.tsv
+    mv "$1"_reads_fixed.tsv "$1"_reads.tsv
+}
+
+change_scrappie_read_names() {
+    while read line; do
+        old_name=$(echo $line | awk '{print $1;}')
+        if [[ "$old_name" == "Name" ]]; then echo $line; continue; fi
+        fast5_file=raw_fast5/"$old_name"
+        read_id=$(h5dump -N read_id $fast5_file | grep -oP "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}"); new_name="$read_id"_Basecall_1D_template
+        echo $line | sed "s|$old_name|$new_name|"
+    done < "$1"_reads.tsv > "$1"_reads_fixed.tsv
+    (head -n 1 "$1"_reads_fixed.tsv && tail -n +2 "$1"_reads_fixed.tsv | sort) > "$1"_reads_fixed_sorted.tsv
+    mv "$1"_reads_fixed_sorted.tsv "$1"_reads_fixed.tsv
+    mv "$1"_reads_fixed.tsv "$1"_reads.tsv
 }
 
 
@@ -172,6 +201,7 @@ if $scrappie_v1_1_0_raw; then
     export OPENBLAS_NUM_THREADS=1
     $scrappie_v1_1_0_path/scrappie raw raw_fast5 --threads=$threads > scrappie_v1_1_0_raw.fasta
     extract_map_and_assemble "scrappie_v1_1_0_raw"
+    change_scrappie_read_names("scrappie_v1_1_0_raw")
 fi
 
 if $scrappie_v1_1_0_events; then
@@ -179,25 +209,14 @@ if $scrappie_v1_1_0_events; then
     export OPENBLAS_NUM_THREADS=1
     $scrappie_v1_1_0_path/scrappie events raw_fast5 --threads=$threads --albacore > scrappie_v1_1_0_events.fasta
     extract_map_and_assemble "scrappie_v1_1_0_events"
+    change_scrappie_read_names("scrappie_v1_1_0_events")
 fi
 
 if $nanonet; then
     cp -r raw_fast5 nanonet  # Nanonet adds data to the fast5s, so we first make a copy.
     nanonetcall --chemistry r9.4 --write_events --min_len 1 --max_len 1000000 --jobs $threads nanonet > /dev/null
     extract_map_and_assemble "nanonet"
-
-    # Nanonet names its reads differently from Albacore. It uses fast5 filenames while Albacore uses read ids.
-    # This messes up merging tables in R, so replace the names in the Nanonet read table.
-    while read line; do
-        old_name=$(echo $line | awk '{print $1;}')
-        if [[ "$old_name" == "Name" ]]; then echo $line; continue; fi
-        fast5_file=raw_fast5/"$old_name".fast5
-        read_id=$(h5dump -N read_id $fast5_file | grep -oP "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}"); new_name="$read_id"_Basecall_1D_template
-        echo $line | sed "s|$old_name|$new_name|"
-    done < nanonet_reads.tsv > nanonet_reads_fixed.tsv
-    (head -n 1 "$1"_reads.tsv && tail -n +2 nanonet_reads_fixed.tsv | sort) > nanonet_reads_fixed_sorted.tsv
-    mv nanonet_reads_fixed_sorted.tsv nanonet_reads_fixed.tsv
-    mv nanonet_reads_fixed.tsv nanonet_reads.tsv
+    change_nanonet_read_names("nanonet")
 fi
 
 if $chiron; then
