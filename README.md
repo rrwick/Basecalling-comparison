@@ -59,7 +59,7 @@ Albacore v1.1 and later can basecall directly to fastq file with `-o fastq`, whi
 
 Scrappie can be run as `scrappie events` (where it basecalls from event segmentation) or as `scrappie raw` (where it basecalls directly from the raw signal). For Scrappie v1.0.0, running as `scrappie events` relies on preexisting event data in the fast5s. For that test I used the fast5s as produced by Albacore 1.2.6 – the last Albacore version to do event segmentation.
 
-In Scrappie v1.1.0, there are three different raw basecalling models to choose from: raw_r94, rgr_r94 and rgrgr_r94. The default is rgrgr_r94, and that is the only one tested.
+In Scrappie v1.1.0, there are three different raw basecalling models to choose from (raw_r94, rgr_r94 and rgrgr_r94) and I tried each.
 
 Unlike other basecallers, Scrappie does not produce fastq output, either directly or by writing it into the fast5 files.
 
@@ -70,7 +70,9 @@ scrappie raw --threads 40 raw_fast5 > scrappie_v1.0.0_raw.fasta
 
 # Scrappie v1.1.0:
 scrappie events --threads 40 raw_fast5 > scrappie_v1.1.0_events.fasta
-scrappie raw --threads 40 raw_fast5 > scrappie_v1.1.0_raw.fasta
+scrappie raw --model raw_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_raw_r94.fasta
+scrappie raw --model rgr_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_rgr_r94.fasta
+scrappie raw --model rgrgr_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_rgrgr_r94.fasta
 ```
 
 ### Chiron
