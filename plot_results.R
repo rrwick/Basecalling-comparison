@@ -5,7 +5,6 @@ library(RColorBrewer)
 library(gridExtra)
 
 
-# Prepare stuff for ggplot
 basecaller_names <- c("Nanonet v2.0.0",
                       "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2",
                       "Scrappie events v1.0.0", "Scrappie events v1.1.0",
@@ -22,103 +21,48 @@ my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
 
 
 
-# Load the tables
-nanonet_reads <- read_tsv("results/nanonet_reads.tsv", skip = 1, col_names = c("Name", "Length_Nanonet", "Identity_Nanonet", "Rel_len_Nanonet"))
-albacore_v0.8.4_reads <- read_tsv("results/albacore_v0.8.4_reads.tsv", skip = 1, col_names = c("Name", "Length_0.8.4", "Identity_0.8.4", "Rel_len_0.8.4"))
-albacore_v0.9.1_reads <- read_tsv("results/albacore_v0.9.1_reads.tsv", skip = 1, col_names = c("Name", "Length_0.9.1", "Identity_0.9.1", "Rel_len_0.9.1"))
-albacore_v1.0.4_reads <- read_tsv("results/albacore_v1.0.4_reads.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
-albacore_v1.1.2_reads <- read_tsv("results/albacore_v1.1.2_reads.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
-albacore_v1.2.6_reads <- read_tsv("results/albacore_v1.2.6_reads.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
-albacore_v2.0.2_reads <- read_tsv("results/albacore_v2.0.2_reads.tsv", skip = 1, col_names = c("Name", "Length_2.0.2", "Identity_2.0.2", "Rel_len_2.0.2"))
-scrappie_events_v1.0.0_reads <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
-scrappie_events_v1.1.0_reads <- read_tsv("results/scrappie_v1.1.0_events_reads.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_events_1.1.0", "Identity_Scrappie_events_1.1.0", "Rel_len_Scrappie_events_1.1.0"))
-scrappie_raw_v1.0.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
-scrappie_raw_raw_r94_v1.1.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_raw_r94_1.1.0 = numeric(), Identity_Scrappie_raw_raw_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_raw_r94_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_rgr_r94_v1.1.0_reads <- data.frame(Name = numeric(), Length_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgr_r94_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_rgrgr_r94_v1.1.0_reads <- read_tsv("results/scrappie_v1.1.0_raw_rgrgr_r94_reads.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_raw_rgrgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0"))
-chiron_reads <- data.frame(Name = numeric(), Length_Chiron = numeric(), Identity_Chiron = numeric(), Rel_len_Chiron = numeric())  # temporary empty table
-
-nanonet_assembly <- read_tsv("results/nanonet_assembly.tsv", skip = 1, col_names = c("Name", "Length_Nanonet", "Identity_Nanonet", "Rel_len_Nanonet"))
-albacore_v0.8.4_assembly <- read_tsv("results/albacore_v0.8.4_assembly.tsv", skip = 1, col_names = c("Name", "Length_0.8.4", "Identity_0.8.4", "Rel_len_0.8.4"))
-albacore_v0.9.1_assembly <- read_tsv("results/albacore_v0.9.1_assembly.tsv", skip = 1, col_names = c("Name", "Length_0.9.1", "Identity_0.9.1", "Rel_len_0.9.1"))
-albacore_v1.0.4_assembly <- read_tsv("results/albacore_v1.0.4_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
-albacore_v1.1.2_assembly <- read_tsv("results/albacore_v1.1.2_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
-albacore_v1.2.6_assembly <- read_tsv("results/albacore_v1.2.6_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
-albacore_v2.0.2_assembly <- read_tsv("results/albacore_v2.0.2_assembly.tsv", skip = 1, col_names = c("Name", "Length_2.0.2", "Identity_2.0.2", "Rel_len_2.0.2"))
-scrappie_events_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
-scrappie_events_v1.1.0_assembly <- read_tsv("results/scrappie_v1.1.0_events_assembly.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_events_1.1.0", "Identity_Scrappie_events_1.1.0", "Rel_len_Scrappie_events_1.1.0"))
-scrappie_raw_v1.0.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
-scrappie_raw_raw_r94_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_raw_r94_1.1.0 = numeric(), Identity_Scrappie_raw_raw_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_raw_r94_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_rgr_r94_v1.1.0_assembly <- data.frame(Name = numeric(), Length_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgr_r94_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_rgrgr_r94_v1.1.0_assembly <- read_tsv("results/scrappie_v1.1.0_raw_rgrgr_r94_assembly.tsv", skip = 1, col_names = c("Name", "Length_Scrappie_raw_rgrgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0"))
-chiron_assembly <- data.frame(Name = numeric(), Length_Chiron = numeric(), Identity_Chiron = numeric(), Rel_len_Chiron = numeric())  # temporary empty table
-
-nanonet_nanopolish <- data.frame(Name = numeric(), Length_Nanonet = numeric(), Identity_Nanonet = numeric(), Rel_len_Nanonet = numeric())  # temporary empty table
-albacore_v0.8.4_nanopolish <- data.frame(Name = numeric(), Length_0.8.4 = numeric(), Identity_0.8.4 = numeric(), Rel_len_0.8.4 = numeric())  # temporary empty table
-albacore_v0.9.1_nanopolish <- data.frame(Name = numeric(), Length_0.9.1 = numeric(), Identity_0.9.1 = numeric(), Rel_len_0.9.1 = numeric())  # temporary empty table
-albacore_v1.0.4_nanopolish <- read_tsv("results/albacore_v1.0.4_nanopolished_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.0.4", "Identity_1.0.4", "Rel_len_1.0.4"))
-albacore_v1.1.2_nanopolish <- read_tsv("results/albacore_v1.1.2_nanopolished_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.1.2", "Identity_1.1.2", "Rel_len_1.1.2"))
-albacore_v1.2.6_nanopolish <- read_tsv("results/albacore_v1.2.6_nanopolished_assembly.tsv", skip = 1, col_names = c("Name", "Length_1.2.6", "Identity_1.2.6", "Rel_len_1.2.6"))
-albacore_v2.0.2_nanopolish <- data.frame(Name = numeric(), Length_2.0.2 = numeric(), Identity_2.0.2 = numeric(), Rel_len_2.0.2 = numeric())  # temporary empty table, until Nanopolish supports Albacore v2
-scrappie_events_v1.0.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_events_1.0.0 = numeric(), Identity_Scrappie_events_1.0.0 = numeric(), Rel_len_Scrappie_events_1.0.0 = numeric())  # temporary empty table
-scrappie_events_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_events_1.1.0 = numeric(), Identity_Scrappie_events_1.1.0 = numeric(), Rel_len_Scrappie_events_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_v1.0.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_1.0.0 = numeric(), Identity_Scrappie_raw_1.0.0 = numeric(), Rel_len_Scrappie_raw_1.0.0 = numeric())  # temporary empty table
-scrappie_raw_raw_r94_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_raw_r94_1.1.0 = numeric(), Identity_Scrappie_raw_raw_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_raw_r94_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_rgr_r94_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgr_r94_1.1.0 = numeric())  # temporary empty table
-scrappie_raw_rgrgr_r94_v1.1.0_nanopolish <- data.frame(Name = numeric(), Length_Scrappie_raw_rgrgr_r94_1.1.0 = numeric(), Identity_Scrappie_raw_rgrgr_r94_1.1.0 = numeric(), Rel_len_Scrappie_raw_rgrgr_r94_1.1.0 = numeric())  # temporary empty table
-chiron_nanopolish <- data.frame(Name = numeric(), Length_Chiron = numeric(), Identity_Chiron = numeric(), Rel_len_Chiron = numeric())  # temporary empty table
+load_tsv_data <- function(filename, column_names) {
+  if(file.exists(filename)) {
+    data <- read_tsv(filename, skip = 1, col_names = column_names)
+  }
+  else {
+    data <- data.frame(matrix(ncol = 4, nrow = 0))
+    colnames(data) <- column_names
+  }
+  return(data)
+}
 
 
 
-# Merge the tables together
 all_reads <- data.frame(Name = character())
-all_reads <- merge(all_reads, nanonet_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, albacore_v0.8.4_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, albacore_v0.9.1_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, albacore_v1.0.4_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, albacore_v1.1.2_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, albacore_v1.2.6_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, albacore_v2.0.2_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, scrappie_events_v1.0.0_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, scrappie_events_v1.1.0_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, scrappie_raw_v1.0.0_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, scrappie_raw_raw_r94_v1.1.0_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, scrappie_raw_rgr_r94_v1.1.0_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, scrappie_raw_rgrgr_r94_v1.1.0_reads, by=1, all=TRUE)
-all_reads <- merge(all_reads, chiron_reads, by=1, all=TRUE)
-
 all_assemblies <- data.frame(Name = numeric())
-all_assemblies <- merge(all_assemblies, nanonet_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, albacore_v0.8.4_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, albacore_v0.9.1_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, albacore_v1.0.4_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, albacore_v1.1.2_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, albacore_v1.2.6_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, albacore_v2.0.2_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, scrappie_events_v1.0.0_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, scrappie_events_v1.1.0_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, scrappie_raw_v1.0.0_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, scrappie_raw_raw_r94_v1.1.0_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, scrappie_raw_rgr_r94_v1.1.0_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, scrappie_raw_rgrgr_r94_v1.1.0_assembly, by=1, all=TRUE)
-all_assemblies <- merge(all_assemblies, chiron_assembly, by=1, all=TRUE)
-
 all_nanopolish <- data.frame(Name = numeric())
-all_nanopolish <- merge(all_nanopolish, nanonet_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, albacore_v0.8.4_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, albacore_v0.9.1_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, albacore_v1.0.4_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, albacore_v1.1.2_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, albacore_v1.2.6_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, albacore_v2.0.2_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, scrappie_events_v1.0.0_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, scrappie_events_v1.1.0_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, scrappie_raw_v1.0.0_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, scrappie_raw_raw_r94_v1.1.0_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, scrappie_raw_rgr_r94_v1.1.0_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, scrappie_raw_rgrgr_r94_v1.1.0_nanopolish, by=1, all=TRUE)
-all_nanopolish <- merge(all_nanopolish, chiron_nanopolish, by=1, all=TRUE)
+basecaller_identities <- c()
+basecaller_rel_lengths <- c()
 
+for (basecaller in basecaller_names) {
+  no_spaces <- gsub(" ", "_", basecaller)
+  
+  read_data_filename <- paste("results/", tolower(no_spaces), "_reads.tsv", sep="")
+  assembly_data_filename <- paste("results/", tolower(no_spaces), "_assembly.tsv", sep="")
+  nanopolish_data_filename <- paste("results/", tolower(no_spaces), "_nanopolished_assembly.tsv", sep="")
+  
+  length_column <- paste("Length_", no_spaces, sep="")
+  identity_column <- paste("Identity_", no_spaces, sep="")
+  rel_length_column <- paste("Rel_len_", no_spaces, sep="")
+  
+  basecaller_identities <- c(basecaller_identities, identity_column)
+  basecaller_rel_lengths <- c(basecaller_rel_lengths, rel_length_column)
+  
+  column_names = c("Name", length_column, identity_column, rel_length_column)
+  read_data <- load_tsv_data(read_data_filename, column_names)
+  assembly_data <- load_tsv_data(assembly_data_filename, column_names)
+  nanopolish_data <- load_tsv_data(nanopolish_data_filename, column_names)
+
+  all_reads <- merge(all_reads, read_data, by=1, all=TRUE)
+  all_assemblies <- merge(all_assemblies, assembly_data, by=1, all=TRUE)
+  all_nanopolish <- merge(all_nanopolish, nanopolish_data, by=1, all=TRUE)
+}
 
 
 # Each read's length is the median value of the different basecallers' lengths.
@@ -146,20 +90,7 @@ for(col_name in names(all_reads)){
 }
 
 
-
 # Reformat data frames for ggplot
-basecaller_identities <- c("Identity_Nanonet",
-                           "Identity_0.8.4", "Identity_0.9.1", "Identity_1.0.4", "Identity_1.1.2", "Identity_1.2.6", "Identity_2.0.2",
-                           "Identity_Scrappie_events_1.0.0", "Identity_Scrappie_events_1.1.0",
-                           "Identity_Scrappie_raw_1.0.0", "Identity_Scrappie_raw_raw_r94_1.1.0", "Identity_Scrappie_raw_rgr_r94_1.1.0", "Identity_Scrappie_raw_rgrgr_r94_1.1.0",
-                           "Identity_Chiron")
-
-basecaller_rel_lengths <- c("Rel_len_Nanonet",
-                            "Rel_len_0.8.4", "Rel_len_0.9.1", "Rel_len_1.0.4", "Rel_len_1.1.2", "Rel_len_1.2.6", "Rel_len_2.0.2",
-                            "Rel_len_Scrappie_events_1.0.0", "Rel_len_Scrappie_events_1.1.0",
-                            "Rel_len_Scrappie_raw_1.0.0", "Rel_len_Scrappie_raw_raw_r94_1.1.0", "Rel_len_Scrappie_raw_rgr_r94_1.1.0", "Rel_len_Scrappie_raw_rgrgr_r94_1.1.0",
-                            "Rel_len_Chiron")
-
 read_identities <- all_reads[,c("Name", "Length", basecaller_identities)]
 colnames(read_identities) <- c("Name", "Length", basecaller_names)
 read_identities <- melt(read_identities, id=c("Name", "Length"))
@@ -187,74 +118,21 @@ colnames(nanopolish_identities) <- c("Read_name", "Length", "Basecaller", "Ident
 
 
 
-# Make a read vs assembly identity data frame
-nanonet_read_id <- matrixStats::weightedMedian(all_reads$Identity_Nanonet, all_reads$Length, na.rm = TRUE)
-nanonet_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Nanonet, all_assemblies$Length, na.rm = TRUE)
-
-albacore_v0.8.4_read_id <- matrixStats::weightedMedian(all_reads$Identity_0.8.4, all_reads$Length, na.rm = TRUE)
-albacore_v0.8.4_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_0.8.4, all_assemblies$Length, na.rm = TRUE)
-
-albacore_v0.9.1_read_id <- matrixStats::weightedMedian(all_reads$Identity_0.9.1, all_reads$Length, na.rm = TRUE)
-albacore_v0.9.1_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_0.9.1, all_assemblies$Length, na.rm = TRUE)
-
-albacore_v1.0.4_read_id <- matrixStats::weightedMedian(all_reads$Identity_1.0.4, all_reads$Length, na.rm = TRUE)
-albacore_v1.0.4_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_1.0.4, all_assemblies$Length, na.rm = TRUE)
-
-albacore_v1.1.2_read_id <- matrixStats::weightedMedian(all_reads$Identity_1.1.2, all_reads$Length, na.rm = TRUE)
-albacore_v1.1.2_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_1.1.2, all_assemblies$Length, na.rm = TRUE)
-
-albacore_v1.2.6_read_id <- matrixStats::weightedMedian(all_reads$Identity_1.2.6, all_reads$Length, na.rm = TRUE)
-albacore_v1.2.6_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_1.2.6, all_assemblies$Length, na.rm = TRUE)
-
-albacore_v2.0.2_read_id <- matrixStats::weightedMedian(all_reads$Identity_2.0.2, all_reads$Length, na.rm = TRUE)
-albacore_v2.0.2_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_2.0.2, all_assemblies$Length, na.rm = TRUE)
-
-scrappie_events_v1.0.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_events_1.0.0, all_reads$Length, na.rm = TRUE)
-scrappie_events_v1.0.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_events_1.0.0, all_assemblies$Length, na.rm = TRUE)
-
-scrappie_events_v1.1.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_events_1.1.0, all_reads$Length, na.rm = TRUE)
-scrappie_events_v1.1.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_events_1.1.0, all_assemblies$Length, na.rm = TRUE)
-
-scrappie_raw_v1.0.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_raw_1.0.0, all_reads$Length, na.rm = TRUE)
-scrappie_raw_v1.0.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_raw_1.0.0, all_assemblies$Length, na.rm = TRUE)
-
-scrappie_raw_raw_r94_v1.1.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_raw_raw_r94_1.1.0, all_reads$Length, na.rm = TRUE)
-scrappie_raw_raw_r94_v1.1.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_raw_raw_r94_1.1.0, all_assemblies$Length, na.rm = TRUE)
-
-scrappie_raw_rgr_r94_v1.1.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_raw_rgr_r94_1.1.0, all_reads$Length, na.rm = TRUE)
-scrappie_raw_rgr_r94_v1.1.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_raw_rgr_r94_1.1.0, all_assemblies$Length, na.rm = TRUE)
-
-scrappie_raw_rgrgr_r94_v1.1.0_read_id <- matrixStats::weightedMedian(all_reads$Identity_Scrappie_raw_rgrgr_r94_1.1.0, all_reads$Length, na.rm = TRUE)
-scrappie_raw_rgrgr_r94_v1.1.0_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Scrappie_raw_rgrgr_r94_1.1.0, all_assemblies$Length, na.rm = TRUE)
-
-chiron_read_id <- matrixStats::weightedMedian(all_reads$Identity_Chiron, all_reads$Length, na.rm = TRUE)
-chiron_assembly_id <- matrixStats::weightedMedian(all_assemblies$Identity_Chiron, all_assemblies$Length, na.rm = TRUE)
-
+# Prepare the data frame for the read vs assembly identity scatterplot.
 read_vs_assembly_identity <- data.frame(Basecaller = factor(), Read_identity = numeric(), Assembly_identity = numeric())
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Nanonet v2.0.0"), Read_identity = nanonet_read_id, Assembly_identity = nanonet_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v0.8.4"), Read_identity = albacore_v0.8.4_read_id, Assembly_identity = albacore_v0.8.4_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v0.9.1"), Read_identity = albacore_v0.9.1_read_id, Assembly_identity = albacore_v0.9.1_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v1.0.4"), Read_identity = albacore_v1.0.4_read_id, Assembly_identity = albacore_v1.0.4_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v1.1.2"), Read_identity = albacore_v1.1.2_read_id, Assembly_identity = albacore_v1.1.2_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v1.2.6"), Read_identity = albacore_v1.2.6_read_id, Assembly_identity = albacore_v1.2.6_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Albacore v2.0.2"), Read_identity = albacore_v2.0.2_read_id, Assembly_identity = albacore_v2.0.2_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie events v1.0.0"), Read_identity = scrappie_events_v1.0.0_read_id, Assembly_identity = scrappie_events_v1.0.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie events v1.1.0"), Read_identity = scrappie_events_v1.1.0_read_id, Assembly_identity = scrappie_events_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.0.0"), Read_identity = scrappie_raw_v1.0.0_read_id, Assembly_identity = scrappie_raw_v1.0.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 raw_r94"), Read_identity = scrappie_raw_raw_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_raw_r94_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 rgr_r94"), Read_identity = scrappie_raw_rgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgr_r94_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Scrappie raw v1.1.0 rgrgr_r94"), Read_identity = scrappie_raw_rgrgr_r94_v1.1.0_read_id, Assembly_identity = scrappie_raw_rgrgr_r94_v1.1.0_assembly_id))
-read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = factor("Chiron 847ad10"), Read_identity = chiron_read_id, Assembly_identity = chiron_assembly_id))
 
+for (basecaller in basecaller_names) {
+  no_spaces <- gsub(" ", "_", basecaller)
+  identity_column <- paste("Identity_", no_spaces, sep="")
+  read_ids <- all_reads[,identity_column]
+  assembly_ids <- all_assemblies[,identity_column]
 
-
-
-
-
-
-
-
-
+  if (!all(is.na(read_ids)) && !all(is.na(assembly_ids)) > 0) {
+    median_read_id <- matrixStats::weightedMedian(read_ids, all_reads$Length, na.rm = TRUE)
+    median_assembly_id <- matrixStats::weightedMedian(assembly_ids, all_assemblies$Length, na.rm = TRUE)
+    read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = basecaller, Read_identity = median_read_id, Assembly_identity = median_assembly_id))
+  }
+}
 
 
 
