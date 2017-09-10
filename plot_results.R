@@ -117,16 +117,23 @@ nanopolish_identities <- melt(nanopolish_identities, id=c("Name", "Length"))
 colnames(nanopolish_identities) <- c("Read_name", "Length", "Basecaller", "Identity")
 
 
+# Prepare the total bases called data frame.
+total_bases <- data.frame(Basecaller = factor(), Total_bases = numeric())
+for (basecaller in basecaller_names) {
+  no_spaces <- gsub(" ", "_", basecaller)
+  length_column <- paste("Length_", no_spaces, sep="")
+  bases <- sum(all_reads[,length_column], na.rm = TRUE)
+  total_bases <- rbind(total_bases, data.frame(Basecaller = basecaller, Total_bases = bases))
+}
+
 
 # Prepare the data frame for the read vs assembly identity scatterplot.
 read_vs_assembly_identity <- data.frame(Basecaller = factor(), Read_identity = numeric(), Assembly_identity = numeric())
-
 for (basecaller in basecaller_names) {
   no_spaces <- gsub(" ", "_", basecaller)
   identity_column <- paste("Identity_", no_spaces, sep="")
   read_ids <- all_reads[,identity_column]
   assembly_ids <- all_assemblies[,identity_column]
-
   if (!all(is.na(read_ids)) && !all(is.na(assembly_ids)) > 0) {
     median_read_id <- matrixStats::weightedMedian(read_ids, all_reads$Length, na.rm = TRUE)
     median_assembly_id <- matrixStats::weightedMedian(assembly_ids, all_assemblies$Length, na.rm = TRUE)
@@ -142,6 +149,16 @@ for (basecaller in basecaller_names) {
 
 
 
+
+
+# Bar plot of yield
+ggplot(total_bases, aes(x = Basecaller, y = Total_bases, fill = Basecaller)) + 
+  geom_bar(stat="identity", colour="black", width = 0.8) +
+  fill_scale + my_theme + guides(fill=FALSE) +
+  labs(title = "Total basecalling yield", x = "", y = "") +
+  scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 2000000000, 500000000), minor_breaks = seq(0, 2000000000, 100000000), labels = scales::unit_format("M", 0.000001)) +
+  coord_cartesian(ylim=c(0, 1500000000))
 
 
 
