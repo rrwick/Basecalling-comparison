@@ -30,7 +30,6 @@ nanonetcall --chemistry r9.4 --write_events --min_len 1 --max_len 1000000 --jobs
 The `--min_len` and `--max_len` options were set so Nanonet wouldn't skip any reads. While Nanonet outputs its basecalls to stdout in fasta format, I've ignored that and instead used the `--write_events` options so it stores fastq basecalls in the fast5 files, which I can extract later. Unlike Albacore, which makes a copy of fast5 files, Nanonet modifies the original ones in the `raw_fast5_dir` directory.
 
 
-
 ### Albacore
 
 Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6 and 2.0.1. The transducer basecaller (helps with homopolymers) was added in v1.0. Event-free basecalling first appears in v2.0. I think you need an account with the [Nanopore community](https://community.nanoporetech.com/) to get the download links for Albacore.
@@ -50,7 +49,6 @@ read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5_dir -t 40 -s o
 ```
 
 Albacore v1.1 and later can basecall directly to fastq file with `-o fastq`, which saves disk space and is usually more convenient. However, for this experiment I used `-o fast5` to keep my analysis options open.
-
 
 
 ### Scrappie
@@ -75,6 +73,7 @@ scrappie raw --model rgr_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_rgr_r9
 scrappie raw --model rgrgr_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_rgrgr_r94.fasta
 ```
 
+
 ### Chiron
 
 [Chiron](https://github.com/haotianteng/chiron) is a third-party neural-network basecaller. The first release (v0.1) did not work on my reads (`extract_sig_ref.py` failed to get the signal from the fast5 files) so I instead used the [latest commit](https://github.com/haotianteng/chiron/commit/847ad101d338a253a7dfed2023c3ed8758886e7e) (at the time of writing) on the master branch.
@@ -82,6 +81,14 @@ scrappie raw --model rgrgr_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_rgrg
 ```
 chiron call -i raw_fast5 -o output_dir
 ```
+
+
+### Excluded basecallers
+
+I did not include [basecRAWller](https://basecrawller.lbl.gov/) for two reasons. First, as stated in [its paper](http://www.biorxiv.org/content/early/2017/05/01/133058), basecRAWller's has a somewhat different focus from the other programs: streaming basecalling. Second, it is not freely available to downloaded without registration on the website.
+
+I _am_ interested in [Guppy](https://github.com/nanoporetech/guppy), an ONT basecaller designed for fast GPU-accelerated performance. However, it is only available to users who have signed the ONT developer license agreement (which is why you might have gotten a 404 if you just tried that link). If and when Guppy becomes publicly available, I'll add it to this comparison.
+
 
 
 # Method
@@ -110,9 +117,11 @@ To get a distribution of assembly identity, I used [`chop_up_assembly.py`](chop_
 # Results
 
 
-### Basecaller differences
+### Total yield
 
-Nanonet had some particularly odd behaviour. For most reads, it produced a much shorter sequence than other basecallers, sometimes drastically shorter. For example, all versions of Albacore basecalled one read (`d2e65643-98b4-4a61-ad36-119e55250b28`) to a 34+ kbp sequence. Nanonet produced a 518 bp sequence for the same read. All in all, while other basecallers produced a total of over 1 Gbp of sequence, Nanonet only made 355 Mbp - something to keep in mind when viewing the results.
+_YIELD BAR PLOT HERE_
+
+You might expect that each basecaller would produce approximately the same total yield. E.g. a read that's 10 kbp in one basecaller would be about 10 kbp in each basecaller. And for the most part, that is what we see, but Nanonet is a notable exception. For most reads, it produced a much shorter sequence than other basecallers, sometimes drastically so. For example, all versions of Albacore basecalled one read (`d2e65643-98b4-4a61-ad36-119e55250b28`) to a 34+ kbp sequence. Nanonet produced a 518 bp sequence for the same read. I don't have an explanation for this odd behaviour.
 
 
 ### Read identity
