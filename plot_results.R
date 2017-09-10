@@ -231,20 +231,25 @@ grid.arrange(gA, gB, ncol=1, heights=c(3.5, 1))
 
 
 
-# Scatter plot
+# Scatter plot 1: both axes go to 100%
 ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
   geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.85) +
   fill_scale + theme_bw() +
-  # scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.5), labels = scales::unit_format("%")) +
-  # scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
-  # coord_cartesian(xlim=c(80, 90), ylim=c(98.5, 100)) +
   scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 2), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   coord_cartesian(xlim=c(80, 100), ylim=c(98.5, 100)) +
   labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
 
+# Scatter plot 2: zoomed in on relevant area
+ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
+  geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.85) +
+  fill_scale + theme_bw() +
+  scale_x_continuous(expand = c(0.03, 0.03), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.5), labels = scales::unit_format("%")) +
+  scale_y_continuous(expand = c(0.02, 0.02), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  coord_cartesian(xlim=c(82, 88), ylim=c(98.8, 99.6)) +
+  labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
 
-# This one is square and has the diagonal line.
+# Scatter plot 3: square and has the diagonal line.
 poly <- data.frame(x=c(0, 100, 100), y=c(0, 0, 100))
 ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
   geom_polygon(data=poly, aes(x=x,y=y),alpha=0.5,fill="black") +

@@ -10,12 +10,14 @@ albacore_v1_1_2=false
 albacore_v1_0_4=false
 albacore_v0_9_1=false
 albacore_v0_8_4=false
-scrappie_v1_1_0_raw=false
-scrappie_v1_1_0_events=false
-scrappie_v1_0_0_raw=false
-scrappie_v1_0_0_events=false
-nanonet=false
-chiron=false
+scrappie_raw_v1_1_0_raw_94=false
+scrappie_raw_v1_1_0_rgr_94=false
+scrappie_raw_v1_1_0_rgrgr_94=false
+scrappie_raw_v1_0_0=false
+scrappie_events_v1_1_0=false
+scrappie_events_v1_0_0=false
+nanonet_v2_0_0=false
+chiron_847ad10=false
 
 
 threads=40
@@ -180,65 +182,65 @@ if $albacore_v0_8_4; then
     extract_map_and_assemble "albacore_v0.8.4"
 fi
 
-if $scrappie_v1_0_0_raw; then
+if $scrappie_raw_v1_0_0; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
-    $scrappie_v1_0_0_path/scrappie raw --threads $threads raw_fast5 > scrappie_v1_0_0_raw.fasta
-    extract_map_and_assemble "scrappie_v1_0_0_raw"
+    $scrappie_v1_0_0_path/scrappie raw --threads $threads raw_fast5 > scrappie_raw_v1_0_0.fasta
+    extract_map_and_assemble "scrappie_raw_v1_0_0"
 fi
 
-if $scrappie_v1_0_0_events; then
+if $scrappie_events_v1_0_0; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
     mkdir albacore_v1.2.6_fast5s
     for f in $(find albacore_v1.2.6/workspace -name "*.fast5"); do cp $f albacore_v1.2.6_fast5s; done
-    $scrappie_v1_0_0_path/scrappie events --threads $threads --albacore albacore_v1.2.6_fast5s > scrappie_v1_0_0_events.fasta
-    extract_map_and_assemble "scrappie_v1_0_0_events"
+    $scrappie_v1_0_0_path/scrappie events --threads $threads --albacore albacore_v1.2.6_fast5s > scrappie_events_v1_0_0.fasta
+    extract_map_and_assemble "scrappie_events_v1_0_0"
 fi
 
-if $scrappie_v1_1_0_raw_raw_94; then
+if $scrappie_raw_v1_1_0_raw_94; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
-    $scrappie_v1_1_0_path/scrappie raw --model raw_r94 --threads $threads raw_fast5 > scrappie_v1_1_0_raw_raw_94.fasta
-    extract_map_and_assemble "scrappie_v1_1_0_raw_raw_94"
-    change_scrappie_read_names("scrappie_v1_1_0_raw_raw_94")
+    $scrappie_v1_1_0_path/scrappie raw --model raw_r94 --threads $threads raw_fast5 > scrappie_raw_v1_1_0_raw_94.fasta
+    extract_map_and_assemble "scrappie_raw_v1_1_0_raw_94"
+    change_scrappie_read_names "scrappie_raw_v1_1_0_raw_94"
 fi
 
-if $scrappie_v1_1_0_raw_rgr_94; then
+if $scrappie_raw_v1_1_0_rgr_94; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
-    $scrappie_v1_1_0_path/scrappie raw --model raw_rgr --threads $threads raw_fast5 > scrappie_v1_1_0_raw_rgr_94.fasta
-    extract_map_and_assemble "scrappie_v1_1_0_raw_rgr_94"
-    change_scrappie_read_names("scrappie_v1_1_0_raw_rgr_94")
+    $scrappie_v1_1_0_path/scrappie raw --model raw_rgr --threads $threads raw_fast5 > scrappie_raw_v1_1_0_rgr_94.fasta
+    extract_map_and_assemble "scrappie_raw_v1_1_0_rgr_94"
+    change_scrappie_read_names "scrappie_raw_v1_1_0_rgr_94"
 fi
 
-if $scrappie_v1_1_0_raw_rgrgr_94; then
+if $scrappie_raw_v1_1_0_rgrgr_94; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
-    $scrappie_v1_1_0_path/scrappie raw --model raw_rgrgr --threads $threads raw_fast5 > scrappie_v1_1_0_raw_rgrgr_94.fasta
-    extract_map_and_assemble "scrappie_v1_1_0_raw_rgrgr_94"
-    change_scrappie_read_names("scrappie_v1_1_0_raw_rgrgr_94")
+    $scrappie_v1_1_0_path/scrappie raw --model raw_rgrgr --threads $threads raw_fast5 > scrappie_raw_v1_1_0_rgrgr_94.fasta
+    extract_map_and_assemble "scrappie_raw_v1_1_0_rgrgr_94"
+    change_scrappie_read_names "scrappie_raw_v1_1_0_rgrgr_94"
 fi
 
-if $scrappie_v1_1_0_events; then
+if $scrappie_events_v1_1_0; then
     export OMP_NUM_THREADS=$threads
     export OPENBLAS_NUM_THREADS=1
-    $scrappie_v1_1_0_path/scrappie events --threads $threads --albacore raw_fast5 > scrappie_v1_1_0_events.fasta
-    extract_map_and_assemble "scrappie_v1_1_0_events"
-    change_scrappie_read_names("scrappie_v1_1_0_events")
+    $scrappie_v1_1_0_path/scrappie events --threads $threads --albacore raw_fast5 > scrappie_events_v1_1_0.fasta
+    extract_map_and_assemble "scrappie_events_v1_1_0"
+    change_scrappie_read_names "scrappie_events_v1_1_0"
 fi
 
-if $nanonet; then
+if $nanonet_v2_0_0; then
     cp -r raw_fast5 nanonet  # Nanonet adds data to the fast5s, so we first make a copy.
     nanonetcall --chemistry r9.4 --write_events --min_len 1 --max_len 1000000 --jobs $threads nanonet > /dev/null
-    extract_map_and_assemble "nanonet"
-    change_nanonet_read_names("nanonet")
+    extract_map_and_assemble "nanonet_v2_0_0"
+    change_nanonet_read_names "nanonet_v2_0_0"
 fi
 
-if $chiron; then
+if $chiron_847ad10; then
     source /home/UNIMELB/inouye-hpc-sa/chiron/chiron/bin/activate
     chiron call -i raw_fast5 -o chiron -t $threads
-    paste --delimiter=\\n --serial chiron/result/*.fasta > chiron.fasta
+    paste --delimiter=\\n --serial chiron/result/*.fasta > chiron_847ad10.fasta
     deactivate
-    extract_map_and_assemble "chiron"
+    extract_map_and_assemble "chiron_847ad10"
 fi

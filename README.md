@@ -121,7 +121,9 @@ To get a distribution of assembly identity, I used [`chop_up_assembly.py`](chop_
 
 _YIELD BAR PLOT HERE_
 
-You might expect that each basecaller would produce approximately the same total yield. E.g. a read that's 10 kbp in one basecaller would be about 10 kbp in each basecaller. And for the most part, that is what we see, but Nanonet is a notable exception. For most reads, it produced a much shorter sequence than other basecallers, sometimes drastically so. For example, all versions of Albacore basecalled one read (`d2e65643-98b4-4a61-ad36-119e55250b28`) to a 34+ kbp sequence. Nanonet produced a 518 bp sequence for the same read. I don't have an explanation for this odd behaviour.
+You might expect that each basecaller would produce approximately the same total yield. E.g. a read that's 10 kbp in one basecaller would be about 10 kbp in each basecaller. That's true for the most part, but Nanonet is a notable exception. For most reads, it produced a much shorter sequence than other basecallers, sometimes drastically so. For example, all versions of Albacore basecalled one read (`d2e65643-98b4-4a61-ad36-119e55250b28`) to a 34+ kbp sequence. Nanonet produced a 518 bp sequence for the same read. I don't have an explanation for this odd behaviour.
+
+The other oddity is Albacore v0.9.1, which produced noticably more sequence than the other basecallers. More on that shortly...
 
 
 ### Read identity
@@ -139,28 +141,24 @@ _VIOLIN PLOT HERE_
 
 By looking at the relative length of read to reference in each alignment, we can get a picture of whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions.
 
-Curiously, some basecallers produce a distinctly bimodal distribution here. For example, Albacore v2.0.2 has a good median value of quite near 100%, but any individual read is more likely to fall either around 99% or 101%. I'm not sure what might be behind this.
+Curiously, a number of basecallers produce a distinctly bimodal distribution here. For example, Albacore v2.0.2 has a good median value of quite near 100%, but any individual read is more likely to fall either around 99% or 101%. I'm not sure what might be behind this.
 
 
 ### Assembly identity
 
 _VIOLIN PLOT HERE_
 
-This analysis is my personal favourite: how accurate are the consensus sequences produced by reads? I don't particularly care if individual reads have low identity if they produce an accurate assembly.
-
-Sometimes read and assembly accuracy go together, as you might expect.
+This analysis is my personal favourite: how accurate are the _consensus_ sequences? I don't particularly care if individual reads have low identity if they produce an accurate assembly.
 
 __SCATTER PLOT HERE__
+
+Sometimes read and assembly accuracy go together, as you might expect.
 
 
 ### Post-Nanopolish assembly identity
 
 _VIOLIN PLOT HERE_
 
-
-### Performance
-
-I didn't try to quantify CPU time or memory during my tests, but roughly speaking, Albacore versions 1.1 and later were the fastest. Chiron was by far the slowest when running on CPUs – it requires GPUs to run at an acceptable speed.
 
 
 # Conclusions
@@ -176,7 +174,10 @@ I didn't try to quantify CPU time or memory during my tests, but roughly speakin
 
 ### Recommendations
 
-* not Nanonet
+* not Nanonet, unless you're interested in training your own
+* not Scrappie, unless you're interested in bleeding edge ideas
+* Latest Albacore!
+
 
 
 ### Future work
