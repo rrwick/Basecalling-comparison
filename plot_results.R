@@ -1,20 +1,27 @@
 library(readr)
 library(reshape2)
 library(ggplot2)
-library(RColorBrewer)
 library(gridExtra)
+library(ggrepel)
 
+basecaller_names <- c()
+basecaller_colours <- c()
 
-basecaller_names <- c("Nanonet v2.0.0",
-                      "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2",
-                      "Scrappie events v1.0.0", "Scrappie events v1.1.0",
-                      "Scrappie raw v1.0.0", "Scrappie raw v1.1.0 raw_r94", "Scrappie raw v1.1.0 rgr_r94", "Scrappie raw v1.1.0 rgrgr_r94",
-                      "Chiron 847ad10")
-basecaller_colours <- c("#F0E57F",                                   # Nanonet colour
-                        brewer.pal(9, "Reds")[2:7],                  # Albacore colours
-                        "#788CC8", "#6175B1",                        # Scrappie event colours
-                        "#C09AC8", "#A56BB1", "#A56BB1", "#A56BB1",  # Scrappie raw colours
-                        "#43B164")                                   # Chiron colour
+basecaller_names <- c(basecaller_names, "Nanonet v2.0.0")
+basecaller_colours <- c(basecaller_colours, "#F0E57F")
+
+basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2")
+basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#DF5952", "#D53937", "#CB181D")
+
+basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.0")
+basecaller_colours <- c(basecaller_colours, "#788CC8", "#6175B1")
+
+basecaller_names <- c(basecaller_names, "Scrappie raw v1.0.0", "Scrappie raw v1.1.0 raw_r94", "Scrappie raw v1.1.0 rgr_r94", "Scrappie raw v1.1.0 rgrgr_r94")
+basecaller_colours <- c(basecaller_colours, "#C4B2C8", "#BA9AC0", "#AF83B9", "#A56BB1")
+
+# basecaller_names <- c(basecaller_names, "Chiron 847ad10")
+# basecaller_colours <- c(basecaller_colours, "#43B164")
+
 names(basecaller_colours) <- basecaller_names
 fill_scale <- scale_fill_manual(name = "Basecaller", values = basecaller_colours)
 my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
@@ -134,6 +141,7 @@ for (basecaller in basecaller_names) {
     read_vs_assembly_identity <- rbind(read_vs_assembly_identity, data.frame(Basecaller = basecaller, Read_identity = median_read_id, Assembly_identity = median_assembly_id))
   }
 }
+read_vs_assembly_identity$Basecaller_with_newlines <- sapply(read_vs_assembly_identity$Basecaller, function(x) gsub(" v","\nv",x,fixed=TRUE))
 
 
 
@@ -144,60 +152,63 @@ for (basecaller in basecaller_names) {
 
 
 
-
-# Bar plots
-ggplot(total_bases, aes(x = Basecaller, y = Total_bases, fill = Basecaller)) + 
+total_yield_plot <- ggplot(total_bases, aes(x = Basecaller, y = Total_bases, fill = Basecaller)) + 
   geom_bar(stat="identity", colour="black", width = 0.8) +
   fill_scale + my_theme + guides(fill=FALSE) +
-  labs(title = "Total basecalling yield", x = "", y = "") +
+  labs(title = "", x = "", y = "total basecalling yield") +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE), limits = basecaller_names) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 2000000000, 500000000), minor_breaks = seq(0, 2000000000, 100000000), labels = scales::unit_format("M", 0.000001)) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 2000000000, 500000000), minor_breaks = seq(0, 2000000000, 100000000), labels = scales::unit_format("Mbp", 0.000001)) +
   coord_cartesian(ylim=c(0, 1500000000))
+total_yield_plot
+ggsave(total_yield_plot, file='plots/total_yield.pdf', width = 9, height = 3)
 
+# ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+#   geom_violin(draw_quantiles = c(0.5)) +
+#   fill_scale + my_theme + guides(fill=FALSE) +
+#   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+#   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
+#   coord_cartesian(ylim=c(65, 100)) +
+#   labs(title = "Read identities", x = "", y = "")
 
-
-# Violin plots
-ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(draw_quantiles = c(0.5)) +
-  fill_scale + my_theme + guides(fill=FALSE) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
-  scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(65, 100)) +
-  labs(title = "Read identities", x = "", y = "")
-
-ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
+rel_read_length_plot <- ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
   geom_hline(yintercept = 100) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 4), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(84, 116)) +
-  labs(title = "Relative read lengths", x = "", y = "")
+  labs(title = "", x = "", y = "read length / reference length")
+rel_read_length_plot
+ggsave(rel_read_length_plot, file='plots/rel_read_length.pdf', width = 9, height = 5)
 
-ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+asssembly_identity_plot <- ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(98.5, 100)) +
-  labs(title = "Assembly identities (pre-Nanopolish)", x = "", y = "")
+  labs(title = "", x = "", y = "assembly identity (pre-Nanopolish)")
+asssembly_identity_plot
+ggsave(asssembly_identity_plot, file='plots/asssembly_identity.pdf', width = 9, height = 5)
 
-ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
+rel_assembly_length_plot <- ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
   geom_hline(yintercept = 100) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 0.5), minor_breaks = seq(0, 200, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(98.5, 101.5)) +
-  labs(title = "Relative assembly lengths", x = "", y = "")
+  labs(title = "", x = "", y = "assembly length / reference length")
+rel_assembly_length_plot
+ggsave(rel_assembly_length_plot, file='plots/rel_assembly_length.pdf', width = 9, height = 5)
 
-ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight = Length, fill = Basecaller)) + 
+nanopolish_identity_plot <- ggplot(nanopolish_identities, aes(x = factor(Basecaller), y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
   coord_cartesian(ylim=c(98.5, 100)) +
-  labs(title = "Assembly identities (post-Nanopolish)", x = "", y = "")
+  labs(title = "", x = "", y = "assembly identity (post-Nanopolish)")
 
 
 
@@ -212,7 +223,7 @@ p1 <- ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length,
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=NULL) +
   coord_cartesian(ylim=c(65, 100)) +
-  labs(title = "Read identities", x = "", y = "")
+  labs(title = "", x = "", y = "read identity")
 p2 <- ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + my_theme + guides(fill=FALSE) +
@@ -225,40 +236,44 @@ gB <- ggplot_gtable(ggplot_build(p2))
 maxWidth = grid::unit.pmax(gA$widths[2:3], gB$widths[2:3])
 gA$widths[2:3] <- as.list(maxWidth)
 gB$widths[2:3] <- as.list(maxWidth)
-grid.arrange(gA, gB, ncol=1, heights=c(3.5, 1))
+read_identity_plot <- grid.arrange(gA, gB, ncol=1, heights=c(3, 1))
+ggsave(read_identity_plot, file='plots/read_identity.pdf', width = 9, height = 5.75)
 
 
 
-
-
-# Scatter plot 1: both axes go to 100%
-ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
-  geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.85) +
-  fill_scale + theme_bw() +
-  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 2), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
-  coord_cartesian(xlim=c(80, 100), ylim=c(98.5, 100)) +
-  labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
+# Scatter plot 1: square and has the diagonal line.
+poly <- data.frame(x=c(0, 100, 100), y=c(0, 0, 100))
+p1 <- ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
+  geom_polygon(data=poly, aes(x=x,y=y),alpha=0.3,fill="black") +
+  geom_point(shape = 21, size = 2, stroke = 0.5, alpha = 0.85) +
+  fill_scale + theme_bw() + theme(aspect.ratio=1) + guides(fill=FALSE) +
+  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1)) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1)) +
+  coord_cartesian(xlim=c(80, 100), ylim=c(80, 100)) +
+  labs(title = "", x = "read identity (%)", y = "assembly identity (%)")
 
 # Scatter plot 2: zoomed in on relevant area
-ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
+p2 <- ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
   geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.85) +
-  fill_scale + theme_bw() +
-  scale_x_continuous(expand = c(0.03, 0.03), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.5), labels = scales::unit_format("%")) +
-  scale_y_continuous(expand = c(0.02, 0.02), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
-  coord_cartesian(xlim=c(82, 88), ylim=c(98.8, 99.6)) +
-  labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
+  # geom_text_repel(aes(label=Basecaller_with_newlines), box.padding = unit(0.4, "lines"), min.segment.length = unit(0.75, "lines")) + guides(fill=FALSE) +
+  fill_scale + theme_bw() + theme(aspect.ratio=1) + guides(fill=guide_legend(title="")) +
+  scale_x_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.5)) +
+  scale_y_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1)) +
+  coord_cartesian(xlim=c(82, 89), ylim=c(98.7, 99.7)) +
+  labs(title = "", x = "read identity (%)", y = "")
 
-# Scatter plot 3: square and has the diagonal line.
-poly <- data.frame(x=c(0, 100, 100), y=c(0, 0, 100))
-ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
-  geom_polygon(data=poly, aes(x=x,y=y),alpha=0.5,fill="black") +
-  geom_point(shape = 21, size = 2, stroke = 0.5, alpha = 0.85) +
-  fill_scale + theme_bw() + theme(aspect.ratio=1) +
-  scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
-  coord_cartesian(xlim=c(80, 100), ylim=c(80, 100)) +
-  labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
+read_assembly_scatter_plot <- grid.arrange(p1, p2, ncol=2, widths=c(2,3))
+ggsave(read_assembly_scatter_plot, file='plots/read_assembly_scatter.pdf', width = 9, height = 3.25)
+
+
+# # Scatter plot 3: both axes go to 100%
+# ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
+#   geom_point(shape = 21, size = 4, stroke = 0.5, alpha = 0.85) +
+#   fill_scale + theme_bw() +
+#   scale_x_continuous(expand = c(0, 0), breaks = seq(0, 100, 2), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+#   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+#   coord_cartesian(xlim=c(80, 100), ylim=c(98.5, 100)) +
+#   labs(title = "Read and assembly identities", x = "Read identity", y = "Assembly identity")
 
 
 # # Joyplots

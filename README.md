@@ -123,36 +123,55 @@ _YIELD BAR PLOT HERE_
 
 You might expect that each basecaller would produce approximately the same total yield. E.g. a read that's 10 kbp in one basecaller would be about 10 kbp in each basecaller. That's true for the most part, but Nanonet is a notable exception. For most reads, it produced a much shorter sequence than other basecallers, sometimes drastically so. For example, all versions of Albacore basecalled one read (`d2e65643-98b4-4a61-ad36-119e55250b28`) to a 34+ kbp sequence. Nanonet produced a 518 bp sequence for the same read. I don't have an explanation for this odd behaviour.
 
-The other oddity is Albacore v0.9.1, which produced noticably more sequence than the other basecallers. More on that shortly...
+Other oddities you might notice are Albacore v0.9.1, which produced noticably more sequence than the other basecallers, and Scrappie events, which produced less. That will explained in the 'Relative read length' section.
 
 
 ### Read identity
 
 _VIOLIN PLOT HERE_
 
-This first analysis tackles the most obvious question: how accurate are the basecalled reads?
+This first analysis tackles the most obvious question: how accurate are the basecalled reads? The plot above shows the read identity distribution, with the median (weighted by read length) marked as a horizontal line. Reads that could not be aligned were given an identity of 0%, creating a bulge at the bottom of the distribution. Reads with an actual identity below about 65% usually to fail to align and fall to 0.
 
 Nanonet performed poorly, with a low median identity and a significant proportion of unaligned reads. Its curiously high peak of about 99% is misleading and results from its short output sequences discussed above. While a few Nanonet 'reads' did indeed align to the reference with up to 99% identity, these were really small fragments (hundreds of bp) of larger reads.
+
+Albacore v0.9.1 is quite peculiar - its read identity distribution has a wide variance and the lowest median of all tested basecallers. All other versions of Albacore performed well, and reassuringly the latest version (v2.0.2) performed best. But surprisingly, v0.8.4 performed second best! The transducer algorithm introduced in v1 did not seem to create a large benefit, possibly because my data isn't too homopolymer-heavy.
+
+Scrappie also did fairly well, overall comparible in accuracy to Albacore.
+_WRITE MORE HERE WHEN SCRAPPIE RAW v1.0.0 IS DONE_
+Interestingly, Scrappie produced significantly more unalign-able reads than Albacore (excluding v0.9.1). This is true even for Scrappie raw v1.1.0 rgr_r94, which had the best overall median identity. It 
+
 
 
 ### Relative read length
 
 _VIOLIN PLOT HERE_
 
-By looking at the relative length of read to reference in each alignment, we can get a picture of whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions.
+By looking at the relative length of read to reference in each alignment, we can get a picture of whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions. Curiously, many basecallers produce a distinctly bimodal distribution here. For example, Albacore v2.0.2 has a good median value of quite near 100%, but any individual read is more likely to fall either around 99% or 101%. I'm not sure what might be behind this.
 
-Curiously, a number of basecallers produce a distinctly bimodal distribution here. For example, Albacore v2.0.2 has a good median value of quite near 100%, but any individual read is more likely to fall either around 99% or 101%. I'm not sure what might be behind this.
+Once again, Albacore v0.9.1 stands out as unusual, tending to overly-long reads, but in a bimodal way. Scrappie events tends to short reads. These explain the total yield differences we saw earlier.
+
 
 
 ### Assembly identity
 
-_VIOLIN PLOT HERE_
+_IDENTITY VIOLIN PLOT HERE_
 
 This analysis is my personal favourite: how accurate are the _consensus_ sequences? I don't particularly care if individual reads have low identity if they produce an accurate assembly.
 
+The first thing you might notice is that the difference between basecallers is more pronounced here than it was for read identity. Most surprisingly, Albacore v0.9.1, which was the worst performing in read identity, produces very good assemblies! This suggests that while its reads have a high degree of error, they have relatively little _systematic error_, and so the errors tend to average out in the consensus. Another notable finding is that while Scrappie events and Scrappie raw are comparible in read identity, Scrappie raw is clearly superior for assembly identity.
+
+_WRITE MORE HERE WHEN SCRAPPIE RAW v1.0.0 IS DONE_
+
+To better see how read identity and assembly identity relate, here are the median identities in a scatter plot:
+
 __SCATTER PLOT HERE__
 
-Sometimes read and assembly accuracy go together, as you might expect.
+If the two values were tightly correlated, the points would fall on a diagonal line. They mostly do, with Albacore v0.9.1 being the most obvious exception.
+
+Finally, it's interesting to look at the assembly insertions-vs-deletions biases, like we did for reads:
+
+_RELATIVE LENGTH VIOLIN PLOT HERE_
+
 
 
 ### Post-Nanopolish assembly identity
@@ -163,27 +182,18 @@ _VIOLIN PLOT HERE_
 
 # Conclusions
 
-### Random vs systematic error
-
-* Not always correlated!
-* Which is more important: read accuracy or consensus accuracy?
-  * Might depend on your application.
-  * If you have low read depth, maybe read accuracy is more important. E.g. taxonomic classification of a metagenome where low-abudance organisms produce few reads.
-  * If you have moderate to high read depth, I suspect consensus accuracy is more important. Certainly for _de novo_ assembly.
-
-
 ### Recommendations
 
-* not Nanonet, unless you're interested in training your own
-* not Scrappie, unless you're interested in bleeding edge ideas
-* Latest Albacore!
+For most users, my current recommendation would be to just use the latest version of Albacore: v2.0.2. It does well with both read and assembly accuracy. Scrappie raw is also a good choice, especially with the rgr_r94 model, though it doesn't offer much advantage over Albacore.
 
+The recommendation would have been harder before Albacore v2.0.2 was released. Then, the best assembly accuracy would be produced by the basecaller with the _worst_ read accuracy: Albacore v0.9.1. This apparent paradox can be explained by that version having lots of random error but relatively low systematic error. Whether or not it would be good choice might depend on the intricacies of your analysis. My hunch is that it may often come down to read depth: low-depth analyses benefit from read accuracy while high-depth analyses benefit from consensus accuracy. We've dodged that tough decision for the moment (just use v2.0.2), but may be faced with a similar dilemma if a future basecaller excels at consensus accuracy over read accuracy or vice versa.
+
+Finally, Nanonet seems a bit dated and should probably be avoided. However, it does allow for custom training of the neural network and may therefore be of interest to power users interested in experimenting.
 
 
 ### Future work
 
-* I'll add more results as new basecallers/versions are released.
-* For the developers of basecallers: need better training sets for neural networks?
+_My_ future work is easy: trying new basecallers as they are released and adding them to this repo. In particular, I'm interested to try Guppy, ONT's GPU basecaller, when that is made public. Check back occasionally for new data!
 
-
+The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies, even after Nanopolish. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in our paper on this topic). If systematic error can be eliminated, then ONT-only assemblies will approach 100% accuracy, and then ONT will be true Illumina alternative.
 

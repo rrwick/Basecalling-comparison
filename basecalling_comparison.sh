@@ -72,7 +72,7 @@ extract_map_and_assemble() {
         fast5_to_fastq.py "$1"/workspace | gzip > "$1".fastq.gz
         basecalled_reads="$1".fastq.gz
     else
-        basecalled_reads="$1".fasta
+        basecalled_reads="$1".fasta.gz
     fi
 
     # Align reads to reference and get reads identities
