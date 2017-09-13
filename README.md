@@ -124,7 +124,7 @@ To get a distribution of assembly identity, I used [`chop_up_assembly.py`](chop_
 
 ### Total yield
 
-<p align="center"><img src="images/total_yield.png" width="100%"></p>
+<p align="center"><img src="images/total_yield.png" width="90%"></p>
 
 You might expect that each basecaller would produce approximately the same total yield. E.g. a read that's 10 kbp in one basecaller would be about 10 kbp in each basecaller. That's true for the most part, but Nanonet is a notable exception. For most reads, it produced a much shorter sequence than other basecallers, sometimes drastically so. For example, all versions of Albacore basecalled one read (`d2e65643-98b4-4a61-ad36-119e55250b28`) to a 34+ kbp sequence. Nanonet produced a 518 bp sequence for the same read. I don't have an explanation for this odd behaviour.
 
@@ -133,7 +133,7 @@ Other oddities you might notice are Albacore v0.9.1, which produced noticably mo
 
 ### Read identity
 
-<p align="center"><img src="images/read_identity.png" width="100%"></p>
+<p align="center"><img src="images/read_identity.png" width="90%"></p>
 
 This first analysis tackles the most obvious question: how accurate are the basecalled reads? The plot above shows the read identity distribution, with the median (weighted by read length) marked as a horizontal line. Reads that could not be aligned were given an identity of 0%, creating a bulge at the bottom of the distribution. Reads with an actual identity below about 65% usually to fail to align and therefore fall to 0%.
 
@@ -145,7 +145,7 @@ Albacore v0.9.1 and Scrappie raw v1.0.0 performed the worst. While their best re
 
 ### Relative read length
 
-<p align="center"><img src="images/rel_read_length.png" width="100%"></p>
+<p align="center"><img src="images/rel_read_length.png" width="90%"></p>
 
 This plot shows the distribution of read length to reference length for each alignment. It shows whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions.
 
@@ -155,13 +155,13 @@ Curiously, many basecallers produce a distinctly bimodal distribution here. For 
 
 ### Assembly identity
 
-<p align="center"><img src="images/assembly_identity.png" width="100%"></p>
+<p align="center"><img src="images/assembly_identity.png" width="90%"></p>
 
 This analysis is my personal favourite: how accurate are the _consensus_ sequences? I don't particularly care if individual reads have low identity if they can produce an accurate assembly.
 
 Albacore v2.0.2 leads the pack by a decent margin. Most surprisingly, Albacore v0.9.1, which had very poor read identity, produces the second-best assemblies! Scrappie raw v1.0.0 was the worst by far - its assembly had a huge variance. I'm not sure what went wrong there, but Scrappie raw v1.1.0 seems to have fixed the problem, because its assemblies look okay.
 
-<p align="center"><img src="images/rel_assembly_length.png" width="100%"></p>
+<p align="center"><img src="images/rel_assembly_length.png" width="90%"></p>
 
 It's also interesting to look at the assembly relative length, like we did for reads. This shows which basecallers are more prone to consensus sequence insertions (e.g. Albacore v1.0 to v1.2) and which are more prone to deletions (most of the rest).
 
@@ -170,19 +170,27 @@ It's also interesting to look at the assembly relative length, like we did for r
 
 ### Read vs assembly identity
 
-<p align="center"><img src="images/read_assembly_scatter.png" width="100%"></p>
+<p align="center"><img src="images/read_assembly_scatter.png" width="90%"></p>
 
-Here I've plotted the median read identity and median assembly identity for all basecallers. The shaded area is where assembly identity is _worse_ than read identity - that should be impossible (unless you've got a _really_ bad assembler).
+Here I've plotted the median read identity and median assembly identity for all basecallers - zoomed out on the left, zoomed in on the right. The shaded zone is where assembly identity is _worse_ than read identity - that should be impossible (unless you've got a _really_ bad assembler).
 
-This plot shows how much of each basecaller's error is random vs systematic. If a basecaller had the same read and assembly identities (i.e. the point was on the edge of the shaded zone), that would imply that _all_ of its error is systematic and every read is making the same mistakes. Thankfully, assembly identities are nowhere that low. Conversely, if a basecaller had an assembly identity of 100%, that would imply that it had little to no systematic error and all problems were ironed out in the consensus.
+This shows how much of each basecaller's error is random vs systematic. If a basecaller had the same read and assembly identities (i.e. the point was on the edge of the shaded zone), that would imply that _all_ of its error is systematic and every read is making the same mistakes. Thankfully, assembly identities are nowhere near that low. Conversely, if a basecaller had an assembly identity of 100%, that would imply a there was very little systematic error so all problems could be ironed out in the consensus.
 
-You might expect that a basecaller's read and assembly identities would be tightly correlated: low-identities reads produce low-identity assemblies and vice versa. That is mostly the case, with Albacore v0.9.1 being the most obvious exception. This suggests that while Albacore v0.9.1 produces reads with a large amount of total error, they have comparatively low systematic error. 
+You might expect that a basecaller's read and assembly identities would be tightly correlated: low-identity reads produce low-identity assemblies and vice versa. That is mostly the case, with Albacore v0.9.1 being the most obvious exception. This suggests that while Albacore v0.9.1 produces reads with a large amount of total error, they have comparatively low systematic error. 
 
 
 
 ### Post-Nanopolish assembly identity
 
-<p align="center"><img src="images/nanopolish_identity.png" width="100%"></p>
+<p align="center"><img src="images/nanopolish_identity.png" width="90%"></p>
+
+The chart above shows the assembly identity distributions after Nanopolish, with the pre-Nanopolish distributions lightly drawn underneath. Since v0.8.0, Nanopolish can be run without event-data-containing fast5 files, which lets me run it with any basecaller!
+
+With just two exceptions, all post-Nanopolish assemblies look quite similar. The first exception is Nanonet, where I suspect the truncated reads may have caused problems. The second is Scrappie raw v1.0.0, where the very low pre-Nanopolish assembly may have been an issue.
+
+The upside seems to be that if you're planning to use Nanopolish, then your basecaller choice may not be very important. Any basecaller, as long as it isn't awful, will be good enough.
+
+The downside is that Nanopolish makes a relatively small improvement to the already good Albacore v2.0.2 assembly. What if a future version of some basecaller can produce a pre-Nanopolish assembly of 99.7% identity or better? I fear that in such a case, Nanopolish may not be able to improve it at all.
 
 
 
