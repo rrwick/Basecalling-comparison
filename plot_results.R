@@ -176,10 +176,10 @@ rel_read_length_plot <- ggplot(read_rel_lengths, aes(x = Basecaller, y = Relativ
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 4), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(84, 116)) +
+  coord_cartesian(ylim=c(88, 112)) +
   labs(title = "", x = "", y = "read length / reference length")
 rel_read_length_plot
-ggsave(rel_read_length_plot, file='plots/rel_read_length.pdf', width = 9, height = 5)
+ggsave(rel_read_length_plot, file='plots/rel_read_length.pdf', width = 9, height = 4)
 
 assembly_identity_plot <- ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(draw_quantiles = c(0.5), adjust=2) +
@@ -197,10 +197,10 @@ rel_assembly_length_plot <- ggplot(assembly_rel_lengths, aes(x = Basecaller, y =
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 0.5), minor_breaks = seq(0, 200, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
-  coord_cartesian(ylim=c(98.5, 101.5)) +
+  coord_cartesian(ylim=c(98.75, 101.25)) +
   labs(title = "", x = "", y = "assembly length / reference length")
 rel_assembly_length_plot
-ggsave(rel_assembly_length_plot, file='plots/rel_assembly_length.pdf', width = 9, height = 4)
+ggsave(rel_assembly_length_plot, file='plots/rel_assembly_length.pdf', width = 9, height = 3.5)
 
 nanopolish_identity_plot <- ggplot(nanopolish_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(data = assembly_identities, draw_quantiles = c(0.5), adjust=2, alpha=0.2, colour=NA) +
