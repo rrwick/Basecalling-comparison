@@ -117,13 +117,13 @@ Unfortunately, I cannot compare with the old cloud-based Metrichor basecalling, 
 ### Sequencing
 
 These reads are the same ones used in our recent paper: [Completing bacterial genome assemblies with multiplex MinION
-sequencing](http://www.biorxiv.org/content/early/2017/07/07/160614). Look there if you're interested in the wet-lab side of things.
+sequencing](http://www.biorxiv.org/content/early/2017/07/07/160614). Look there if you're interested in the wet lab side of things.
 
 
 
 ### Read preparation
 
-I first collected the fast5 files which I had previously binned to the barcode 1. I also tossed out any fast5 files less than 100 kilobytes in size – this was to subsample for longer reads in a manner that's hopefully not biased towards any particular basecaller. To extract a fastq from the fast5s, I used my own script [`fast5_to_fastq.py`](https://github.com/rrwick/Fast5-to-Fastq), but many other tools exist to do the same job.
+I started by collecting the fast5 files for reads which were confidently binned to barcode NB01. This should have excluded most of the very low quality reads, because such reads would not have been confidently binned. I also tossed out any fast5 files less than 100 kilobytes in size to remove shorter reads. To extract a fastq from the fast5s, I used my own [`fast5_to_fastq.py`](https://github.com/rrwick/Fast5-to-Fastq) script, but many other tools exist to do the same job.
 
 
 
