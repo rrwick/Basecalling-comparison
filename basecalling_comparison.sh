@@ -91,16 +91,18 @@ extract_map_and_assemble() {
 
     # Improve the assembly with Nanopolish and get assembly identities again
     mkdir "$1"_nanopolish
-    nanopolish index -d raw_fast5 $basecalled_reads
-    nanopolish_reads="$basecalled_reads".fa.gz
-    bwa index "$1"_assembly.fasta
-    bwa mem -x ont2d -t $threads "$1"_assembly.fasta $nanopolish_reads | samtools sort -o "$nanopolish_reads".bam -T reads.tmp -
-    rm "$1"_assembly.fasta.*  # clean up BWA index files
-    samtools index "$1"_nanopolish/reads.sorted.bam
-    python nanopolish_makerange.py "$1"_assembly.fasta | parallel --results "$1"_nanopolish/nanopolish.results -P 10 nanopolish variants --consensus "$1"_nanopolish/polished.{1}.fa -w {1} -r "$1"_nanopolish/reads.fa -b "$1"_nanopolish/reads.sorted.bam -g "$1"_assembly.fasta -t 4 --min-candidate-frequency 0.1
-    python nanopolish_merge.py "$1"_nanopolish/polished.*.fa > "$1"_nanopolished_assembly.fasta
-    assembly_identity_distribution "$1"_nanopolished_assembly.fasta "$1"_nanopolished_assembly
-    rm $nanopolish_reads "$nanopolish_reads".*  # Clean up Nanopolish files
+    cd "$1"_nanopolish
+    cp ../$basecalled_reads .; gunzip $basecalled_reads
+    cp ../"$1"_assembly.fasta .
+    nanopolish index -d ../raw_fast5 "$1".fastq
+    bwa index $assembly
+    bwa mem -x ont2d -t $threads "$1"_assembly.fasta "$1".fastq | samtools sort -o reads.sorted.bam -T reads.tmp -
+    samtools index reads.sorted.bam
+    python nanopolish_makerange.py "$1"_assembly.fasta | parallel --results nanopolish.results -P 10 nanopolish variants --consensus polished.{1}.fa -w {1} -r "$1".fastq -b reads.sorted.bam -g "$1"_assembly.fasta -t 4 --min-candidate-frequency 0.1
+    python nanopolish_merge.py "$1"_nanopolish/polished.*.fa > polished_genome.fa
+    cd ..
+    cp "$1"_nanopolish/polished_genome.fa "$1"_nanopolish.fasta
+    assembly_identity_distribution "$1"_nanopolish.fasta "$1"_nanopolish
 }
 
 
