@@ -17,7 +17,8 @@ scrappie_raw_v1_0_0=false
 scrappie_events_v1_1_0=false
 scrappie_events_v1_0_0=false
 nanonet_v2_0_0=false
-chiron_847ad10=false
+chiron_v0_1_4=false
+basecrawller_v0.1=false
 
 
 threads=40
@@ -239,10 +240,15 @@ if $nanonet_v2_0_0; then
     change_nanonet_read_names "nanonet_v2_0_0"
 fi
 
-if $chiron_847ad10; then
+if $chiron_v0_1_4; then
     source /home/UNIMELB/inouye-hpc-sa/chiron/chiron/bin/activate
     chiron call -i raw_fast5 -o chiron -t $threads
-    paste --delimiter=\\n --serial chiron/result/*.fasta > chiron_847ad10.fasta
+    paste --delimiter=\\n --serial chiron/result/*.fasta > chiron_v0.1.4.fasta
     deactivate
-    extract_map_and_assemble "chiron_847ad10"
+    extract_map_and_assemble "chiron_v0.1.4"
+fi
+
+if $basecrawller_v0.1; then
+    basecrawller call --fast5-basedirs raw_fast5 --out-filename basecrawller_v0.1.fasta --processes 4
+    extract_map_and_assemble "basecrawller_v0.1"
 fi
