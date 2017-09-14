@@ -2,9 +2,7 @@
 
 __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 <br>
-<sub>Department of Biochemistry and Molecular Biology, Bio21 Molecular Science and Biotechnology Institute,
-<br>
-University of Melbourne, Parkville, Victoria 3010, Australia</sub>
+<sub>Department of Biochemistry and Molecular Biology, Bio21 Molecular Science and Biotechnology Institute, University of Melbourne, Australia</sub>
 
 
 <p align="center"><img src="images/logo.png" alt="logo" width="100%"></p>
@@ -17,10 +15,9 @@ Basecallers, for those not familiar, are the programs which translate the raw el
 
 For each basecaller, I assess the accuracy of the reads and of the resulting assembly. Read accuracy is interesting for obvious reasons – more accurate reads are nice! Assembly accuracy is interesting because shows whether the read errors can 'average out' with depth. In doing so it provides a window into the nature of the basecalling errors. For example, consider a hypothetical set of reads with a mediocre accuracy of 85% but a truly random error profile (i.e. no systematic error). Despite their error rate, these reads could result in a perfect assembly. Now consider a set of reads with an excellent 98% accuracy but they all make the _same mistakes_ (i.e. error is all systematic, not random) – their assembly will also have a 98% error rate. Which read set is better? That probably depends on how you're using them, but in my line of work, I'd prefer the first.
 
-In particular, I hope these results help to answer the question: _Should I go back to old reads and re-basecall them with a newer basecaller?_ Doing so would take a lot of CPU time, so you probably don't want to do it unless there's a significant improvement.
+In particular, I hope these results help to answer the question: _Should I go back to old reads and re-basecall them with a newer basecaller?_ Doing so could take a lot of CPU time, so you probably don't want to do it unless it would bring a significant improvement.
 
 As a final note, I used an R9.4 1D dataset of _Klebsiella pneumoniae_ reads for this analysis, so my results may well be biased toward that kind of data. I'm not sure how consistent these results are with other data types, e.g. eukaryote genomes, R9.5 flow cells, 1D<sup>2</sup> kits, etc.
-
 
 
 
@@ -34,7 +31,6 @@ If you'd like to try this analysis using the same data, here are the relevant li
 * [Reference hybrid assembly](https://ndownloader.figshare.com/files/8810704)
 * [Raw fast5 files](https://ndownloader.figshare.com/files/9199063)
 * [Relevant repo/paper](https://github.com/rrwick/Bacterial-genome-assemblies-with-multiplex-MinION-sequencing)
-
 
 
 
@@ -111,7 +107,6 @@ Unfortunately, I cannot compare with the old cloud-based Metrichor basecalling, 
 
 
 
-
 ## Method
 
 ### Sequencing
@@ -149,7 +144,6 @@ I used [Nanopolish](https://github.com/jts/nanopolish) [v0.8.1](https://github.c
 
 
 
-
 ## Results
 
 ### Total yield
@@ -170,7 +164,7 @@ This first analysis tackles the most obvious question: how accurate are the base
 
 Nanonet performed poorly, with a low median and a significant proportion of unaligned reads. Its curiously high peak of about 99% results from its short output sequences discussed above. While a few Nanonet 'reads' did indeed align to the reference with up to 99% identity, these were really small fragments (hundreds of bp) of larger reads.
 
-Albacore v0.9.1 and Scrappie raw v1.0.0 performed the worst. While their best reads were comparable to other basecallers' best reads, they produced many more reads below 80%. Excluding those versions, Albacore and Scrappie performed well and were comparable to each other. Scrappie raw v1.1.0 rgr_r94 and Albacore v2.0.2 did best and second-best, respectively. Interestingly, Scrappie produced a significant proportion of unalignable reads in each set, whereas Albacore (excluding v0.9.1) did not – I'm not sure why.
+Albacore v0.9.1 and Scrappie raw v1.0.0 had the lowest median identities. While their best reads were comparable to other basecallers' best reads, they produced many more reads below 80%. Excluding those versions, Albacore and Scrappie performed well and were comparable to each other. Scrappie raw v1.1.0 rgr_r94 and Albacore v2.0.2 did best and second-best, respectively. Interestingly, Scrappie produced a significant proportion of unalignable reads in each set, whereas Albacore (excluding v0.9.1) did not – I'm not sure why.
 
 
 
@@ -216,12 +210,9 @@ You might expect that a basecaller's read and assembly identities would be tight
 
 This plot shows the assembly identity distributions after Nanopolish, with pre-Nanopolish assembly identity distributions lightly drawn underneath.
 
-With just two exceptions, all post-Nanopolish assemblies look quite similar. The first exception is Nanonet, where I suspect the truncated reads may have caused problems. The second is Scrappie raw v1.0.0, where the low quality pre-Nanopolish assembly may have been an issue.
+In every case, Nanopolish improved the assembly accuracy, and with just two exceptions, all post-Nanopolish assemblies look quite similar. The first exception is Nanonet, where I suspect the truncated reads may have caused problems. The second is Scrappie raw v1.0.0, where the low quality pre-Nanopolish assembly may have been an issue.
 
-The upside seems to be that if you're planning to use Nanopolish, then your basecaller choice may not be very important. Any basecaller, as long as it isn't awful, should be good enough.
-
-The downside is that Nanopolish makes a relatively small improvement to the already good Albacore v2.0.2 assembly. What if a future version of some basecaller can produce a pre-Nanopolish assembly of 99.7% identity or better? I fear that in such a case, Nanopolish may not be able to improve it at all.
-
+The upside seems to be that if you're planning to use Nanopolish, then your basecaller choice may not be very important. Any basecaller, as long as it isn't awful, should be fine. The downside is that Nanopolish makes a relatively small improvement to the already good Albacore v2.0.2 assembly. What if a future basecaller can produce a pre-Nanopolish assembly of 99.7% identity or better? I fear that in such a case, Nanopolish may not be able to improve it at all.
 
 
 
@@ -243,7 +234,7 @@ Finally, Nanonet seems a bit dated and should probably be avoided. However, it d
 
 _My_ future work is easy: trying new versions and new basecallers as they are released and adding them to this analysis. Check back occasionally for new data!
 
-The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies, even after Nanopolish. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://www.biorxiv.org/content/early/2017/07/07/160614)). If systematic error can be eliminated, then ONT-only assemblies will approach 100% accuracy, and then ONT will be true Illumina alternative.
+The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies, even after Nanopolish. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://www.biorxiv.org/content/early/2017/07/07/160614)). If systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be true Illumina alternative.
 
 Did I miss anything important? Can you shed any light on oddities that I couldn't explain? Please let me know through the [issue tracker](https://github.com/rrwick/Basecalling-comparison/issues)!
 
