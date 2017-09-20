@@ -28,8 +28,8 @@ As a final note, I used an R9.4 1D dataset of _Klebsiella pneumoniae_ reads for 
 I've included the scripts I used for basecalling and analysis in this repo, but you'll need to modify some paths in [`basecalling_comparison.sh`](basecalling_comparison.sh) to use it for yourself.
 
 If you'd like to try this analysis using the same data, here are the relevant links:
-* [Reference hybrid assembly](https://ndownloader.figshare.com/files/8810704)
-* [Raw fast5 files](https://ndownloader.figshare.com/files/9199063)
+* [Reference hybrid assembly](https://figshare.com/articles/Unicycler_v0_4_0_assemblies_hybrid_Illumina_and_ONT_/5170750) (barcode01.fasta.gz)
+* [Raw fast5 files](https://figshare.com/articles/Raw_ONT_reads_-_barcode_1/5353210)
 * [Relevant repo/paper](https://github.com/rrwick/Bacterial-genome-assemblies-with-multiplex-MinION-sequencing)
 
 
@@ -226,7 +226,16 @@ My current recommendation is simply to use the latest version of Albacore: v2.0.
 
 The recommendation would have been harder before Albacore v2.0.2 was released. Then, the basecaller with the best assembly accuracy had some of the _worst_ read accuracies: Albacore v0.9.1. Whether or not it would be good choice might depend on your analysis. We've dodged that tough decision for the moment (just use v2.0.2), but may someday be faced with a similar dilemma if a future basecaller excels at consensus accuracy over read accuracy or vice versa.
 
-Finally, Nanonet seems a bit dated and should probably be avoided. However, it does allow for custom training of the neural network and may therefore be of interest to power users interested in experimenting with their own training sets.
+Finally, Nanonet seems a bit dated and should probably be avoided. However, it does allow for custom training of the neural network and may therefore be of interest to power users interested in experimenting with their own training sets. That being said, ONT has open-sourced their [Sloika project](https://github.com/nanoporetech/sloika) for training Albacore/Scrappie neural nets, so users doing custom training may want to use that over Nanonet.
+
+
+
+### Training and methylation
+
+The training set used for any given basecaller may have a huge impact on the quality of the results. [Tim Massingham](https://github.com/tmassingham-ont) (the author of Scrappie) mentioned [here](https://github.com/rrwick/Basecalling-comparison/issues/1) that Albacore v2.0.2 and Scrappie raw v1.1.0 rgrgr_r94 are very similar. The key difference is that Scrappie was trained with a human-only dataset, which possibly explains why Albacore v2.0.2 did much better for my _Klebsiella_ sample.
+
+
+Methylation may also be an important factor related to training. A methylated base would be expected to produce a different signal in the pore than its unmethylated counterpart, but I have heard (by word-of-mouth, so I could be wrong) that Albacore/Scrappie training sets only use PCRed DNA (which lacks methylation). This could mean that the basecaller is confused by signals resulting from methylated bases, explaining much of the residual error in assemblies. If this is the case, two solutions jump to mind: 1) PCR your DNA before ONT sequencing, or 2) train the basecaller's neural network using native DNA (_with_ methylation). I don't like the first solution (more wet lab work), but the second seems promising. If it really is as simple as using a better training set, then significant basecaller improvements are potentially just around the corner.
 
 
 
@@ -237,5 +246,3 @@ _My_ future work is easy: trying new versions and new basecallers as they are re
 The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies, even after Nanopolish. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). If systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true Illumina alternative.
 
 Did I miss anything important? Can you shed any light on oddities that I couldn't explain? Please let me know through the [issue tracker](https://github.com/rrwick/Basecalling-comparison/issues)!
-
-
