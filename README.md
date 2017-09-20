@@ -112,7 +112,7 @@ Unfortunately, I cannot compare with the old cloud-based Metrichor basecalling, 
 ### Sequencing
 
 These reads are the same ones used in our recent paper: [Completing bacterial genome assemblies with multiplex MinION
-sequencing](http://www.biorxiv.org/content/early/2017/07/07/160614). Look there if you're interested in the wet lab side of things.
+sequencing](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132). Look there if you're interested in the wet lab side of things.
 
 
 
@@ -234,7 +234,7 @@ Finally, Nanonet seems a bit dated and should probably be avoided. However, it d
 
 _My_ future work is easy: trying new versions and new basecallers as they are released and adding them to this analysis. Check back occasionally for new data!
 
-The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies, even after Nanopolish. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://www.biorxiv.org/content/early/2017/07/07/160614)). If systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true Illumina alternative.
+The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies, even after Nanopolish. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). If systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true Illumina alternative.
 
 Did I miss anything important? Can you shed any light on oddities that I couldn't explain? Please let me know through the [issue tracker](https://github.com/rrwick/Basecalling-comparison/issues)!
 
