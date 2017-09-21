@@ -41,7 +41,9 @@ def main():
             read_alignments[read_name].append((read_start, read_end, ref_start, ref_end, identity))
 
     print('\t'.join(['Name', 'Length', 'Identity', 'Relative length']))
-    for read_name, read_length in read_lengths.items():
+    read_names = sorted(read_lengths.keys())
+    for read_name in read_names:
+        read_length = read_lengths[read_name]
         alignments = read_alignments[read_name]
         identity_by_base = [0.0] * read_length
 
