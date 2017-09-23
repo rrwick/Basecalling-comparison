@@ -97,9 +97,35 @@ Unlike other basecallers, Scrappie does not have fastq output, either directly o
 
 
 
+### Chiron
+
+[Chiron](https://github.com/haotianteng/chiron) is a third-party basecaller developed by [Haotian Teng](https://github.com/haotianteng) and others in [Lachlan Coin's group](https://imb.uq.edu.au/profile/647/lachlan-coin) at the University of Queensland.
+
+```
+chiron call -i raw_fast5 -o chiron_v0.2 --batch_size 1000
+```
+
+While testing Chiron, I noticed a curious effect. The `--batch_size` parameter was described as controlling performance: a larger value improves performance but increases RAM requirements. While I found this to be true, I discovered a secondary effect: larger `--batch_size` values also improved the read accuracy. The default value is `100` and I saw modest read accuracy improvements up to about `500`, after which accuracy plateaued. In my tests I used `--batch_size 1000`for both performance and accuracy.
+
+NOTE: I'm still running Chiron tests, so they aren't included (yet) in the results below. Check back soon!
+
+
+
+### basecRAWller
+
+[basecRAWller](https://basecrawller.lbl.gov/) is a third-party basecaller developed by Marcus Stoiber and James Brown at the Lawrence Berkeley National Laboratory. Unlike other basecallers, it focuses on _streaming_ basecalling. I.e. it can basecall data using any part of a read and does not require the entire sequence to be present. This could potentially be used to basecall reads even before they are finished sequencing. As discussed in the [basecRAWller paper](https://www.biorxiv.org/content/early/2017/05/01/133058), the ability to perform streaming basecalling does negatively impact accuracy.
+
+```
+basecRAWller call --fast5-basedirs raw_fast5 --out-filename basecrawller_v0.1.fasta
+```
+
+NOTE: I'm still running basecRAWller tests, so they aren't included (yet) in the results below. Check back soon!
+
+
+
 ### Excluded basecallers
 
-I am currently trying two other basecallers: [basecRAWller](https://basecrawller.lbl.gov/) and [Chiron](https://github.com/haotianteng/chiron). I'll add their results after they finish. I am also interested in [Guppy](https://github.com/nanoporetech/guppy), an ONT basecaller designed for fast GPU-accelerated performance. However, it is only available to users who have signed the ONT developer license agreement (which is why you might have gotten a 404 if you just tried that link). If and when Guppy becomes publicly available, I'll add it to this comparison too.
+I am also interested in [Guppy](https://github.com/nanoporetech/guppy), an ONT basecaller designed for fast GPU-accelerated performance. However, it is only available to users who have signed the ONT developer license agreement (which is why you might have gotten a 404 if you just tried that link). If and when Guppy becomes publicly available, I'll add it to this comparison too.
 
 Unfortunately, I cannot compare with the old cloud-based Metrichor basecalling, as it's no longer available. I also cannot test the integrated basecalling in MinKNOW (ONT's sequencing software). I believe MinKNOW's integrated basecalling shares much in common with Albacore, but I don't know which Albacore versions correspond to which MinKNOW versions.
 
