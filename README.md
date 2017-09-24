@@ -8,6 +8,24 @@ __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 <p align="center"><img src="images/logo.png" alt="logo" width="100%"></p>
 
 
+## Table of contents
+
+* [Intro](#intro)
+* [Data availability](#data-availability)
+* [Basecallers tested](#basecallers-tested)
+* [Method](#method)
+* [Results](#results)
+  * [Total yield](#total-yield)
+  * [Read identity](#read-identity-1)
+  * [Relative read length](#relative-read-length)
+  * [Assembly identity](#assembly-identity-1)
+  * [Read vs assembly identity](#read-vs-assembly-identity)
+  * [Nanopolish assembly identity](#nanopolish-assembly-identity)
+* [Conclusions](#conclusions)
+
+
+
+## Intro
 
 This repo contains a comparison of available basecallers for Oxford Nanopore Technologies (ONT) sequencing reads. It's a bit like a mini-paper, but I decided to put it here on GitHub (instead of somewhere more papery like [bioRxiv](http://www.biorxiv.org/)) so I can come back and update it as new versions of basecallers are released.
 
@@ -230,7 +248,7 @@ You might expect that a basecaller's read and assembly identities would be tight
 
 
 
-### Post-Nanopolish assembly identity
+### Nanopolish assembly identity
 
 <p align="center"><img src="images/nanopolish_identity.png" width="90%"></p>
 
