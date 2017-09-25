@@ -43,8 +43,6 @@ As a final note, I used an R9.4 1D dataset of _Klebsiella pneumoniae_ reads for 
 
 ## Data availability
 
-I've included the scripts I used for basecalling and analysis in this repo, but you'll need to modify some paths in [`basecalling_comparison.sh`](basecalling_comparison.sh) to use it for yourself.
-
 If you'd like to try this analysis using the same data, here are the relevant links:
 * [Reference hybrid assembly](https://figshare.com/articles/Unicycler_v0_4_0_assemblies_hybrid_Illumina_and_ONT_/5170750) (barcode01.fasta.gz)
 * [Raw fast5 files](https://figshare.com/articles/Raw_ONT_reads_-_barcode_1/5353210)
@@ -153,36 +151,64 @@ Unfortunately, I cannot compare with the old cloud-based Metrichor basecalling, 
 
 ## Method
 
-### Sequencing
-
-These reads are the same ones used in our recent paper: [Completing bacterial genome assemblies with multiplex MinION
-sequencing](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132). Look there if you're interested in the wet lab side of things.
+If you'd like to try this analysis for yourself, here's what you need to do. I tried to make this process somewhat flexible, but some aspects may be particular to my setup, so you'll probably need to modify some parts to make it work for you. In particular, the `nanopolish_slurm_wrapper.py` script assumes you're using a SLURM-managed cluster, so other users will probably need to change that one.
 
 
 
-### Read preparation
+### Required files
 
-I started by collecting the fast5 files for reads which were confidently binned to barcode NB01. This should have excluded most of the very low quality reads, because such reads would not have been confidently binned. I also tossed out any fast5 files less than 100 kilobytes in size to remove shorter reads. To extract a fastq from the fast5s, I used my own [`fast5_to_fastq.py`](https://github.com/rrwick/Fast5-to-Fastq) script, but many other tools exist to do the same job.
+You'll obviously need a set of ONT reads. Put them in a directory named `01_raw_fast5`. I used the same ones from our recent paper: [Completing bacterial genome assemblies with multiplex MinION
+sequencing](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132). Check out that paper if you're in the wet lab side of things.
 
+You'll also need Illumina reads for the sample (`illumina_1.fastq.gz` and `illumina_2.fastq.gz`) and a good reference sequence (`reference.fasta`), e.g. a completed hybrid assembly.
 
-
-### Read identity
-
-To assess read identity, I aligned the reads to the reference using [minimap2](https://github.com/lh3/minimap2) (lovely tool, very fast) and then used [`read_length_identity.py`](read_length_identity.py) to get a per-read summary. Only the aligned parts of the read were used to calculate the read's identity. The definition used for 'identity' is the same as how BLAST defines it: the number of matching bases in the alignment divided by the total bases in the alignment (including gaps). If less than 50% of the read aligned, it was deemed unaligned and given an identity of 0%. This script also determines the read length to reference length ratio for each read, to see if insertions or deletions are more likely.
-
-
-
-### Assembly identity
-
-Before assembly, I used [Porechop](https://github.com/rrwick/Porechop) and [Filtlong](https://github.com/rrwick/Filtlong) to clean up the read set\*. I then assembled with [Unicycler](https://github.com/rrwick/Unicycler), which conducts multiple rounds of [Racon](https://github.com/isovic/racon), so the final assembly accuracy is defined by the Racon consensus (which in my experience is a bit higher accuracy than a [Canu](https://github.com/marbl/canu) assembly). To get a distribution of assembly identity, I used [`chop_up_assembly.py`](chop_up_assembly.py) to divide the assembly into 10 kbp 'reads' which were assessed in the same way as the actual reads ([`read_length_identity.py`](read_length_identity.py)).
-
-<sup>\* I did use Filtlong's reference-based mode (using Illumina reads) with trimming and splitting, so this assembly method isn't _truly_ ONT-only. However, I found that doing so led to more consistent assemblies (always getting one contig per replicon) which made it a lot easier to compare them.</sup>
+My reads came from a barcoded run, so I first had to collect only the fast5 files for my sample. I did this by analysing the fastq file of our confidently-binned reads (again, see [the paper](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132) for more info). This process should have excluded most of the very low quality reads, because such reads would not have been confidently binned. I also tossed out any fast5 files less than 100 kilobytes in size to remove shorter reads, though this step may not be necessary.
 
 
 
-### Nanopolish
+### Required tools
 
-I used [Nanopolish](https://github.com/jts/nanopolish) [v0.8.1](https://github.com/jts/nanopolish/releases/tag/v0.7.1) to improve each assembly and then assessed identity again. Since v0.8.0, Nanopolish can be run without event-data-containing fast5 files, which lets me run it with any basecaller! However, for non-Albacore basecallers I did have to alter read names so they were Albacore-like and compatible with the `nanopolish index` command.
+The following tools must be installed and available in your `PATH`: [minimap2](https://github.com/lh3/minimap2), [Filtlong](https://github.com/rrwick/Filtlong), [Porechop](https://github.com/rrwick/Porechop), [Racon](https://github.com/isovic/racon), [Rebaler](https://github.com/rrwick/Rebaler), Nanopolish and SAMtools.
+
+I used [Nanopolish](https://github.com/jts/nanopolish) [v0.8.1](https://github.com/jts/nanopolish/releases/tag/v0.8.1) to improve each assembly and then assessed identity again. Since v0.8.0, Nanopolish can be run without event-data-containing fast5 files, which lets me run it with any basecaller! However, for non-Albacore basecallers I did have to alter read names so they were Albacore-like and compatible with the `nanopolish index` command.
+
+
+
+### Basecalling
+
+The specifics here depends on the basecaller – the commands I used are described above. When basecalled reads are ready, put them in a `02_basecalled_reads` directory as either `*.fastq.gz` or `*.fasta.gz` files.
+
+
+
+### Read ID to fast5 file
+
+It is also necessary to make a `read_id_to_fast5` file which contains two columns: read_ID in the first and fast5 filename in the second. This is to ensure that all basecalled read files are named consistently and in a format compatible with Nanopolish.
+
+For example:
+```
+0000974e-e5b3-4fc2-8fa5-af721637e66c_Basecall_1D_template	5210_N125509_20170425_FN2002039725_MN19691_sequencing_run_klebs_033_restart_87298_ch173_read25236_strand.fast5
+00019174-2937-4e85-b104-0e524d8a7ba7_Basecall_1D_template	5210_N125509_20170424_FN2002039725_MN19691_sequencing_run_klebs_033_75349_ch85_read2360_strand.fast5
+000196f6-6041-49a5-9724-77e9d117edbe_Basecall_1D_template	5210_N125509_20170425_FN2002039725_MN19691_sequencing_run_klebs_033_restart_87298_ch200_read1975_strand.fast5
+```
+
+
+
+### Run analysis
+
+The `analysis.sh` script automates most of the remaining steps. It will:
+1) Change the read names to a consistent, Nanopolish-friendly format (`fix_read_names.py`).
+2) Align the reads to a reference and make a tsv file of read accuracies (`read_length_identity.py`). This only uses the aligned parts of the read to calculate the read's identity. The definition used for 'identity' is the same as how BLAST defines it: the number of matching bases in the alignment divided by the total bases in the alignment (including gaps). If less than 50% of the read aligned, it is deemed unaligned and given an identity of 0%. This script also determines the read length to reference length ratio for each read, to see if insertions or deletions are more likely.
+3) Prepare reads for assembly (`porechop` and `filtlong`).
+4) Do a reference-based assembly (`rebaler`).  [Rebaler](https://github.com/rrwick/Rebaler), conducts multiple rounds of [Racon](https://github.com/isovic/racon), so the final assembly accuracy is defined by the Racon consensus (which in my experience is a bit higher accuracy than a [Canu](https://github.com/marbl/canu) assembly).
+5) Assess the assembly in the same manner as it did for reads (`chop_up_assembly.py` and `read_length_identity.py`). By chopping the assembly into 10 kbp pieces and assessing them like reads, we can get a _distribution_ of assembly identity instead of just a single value.
+6) Run Nanopolish (`nanopolish_slurm_wrapper.py`).
+7) Assess the Nanopolished assembly (`chop_up_assembly.py` and `read_length_identity.py`).
+
+
+
+### Generate figures
+
+Put all of your resulting tsv files in a `results` directory and run `plot_results.R` to generate figures.
 
 
 
