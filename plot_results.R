@@ -29,6 +29,8 @@ names(basecaller_colours) <- basecaller_names
 fill_scale <- scale_fill_manual(name = "Basecaller", values = basecaller_colours)
 my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
 
+basecaller_labels <- gsub(" ", "\n", basecaller_names, fixed=TRUE)
+basecaller_labels <- gsub("basecRAWller", "base-\ncRAWller", basecaller_labels, fixed=TRUE)
 
 
 load_tsv_data <- function(filename, column_names) {
@@ -176,7 +178,7 @@ rel_read_length_plot <- ggplot(read_rel_lengths, aes(x = Basecaller, y = Relativ
   geom_violin(draw_quantiles = c(0.5)) +
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 4), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
-  scale_x_discrete(labels=function(x) gsub(" ","\n",x,fixed=TRUE)) +
+  scale_x_discrete(labels=basecaller_labels) +
   coord_cartesian(ylim=c(88, 112)) +
   labs(title = "", x = "", y = "read length / reference length")
 rel_read_length_plot
