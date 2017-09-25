@@ -11,7 +11,6 @@ __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 ## Table of contents
 
 * [Intro](#intro)
-* [Data availability](#data-availability)
 * [Basecallers tested](#basecallers-tested)
 * [Method](#method)
 * [Results](#results)
@@ -31,7 +30,7 @@ This repo contains a comparison of available basecallers for Oxford Nanopore Tec
 
 Basecallers, for those not familiar, are the programs which translate the raw electrical signal from an ONT sequencer to a DNA sequence. Basecalling is interesting because it's a hard machine learning problem (modern basecallers all seem to tackle it with neural networks) and because it's a huge part of what makes ONT sequencing good or bad. Getting a piece of DNA through a pore and measuring the current is only half the battle; the other half is in the computer. It's a very active field, with both ONT themselves and independent researchers developing methods.
 
-For each basecaller, I assess the accuracy of the reads and of the resulting assembly. Read accuracy is interesting for obvious reasons – more accurate reads are nice! Assembly accuracy is interesting because shows whether the read errors can 'average out' with depth. In doing so it provides a window into the nature of the basecalling errors. For example, consider a hypothetical set of reads with a mediocre accuracy of 85% but a truly random error profile (i.e. no systematic error). Despite their error rate, these reads could result in a perfect assembly. Now consider a set of reads with an excellent 98% accuracy but they all make the _same mistakes_ (i.e. error is all systematic, not random) – their assembly will also have a 98% error rate. Which read set is better? That probably depends on how you're using them, but in my line of work, I'd prefer the first.
+For each basecaller, I assess the accuracy of the reads and of the resulting assembly. Read accuracy is interesting for obvious reasons – more accurate reads are nice! Assembly accuracy is interesting because shows whether the read errors can 'average out' with depth. In doing so it provides a window into the nature of the basecalling errors. For example, consider a hypothetical set of reads with a mediocre accuracy of 80% but a truly random error profile (i.e. no systematic error). Despite their error rate, these reads could result in a perfect assembly. Now consider a set of reads with an excellent 98% accuracy but they all make the _same mistakes_ (i.e. error is all systematic, not random) – their assembly will have an accuracy of 98%, no better than the raw reads and worse than our first hypothetical assembly. Which read set is better? That probably depends on how you're using them, but in my line of work, I'd prefer the first.
 
 In particular, I hope these results help to answer the question: _Should I go back to old reads and re-basecall them with a newer basecaller?_ Doing so could take a lot of CPU time, so you probably don't want to do it unless it would bring a significant improvement.
 
@@ -41,20 +40,11 @@ As a final note, I used an R9.4 1D dataset of _Klebsiella pneumoniae_ reads for 
 
 
 
-## Data availability
-
-If you'd like to try this analysis using the same data, here are the relevant links:
-* [Reference hybrid assembly](https://figshare.com/articles/Unicycler_v0_4_0_assemblies_hybrid_Illumina_and_ONT_/5170750) (barcode01.fasta.gz)
-* [Raw fast5 files](https://figshare.com/articles/Raw_ONT_reads_-_barcode_1/5353210)
-* [Relevant repo/paper](https://github.com/rrwick/Bacterial-genome-assemblies-with-multiplex-MinION-sequencing)
-
-
-
-
-
 ## Basecallers tested
 
 For each basecaller I have only used the training model(s) included with the program. Custom training of the neural net is out of scope for this analysis. Similarly, whenever low-level tuning parameters were available, I stuck with the defaults.
+
+When a basecaller had many versions, I've skipped testing patch versions that were superceded. E.g. I only tested Albacore v1.1.2, not v1.1.0 or v1.1.1.
 
 
 
@@ -100,30 +90,16 @@ Scrappie can be run as `scrappie events` (where it basecalls from event segmenta
 ```
 # Scrappie v1.0.0:
 scrappie events --albacore --threads 40 albacore_v1.2.6_fast5 > scrappie_v1.0.0_events.fasta
-scrappie raw --threads 40 raw_fast5 > scrappie_v1.0.0_raw.fasta
+scrappie raw --threads 40 raw_fast5_dir > scrappie_v1.0.0_raw.fasta
 
 # Scrappie v1.1.0:
-scrappie events --threads 40 raw_fast5 > scrappie_v1.1.0_events.fasta
-scrappie raw --model raw_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_raw_r94.fasta
-scrappie raw --model rgr_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_rgr_r94.fasta
-scrappie raw --model rgrgr_r94 --threads 40 raw_fast5 > scrappie_v1.1.0_raw_rgrgr_r94.fasta
+scrappie events --threads 40 raw_fast5_dir > scrappie_v1.1.0_events.fasta
+scrappie raw --model raw_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.0_raw_raw_r94.fasta
+scrappie raw --model rgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.0_raw_rgr_r94.fasta
+scrappie raw --model rgrgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.0_raw_rgrgr_r94.fasta
 ```
 
 Unlike other basecallers, Scrappie does not have fastq output, either directly or by writing it into the fast5 files. It only produces fasta reads.
-
-
-
-### Chiron
-
-[Chiron](https://github.com/haotianteng/chiron) is a third-party basecaller developed by [Haotian Teng](https://github.com/haotianteng) and others in [Lachlan Coin's group](https://imb.uq.edu.au/profile/647/lachlan-coin) at the University of Queensland.
-
-```
-chiron call -i raw_fast5 -o chiron_v0.2 --batch_size 1000
-```
-
-While testing Chiron, I noticed a curious effect. The `--batch_size` parameter was described as controlling performance: a larger value improves performance but increases RAM requirements. While I found this to be true, I discovered a secondary effect: larger `--batch_size` values also improved the read accuracy. The default value is `100` and I saw modest read accuracy improvements up to about `500`, after which accuracy plateaued. In my tests I used `--batch_size 1000`for both performance and accuracy.
-
-NOTE: I'm still running Chiron tests, so they aren't included (yet) in the results below. Check back soon!
 
 
 
@@ -132,10 +108,39 @@ NOTE: I'm still running Chiron tests, so they aren't included (yet) in the resul
 [basecRAWller](https://basecrawller.lbl.gov/) is a third-party basecaller developed by Marcus Stoiber and James Brown at the Lawrence Berkeley National Laboratory. Unlike other basecallers, it focuses on _streaming_ basecalling. I.e. it can basecall data using any part of a read and does not require the entire sequence to be present. This could potentially be used to basecall reads even before they are finished sequencing. As discussed in the [basecRAWller paper](https://www.biorxiv.org/content/early/2017/05/01/133058), the ability to perform streaming basecalling does negatively impact accuracy.
 
 ```
-basecRAWller call --fast5-basedirs raw_fast5 --out-filename basecrawller_v0.1.fasta
+basecRAWller call --fast5-basedirs raw_fast5_dir --out-filename basecrawller_v0.1.fasta
 ```
 
 NOTE: I'm still running basecRAWller tests, so they aren't included (yet) in the results below. Check back soon!
+
+
+
+### Chiron
+
+[Chiron](https://github.com/haotianteng/chiron) is a third-party basecaller developed by [Haotian Teng](https://github.com/haotianteng) and others in [Lachlan Coin's group](https://imb.uq.edu.au/profile/647/lachlan-coin) at the University of Queensland.
+
+```
+chiron call -i raw_fast5_dir -o chiron_v0.2 --batch_size 1000
+```
+
+While testing Chiron, I noticed a curious effect. The `--batch_size` parameter was described as controlling performance: a larger value runs faster but increases RAM requirements. While I found this to be true, I also saw another effect: larger `--batch_size` values also improved the read accuracy. The default is `100` and I saw modest read accuracy improvements up to about `500`, after which accuracy plateaued. I used `--batch_size 1000` for both performance and accuracy.
+
+NOTE: I'm still running Chiron tests, so they aren't included (yet) in the results below. Check back soon!
+
+
+
+### DeepNano
+
+[DeepNano](https://bitbucket.org/vboza/deepnano) is developed by Vladimír Boža and colleages at Comenius University and is described in [this paper](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178751). I could not find any version numbers associated with DeepNano, so I used its most current commit (at the time of this writing): [e8a621e](https://bitbucket.org/vboza/deepnano/commits/e8a621e17b9fb73c261e6ca041976440812bc75f).
+
+It's worth noting that the basecalling script I ran was _not_ the `basecall.py` in the DeepNano base directory, but rather the different `basecall.py` in the `r9` directory, which can handle R9.4 reads.
+
+```
+export OMP_NUM_THREADS=1
+python basecall.py --chemistry r9.4 --event-detect --directory raw_fast5_dir --output deepnano.fasta
+```
+
+NOTE: I'm still running DeepNano tests, so they aren't included (yet) in the results below. Check back soon!
 
 
 
@@ -151,32 +156,38 @@ Unfortunately, I cannot compare with the old cloud-based Metrichor basecalling, 
 
 ## Method
 
-If you'd like to try this analysis for yourself, here's what you need to do. I tried to make this process somewhat flexible, but some aspects may be particular to my setup, so you'll probably need to modify some parts to make it work for you. In particular, the `nanopolish_slurm_wrapper.py` script assumes you're using a SLURM-managed cluster, so other users will probably need to change that one.
+If you'd like to try this analysis for yourself, here's what you need to do. I tried to make this process somewhat flexible, but some aspects may be particular to my setup, so you'll probably need to modify some parts to make it work for you. In particular, the [`nanopolish_slurm_wrapper.py`](nanopolish_slurm_wrapper.py) script assumes you're using a SLURM-managed cluster, so other users will probably need to change that one.
 
 
 
 ### Required files
 
 You'll obviously need a set of ONT reads. Put them in a directory named `01_raw_fast5`. I used the same ones from our recent paper: [Completing bacterial genome assemblies with multiplex MinION
-sequencing](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132). Check out that paper if you're in the wet lab side of things.
+sequencing](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132) (and [its corresponding repo](https://github.com/rrwick/Bacterial-genome-assemblies-with-multiplex-MinION-sequencing)). Check out that paper if you're in the wet lab side of things.
 
-You'll also need Illumina reads for the sample (`illumina_1.fastq.gz` and `illumina_2.fastq.gz`) and a good reference sequence (`reference.fasta`), e.g. a completed hybrid assembly.
+You'll also need Illumina reads for the sample (named `illumina_1.fastq.gz` and `illumina_2.fastq.gz`) and a good reference sequence (named `reference.fasta`), e.g. a completed hybrid assembly.
 
 My reads came from a barcoded run, so I first had to collect only the fast5 files for my sample. I did this by analysing the fastq file of our confidently-binned reads (again, see [the paper](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132) for more info). This process should have excluded most of the very low quality reads, because such reads would not have been confidently binned. I also tossed out any fast5 files less than 100 kilobytes in size to remove shorter reads, though this step may not be necessary.
+
+If you'd like to try this analysis using the same data I used, here are the relevant links:
+* [Reference hybrid assembly](https://figshare.com/articles/Unicycler_v0_4_0_assemblies_hybrid_Illumina_and_ONT_/5170750) (`barcode01.fasta.gz`)
+* [Illumina reads](https://figshare.com/articles/Trimmed_Illumina_reads/5170831) (`barcode01_1.fastq.gz` and `barcode01_2.fastq.gz`)
+* [Raw fast5 files](https://figshare.com/articles/Raw_ONT_reads_-_barcode_1/5353210)
 
 
 
 ### Required tools
 
-The following tools must be installed and available in your `PATH`: [minimap2](https://github.com/lh3/minimap2), [Filtlong](https://github.com/rrwick/Filtlong), [Porechop](https://github.com/rrwick/Porechop), [Racon](https://github.com/isovic/racon), [Rebaler](https://github.com/rrwick/Rebaler), Nanopolish and SAMtools.
+The following tools must be installed and available in your `PATH`:<br>
+[minimap2](https://github.com/lh3/minimap2) v2.2, [Filtlong](https://github.com/rrwick/Filtlong) v0.1.1, [Porechop](https://github.com/rrwick/Porechop) v0.2.2, [Racon](https://github.com/isovic/racon) v0.5.0, [Rebaler](https://github.com/rrwick/Rebaler) v0.1.0, [Nanopolish](https://github.com/jts/nanopolish) v0.8.1 and [SAMtools](https://samtools.github.io/) v1.3.1.
 
-I used [Nanopolish](https://github.com/jts/nanopolish) [v0.8.1](https://github.com/jts/nanopolish/releases/tag/v0.8.1) to improve each assembly and then assessed identity again. Since v0.8.0, Nanopolish can be run without event-data-containing fast5 files, which lets me run it with any basecaller! However, for non-Albacore basecallers I did have to alter read names so they were Albacore-like and compatible with the `nanopolish index` command.
+I've indicated the versions I used, but the exact versions may or may not be important (I haven't checked). However, it is definitely necessary to use a recent version of Nanopolish. Since v0.8, Nanopolish can be run without event-data-containing fast5 files, which lets it work with any basecaller! However, for non-Albacore basecallers I did have to alter read names – more on that later.
 
 
 
 ### Basecalling
 
-The specifics here depends on the basecaller – the commands I used are described above. When basecalled reads are ready, put them in a `02_basecalled_reads` directory as either `*.fastq.gz` or `*.fasta.gz` files.
+The commands I used are described above in the [Basecallers tested](#basecallers-tested) section. Regardless of which basecaller was used, the reads need to be put in the `02_basecalled_reads` directory in either `*.fastq.gz` or `*.fasta.gz` format.
 
 
 
@@ -195,20 +206,20 @@ For example:
 
 ### Run analysis
 
-The `analysis.sh` script automates most of the remaining steps. It will:
-1) Change the read names to a consistent, Nanopolish-friendly format (`fix_read_names.py`).
-2) Align the reads to a reference and make a tsv file of read accuracies (`read_length_identity.py`). This only uses the aligned parts of the read to calculate the read's identity. The definition used for 'identity' is the same as how BLAST defines it: the number of matching bases in the alignment divided by the total bases in the alignment (including gaps). If less than 50% of the read aligned, it is deemed unaligned and given an identity of 0%. This script also determines the read length to reference length ratio for each read, to see if insertions or deletions are more likely.
+The [`analysis.sh`](analysis.sh) script automates most of the remaining steps. It will:
+1) Change the read names to a consistent, Nanopolish-friendly format ([`fix_read_names.py`](fix_read_names.py)).
+2) Align the reads to a reference and make a tsv file of read accuracies ([`read_length_identity.py`](read_length_identity.py)). This only uses the aligned parts of the read to calculate the read's identity. The definition used for 'identity' is the same as how BLAST defines it: the number of matching bases in the alignment divided by the total bases in the alignment (including gaps). If less than 50% of the read aligned, it is deemed unaligned and given an identity of 0%. This script also determines the read length to reference length ratio for each read, to see if insertions or deletions are more likely.
 3) Prepare reads for assembly (`porechop` and `filtlong`).
 4) Do a reference-based assembly (`rebaler`).  [Rebaler](https://github.com/rrwick/Rebaler), conducts multiple rounds of [Racon](https://github.com/isovic/racon), so the final assembly accuracy is defined by the Racon consensus (which in my experience is a bit higher accuracy than a [Canu](https://github.com/marbl/canu) assembly).
-5) Assess the assembly in the same manner as it did for reads (`chop_up_assembly.py` and `read_length_identity.py`). By chopping the assembly into 10 kbp pieces and assessing them like reads, we can get a _distribution_ of assembly identity instead of just a single value.
-6) Run Nanopolish (`nanopolish_slurm_wrapper.py`).
-7) Assess the Nanopolished assembly (`chop_up_assembly.py` and `read_length_identity.py`).
+5) Assess the assembly in the same manner as it did for reads ([`chop_up_assembly.py`](chop_up_assembly.py) and [`read_length_identity.py`](read_length_identity.py)). By chopping the assembly into 10 kbp pieces and assessing them like reads, we can get a _distribution_ of assembly identity instead of just a single value.
+6) Run Nanopolish ([`nanopolish_slurm_wrapper.py`](nanopolish_slurm_wrapper.py)).
+7) Assess the Nanopolished assembly ([`chop_up_assembly.py`](chop_up_assembly.py) and [`read_length_identity.py`](read_length_identity.py)).
 
 
 
 ### Generate figures
 
-Put all of your resulting tsv files in a `results` directory and run `plot_results.R` to generate figures.
+Put all of your resulting tsv files in a `results` directory and run [`plot_results.R`](plot_results.R) to generate figures. Edit the `basecaller_names` and `basecaller_colours` vectors at the top of that script to control which results are included in the plots.
 
 
 
