@@ -203,7 +203,7 @@ ggsave(assembly_identity_plot, file='plots/assembly_identity.pdf', width = 10, h
 
 rel_assembly_length_plot <- ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
   geom_hline(yintercept = 100) + 
-  geom_violin(draw_quantiles = c(0.5), bw=0.06, width=1.1) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 0.5), minor_breaks = seq(0, 200, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
