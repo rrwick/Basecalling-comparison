@@ -3,7 +3,8 @@
 This script adjusts read headers to be consistent between basecallers and compatible with Nanopolish.
 After running, each read header should be in this format:
 5a8d447e-84e2-4f6f-922c-5ad7269f688c_Basecall_1D_template 5210_N125509_20170425_FN2002039725_MN19691_sequencing_run_klebs_033_restart_87298_ch152_read14914_strand
-It also sorts the reads alphabetically by their new headers.
+
+It also sorts the reads alphabetically by their new headers and removes 0-length reads.
 
 Usage:
 fix_read_names.py input_reads.fastq.gz read_id_to_fast5 | gzip > output_reads.fastq.gz
@@ -74,6 +75,8 @@ def main():
 
     print('Outputting reads', file=sys.stderr, flush=True)
     for header, seq, qual in output_reads:
+        if len(seq) == 0:
+            continue
         if read_type == 'FASTA':
             print('>' + header)
             print(seq)

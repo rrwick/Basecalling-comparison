@@ -27,6 +27,8 @@ def main():
     set_name = assembly_filename.split('/')[-1].split('.fasta')[0]
     print('\nPreparing to run Nanopolish for ' + set_name)
 
+    final_assembly = ('../' + set_name + '.fasta').replace('_assembly.fasta', '_nanopolish.fasta')
+
     pid = str(os.getpid())
     temp_dir = os.path.join(output_dir, pid + '_temp_dir')
     os.mkdir(temp_dir)
@@ -36,6 +38,14 @@ def main():
     print('Getting ranges: ', end='')
     polish_ranges = get_nanopolish_ranges(nanopolish_makerange, assembly_filename)
     print(', '.join(polish_ranges))
+
+    # # Align reads with BWA MEM
+    # print('Aligning reads')
+    # index_command = 'bwa index ' + assembly_filename
+    # subprocess.run(index_command, shell=True, check=True)
+    # alignment_command = 'bwa mem -x ont2d -t ' + str(threads) + ' ' + assembly_filename + ' ' + read_filename + ' | samtools sort -o reads.sorted.bam -T reads.tmp -'
+    # subprocess.run(alignment_command, shell=True, check=True)
+    # subprocess.run('samtools index reads.sorted.bam', shell=True, check=True)
 
     # Align reads with minimap2
     print('Aligning reads')
@@ -88,7 +98,6 @@ def main():
             fasta.write('\n')
 
     # Merge results together
-    final_assembly = '../' + set_name + '.fasta'
     merge_command = 'python ' + nanopolish_merge + ' polished.*.fa > ' + final_assembly
     subprocess.run(merge_command, shell=True, check=True)
 

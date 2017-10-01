@@ -8,18 +8,26 @@ __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 <p align="center"><img src="images/logo.png" alt="logo" width="100%"></p>
 
 
+## Abstract
+
+
+
+
+
 ## Table of contents
 
 * [Intro](#intro)
 * [Basecallers tested](#basecallers-tested)
 * [Method](#method)
-* [Results](#results)
+* [Results/discussion](#resultsdiscussion)
   * [Total yield](#total-yield)
-  * [Read identity](#read-identity-1)
+  * [Read identity](#read-identity)
   * [Relative read length](#relative-read-length)
-  * [Assembly identity](#assembly-identity-1)
+  * [Assembly identity](#assembly-identity)
   * [Read vs assembly identity](#read-vs-assembly-identity)
   * [Nanopolish assembly identity](#nanopolish-assembly-identity)
+  * [Importance of training sets](#importance-of-training-sets)
+  * [Combining different basecallers](#combining-different-basecallers)
 * [Conclusions](#conclusions)
 
 
@@ -42,9 +50,9 @@ As a final note, I used an R9.4 1D dataset of _Klebsiella pneumoniae_ reads for 
 
 ## Basecallers tested
 
-For each basecaller I have only used the training model(s) included with the program. Custom training of the neural net is out of scope for this analysis. Similarly, whenever low-level tuning parameters were available, I stuck with the defaults.
+For each basecaller I have only used the training model(s) included with the program. Custom training of the neural net is out of scope for this analysis. Similarly, whenever low-level tuning parameters were available, I used the defaults.
 
-When a basecaller had many versions, I've skipped testing patch versions that were superceded. E.g. I only tested Albacore v1.1.2, not v1.1.0 or v1.1.1.
+When a basecaller had many versions, I've skipped testing patch versions that were superseded. E.g. I tested Albacore v1.1.2 but not v1.1.0 and v1.1.1.
 
 
 
@@ -61,7 +69,7 @@ I set the `--min_len` and `--max_len` options so Nanonet wouldn't skip any reads
 
 ### Albacore
 
-Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6 and 2.0.2. All of these versions were released in 2017, which shows just how rapidly basecaller development is progressing. The transducer basecaller (helps with homopolymers) was added in v1.0. Basecalling from raw signal (without segmenting the signal into events) first appears in v2.0. Albacore can be downloaded from the [Nanopore community](https://community.nanoporetech.com/downloads), but you'll need an account to log in.
+Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.0.4, 1.1.2, 1.2.6 and 2.0.2. These were all released in 2017, which shows the rapid pace of basecaller development. The transducer basecaller (helps with homopolymers) was added in v1.0. Basecalling from raw signal (without segmenting the signal into events) first appears in v2.0. Albacore can be downloaded from the [Nanopore community](https://community.nanoporetech.com/downloads), but you'll need an account to log in.
 
 ```
 # Albacore v0.8.4 and v0.9.1:
@@ -83,23 +91,24 @@ Albacore v1.1 and later can basecall directly to fastq file with `-o fastq`. Thi
 
 ### Scrappie
 
-[Scrappie](https://github.com/nanoporetech/scrappie) is ONT's research basecaller. Successful developments here seem to eventually work their way into Albacore. I tested versions 1.0.0 and 1.1.0.
+[Scrappie](https://github.com/nanoporetech/scrappie) is ONT's research basecaller. Successful developments here seem to eventually work their way into Albacore. I tested versions 1.0.0 and 1.1.1.
 
-Scrappie can be run as `scrappie events` (where it basecalls from event segmentation) or as `scrappie raw` (where it basecalls directly from the raw signal). For Scrappie v1.0.0, running as `scrappie events` relies on pre-existing event data in the fast5s, so I used the fast5s produced by Albacore 1.2.6 – the last Albacore version to do event segmentation. In Scrappie v1.1.0, there are three different raw basecalling models to choose from (raw_r94, rgr_r94 and rgrgr_r94) and I tried each.
+Scrappie can be run as `scrappie events` (where it basecalls from event segmentation) or as `scrappie raw` (where it basecalls directly from the raw signal). For Scrappie v1.0.0, running as `scrappie events` relies on pre-existing event data in the fast5s, so I used the fast5s produced by Albacore 1.2.6 – the last Albacore version to do event segmentation. In Scrappie v1.1.1, there are three different raw basecalling models to choose from (raw_r94, rgr_r94 and rgrgr_r94) and I tried each. As a side note, the rgr_r94 and rgrgr_r94 models are sometimes referred to as 'pirate' models, for reasons explained [here](https://github.com/rrwick/Basecalling-comparison/issues/1#issuecomment-330766633).
+
 
 ```
 # Scrappie v1.0.0:
 scrappie events --albacore --threads 40 albacore_v1.2.6_fast5 > scrappie_v1.0.0_events.fasta
 scrappie raw --threads 40 raw_fast5_dir > scrappie_v1.0.0_raw.fasta
 
-# Scrappie v1.1.0:
-scrappie events --threads 40 raw_fast5_dir > scrappie_v1.1.0_events.fasta
-scrappie raw --model raw_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.0_raw_raw_r94.fasta
-scrappie raw --model rgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.0_raw_rgr_r94.fasta
-scrappie raw --model rgrgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.0_raw_rgrgr_r94.fasta
+# Scrappie v1.1.1:
+scrappie events --threads 40 raw_fast5_dir > scrappie_v1.1.1_events.fasta
+scrappie raw --model raw_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.1_raw_raw_r94.fasta
+scrappie raw --model rgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.1_raw_rgr_r94.fasta
+scrappie raw --model rgrgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.1_raw_rgrgr_r94.fasta
 ```
 
-Unlike other basecallers, Scrappie does not have fastq output, either directly or by writing it into the fast5 files. It only produces fasta reads.
+Unlike Albacore, Scrappie does not have fastq output, either directly or by writing it into the fast5 files. It only produces fasta reads.
 
 
 
@@ -111,8 +120,6 @@ Unlike other basecallers, Scrappie does not have fastq output, either directly o
 basecRAWller call --fast5-basedirs raw_fast5_dir --out-filename basecrawller_v0.1.fasta
 ```
 
-NOTE: I'm still running basecRAWller tests, so they aren't included (yet) in the results below. Check back soon!
-
 
 
 ### Chiron
@@ -123,30 +130,28 @@ NOTE: I'm still running basecRAWller tests, so they aren't included (yet) in the
 chiron call -i raw_fast5_dir -o chiron_v0.2 --batch_size 1000
 ```
 
-While testing Chiron, I noticed a curious effect. The `--batch_size` parameter was described as controlling performance: a larger value runs faster but increases RAM requirements. While I found this to be true, I also saw another effect: larger `--batch_size` values also improved the read accuracy. The default is `100` and I saw modest read accuracy improvements up to about `500`, after which accuracy plateaued. I used `--batch_size 1000` for both performance and accuracy.
-
-NOTE: I'm still running Chiron tests, so they aren't included (yet) in the results below. Check back soon!
+While testing Chiron, I noticed a curious effect. The `--batch_size` parameter was described as controlling performance: a larger value runs faster but increases RAM requirements. While I found this to be true, I also saw another effect: larger `--batch_size` values improved the read accuracy. The default is `100` and I saw modest read accuracy improvements up to about `500`, after which accuracy plateaued. I used `--batch_size 1000` for both performance and accuracy.
 
 
 
 ### DeepNano
 
-[DeepNano](https://bitbucket.org/vboza/deepnano) is developed by Vladimír Boža and colleages at Comenius University and is described in [this paper](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178751). I could not find any version numbers associated with DeepNano, so I used its most current commit (at the time of this writing): [e8a621e](https://bitbucket.org/vboza/deepnano/commits/e8a621e17b9fb73c261e6ca041976440812bc75f).
+[DeepNano](https://bitbucket.org/vboza/deepnano) is developed by Vladimír Boža and colleagues at Comenius University and is described in [this paper](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178751). I could not find any version numbers associated with DeepNano, so I used its most current commit (at the time of this writing): [e8a621e](https://bitbucket.org/vboza/deepnano/commits/e8a621e17b9fb73c261e6ca041976440812bc75f).
 
-It's worth noting that the basecalling script I ran was _not_ the `basecall.py` in the DeepNano base directory, but rather the different `basecall.py` in the `r9` directory, which can handle R9.4 reads.
+It's worth noting that the basecalling script I ran was _not_ the `basecall.py` in the DeepNano repo base directory, but rather the different `basecall.py` in the `r9` directory, which can handle R9.4 reads.
 
 ```
 export OMP_NUM_THREADS=1
-python basecall.py --chemistry r9.4 --event-detect --directory raw_fast5_dir --output deepnano.fasta
+python basecall.py --chemistry r9.4 --event-detect --max-events 1000000 --directory raw_fast5_dir --output deepnano.fasta
 ```
 
-NOTE: I'm still running DeepNano tests, so they aren't included (yet) in the results below. Check back soon!
+The `--max-events` parameter is important – without it DeepNano will use a default value of 50000 which results in a maximum read length of about 30 kbp (longer reads are truncated).
 
 
 
 ### Excluded basecallers
 
-I am also interested in [Guppy](https://github.com/nanoporetech/guppy), an ONT basecaller designed for fast GPU-accelerated performance. However, it is only available to users who have signed the ONT developer license agreement (which is why you might have gotten a 404 if you just tried that link). If and when Guppy becomes publicly available, I'll add it to this comparison too.
+I am also interested in [Guppy](https://github.com/nanoporetech/guppy), an ONT basecaller designed for fast GPU-accelerated performance. However, it is only available to users who have signed the ONT developer license agreement (which is why you might get a 404 if you try that link). If and when Guppy becomes publicly available, I'll add it to this comparison too.
 
 Unfortunately, I cannot compare with the old cloud-based Metrichor basecalling, as it's no longer available. I also cannot test the integrated basecalling in MinKNOW (ONT's sequencing software). I believe MinKNOW's integrated basecalling shares much in common with Albacore, but I don't know which Albacore versions correspond to which MinKNOW versions.
 
@@ -193,7 +198,7 @@ The commands I used are described above in the [Basecallers tested](#basecallers
 
 ### Read ID to fast5 file
 
-It is also necessary to make a `read_id_to_fast5` file which contains two columns: read_ID in the first and fast5 filename in the second. This is to ensure that all basecalled read files are named consistently and in a format compatible with Nanopolish.
+It is also necessary to make a `read_id_to_fast5` file which contains two columns: read ID in the first and fast5 filename in the second. This is to ensure that all basecalled read files are named consistently and in a format compatible with Nanopolish.
 
 For example:
 ```
@@ -219,13 +224,13 @@ The [`analysis.sh`](analysis.sh) script automates most of the remaining steps. I
 
 ### Generate figures
 
-Put all of your resulting tsv files in a `results` directory and run [`plot_results.R`](plot_results.R) to generate figures. Edit the `basecaller_names` and `basecaller_colours` vectors at the top of that script to control which results are included in the plots.
+Put all your resulting tsv files in a `results` directory and run [`plot_results.R`](plot_results.R) to generate figures. Edit the `basecaller_names` and `basecaller_colours` vectors at the top of that script to control which results are included in the plots.
 
 
 
 
 
-## Results
+## Results/discussion
 
 ### Total yield
 
@@ -233,7 +238,7 @@ Put all of your resulting tsv files in a `results` directory and run [`plot_resu
 
 You might expect that each basecaller would produce approximately the same total yield. E.g. a read that makes a 10 kbp sequence in one basecaller would be about 10 kbp in each basecaller. That's true for the most part, but Nanonet is a notable exception. For most reads, it produced a much shorter sequence than other basecallers, sometimes drastically so. For example, all versions of Albacore basecalled one read (d2e65643-98b4-4a61-ad36-119e55250b28) to a 34+ kbp sequence. Nanonet produced 518 bp for the same read. I don't have an explanation for this odd behaviour.
 
-Other oddities you might notice are Albacore v0.9.1, which produced a bit more sequence than the other basecallers, and Scrappie events, which produced a bit less. These will explained in the 'Relative read length' section.
+Other oddities you might notice are Albacore v0.9.1 and basecRAWller, which produced a bit more sequence than the others, and Scrappie events, which produced a bit less. These will explained in the 'Relative read length' section.
 
 
 
@@ -241,11 +246,15 @@ Other oddities you might notice are Albacore v0.9.1, which produced a bit more s
 
 <p align="center"><img src="images/read_identity.png" width="90%"></p>
 
-This first analysis tackles the most obvious question: how accurate are the basecalled reads? The plot above shows the read identity distribution, with the median (weighted by read length) marked as a horizontal line. Unaligned reads were given an identity of 0% and fall to the bottom of the distribution. Reads with an actual identity below about 65% usually to fail to align and therefore end up at 0%.
+This first analysis tackles the most obvious question: how accurate are the basecalled reads? The plot above shows the read identity distribution, with the median (weighted by read length) marked as a horizontal line. Unaligned reads were given an identity of 0% and fall to the bottom of the distribution. Reads with an actual identity of about 65% or less often to fail to align and therefore end up at 0%.
 
 Nanonet performed poorly, with a low median and a significant proportion of unaligned reads. Its curiously high peak of about 99% results from its short output sequences discussed above. While a few Nanonet 'reads' did indeed align to the reference with up to 99% identity, these were actually just small fragments (hundreds of bp) of larger reads.
 
-Albacore v0.9.1 and Scrappie raw v1.0.0 had the lowest median identities. While their best reads were comparable to other basecallers' best reads, they produced many more reads below 80%. Excluding those versions, Albacore and Scrappie performed well and were comparable to each other. Scrappie raw v1.1.0 rgr_r94 and Albacore v2.0.2 did best and second-best, respectively. Interestingly, Scrappie produced a significant proportion of unalignable reads in each set, whereas Albacore (excluding v0.9.1) did not – I'm not sure why.
+Albacore and Scrappie performed the best overall, with Albacore v0.9.1 and Scrappie raw v1.0.0 being interesting exceptions. Albacore v2.0.2 and Scrappie raw v1.1.1 (with the rgr_r94 and rgrgr_r94 models) were the best performing of all tested basecallers. Interestingly, Scrappie produced a small proportion of unalignable reads in each set, whereas Albacore (excluding v0.9.1) did not – I'm not sure why.
+
+BasecRAWller performed the worst, producing reads with so much error as to be nearly unusable. I have a hypothesis as to why this is the case: the models included with basecRAWller were trained only on human reads. Figure 2 in the [basecRAWller paper](https://www.biorxiv.org/content/early/2017/05/01/133058) shows that _E. coli_ reads basecalled using a human-data-trained model gives read identities in the mid 70s – similar to my results. If my hypothesis is correct, then basecRAWller has the potential to perform much better if it had a model more appropriate to my sample.
+
+DeepNano also performed quite poorly with most reads under 80% identity. Chiron did reasonably well, producing reads comparable to Albacore/Scrappie.
 
 
 
@@ -253,9 +262,9 @@ Albacore v0.9.1 and Scrappie raw v1.0.0 had the lowest median identities. While 
 
 <p align="center"><img src="images/rel_read_length.png" width="90%"></p>
 
-This plot shows the distribution of read length to reference length for each alignment. It shows whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions.
+This plot shows the distribution of read length to reference length for each alignment. It shows whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions. Albacore v0.9.1 and basecRAWller stand out with many overly-long reads, while Scrappie events tends to make short reads. This explains the total yield differences we saw earlier.
 
-Curiously, many basecallers produce a distinctly bimodal distribution. For example, Albacore v2.0.2 has a good median value of quite near 100%, but any individual read is more likely to fall either around 99% or 101%. I'm not sure what might be behind this. Albacore v0.9.1 stands out with many overly-long reads, while Scrappie events tends to make short reads. This explains the total yield differences we saw earlier.
+I found it curious that many basecallers produced a distinctly bimodal distribution. I dug a bit deeper and found that it's related to the timing of this MinION run. The run was started at about 4 pm and MinKNOW crashed at 10:30 pm, halting the run. Nobody was in the lab to notice, and the next day was a [public holiday](https://www.awm.gov.au/commemoration/anzac-day/traditions). Thankfully Louise came in that afternoon, saw the crashed run and restarted it at about 3 pm. That means the flow cell sat for about 16.5 hours not being used. When I [plot read length against signal length and colour by the restart](images/read_vs_signal_albacore_v2.0.2.png), the effect is obvious. It's still not entirely clear _why_ the restart has resulted in shorter basecalled reads, but the effect is present in all basecallers. A possible clue is that the raw signal values are lower after the restart: with a median value of about 450 before and 370 after.
 
 
 
@@ -265,11 +274,13 @@ Curiously, many basecallers produce a distinctly bimodal distribution. For examp
 
 This analysis is my personal favourite: how accurate are the _consensus_ sequences? I don't particularly care if individual reads have low identity if they can produce an accurate assembly.
 
-Albacore v2.0.2 leads the pack by a decent margin. Most surprisingly, Albacore v0.9.1, which had very poor read identity, does second-best! Scrappie raw v1.0.0 was the worst by far – its assembly was all over the place. I'm not sure what went wrong, but Scrappie raw v1.1.0 seems to have fixed the problem.
+Albacore v2.0.2 leads the pack by a decent margin. Most surprisingly, Albacore v0.9.1, which had very poor read identity, also did well. Scrappie raw v1.0.0, basecRAWller and DeepNano all performed poorly (BasecRAWller isn't missing from this plot, it's just off the bottom with a median value in the 80s).
+
+It's also interesting to look at the assembly relative length, like we did for reads:
 
 <p align="center"><img src="images/rel_assembly_length.png" width="90%"></p>
 
-It's also interesting to look at the assembly relative length, like we did for reads. This shows which basecallers are more prone to consensus sequence insertions (e.g. Albacore v1.0 to v1.2) and which are more prone to deletions (most of the rest).
+This shows which basecallers are more prone to consensus sequence insertions (e.g. Albacore v1.0 to v1.2) and which are more prone to deletions (most of the rest). BasecRAWller looks absent from this plot as well because the bulk of its distribution is between 107% and 108%.
 
 
 
@@ -279,9 +290,9 @@ It's also interesting to look at the assembly relative length, like we did for r
 
 Here I've plotted the median read identity and median assembly identity for all basecallers – zoomed out on the left, zoomed in on the right. The shaded zone is where assembly identity is _worse_ than read identity. That should be impossible (unless you've got a _really_ bad assembler).
 
-This shows how much of each basecaller's error is random vs systematic. If a basecaller had the same read and assembly identities (i.e. on the edge of the shaded zone), that would imply that _all_ of its error is systematic and every read is making the same mistakes. Thankfully, assembly identities are nowhere near that low. Conversely, if a basecaller had an assembly identity of 100%, that would imply a there was very little systematic error so all problems could be ironed out in the consensus.
+This shows how much of each basecaller's error is random vs systematic. If a basecaller had the same read and assembly identities (i.e. on the edge of the shaded zone), that would imply that _all_ its error is systematic and every read is making the same mistakes. Thankfully, assembly identities are nowhere near that low. Conversely, if a basecaller had an assembly identity of 100%, that would imply a there was very little systematic error so all problems could be ironed out in the consensus.
 
-You might expect that a basecaller's read and assembly identities would be tightly correlated: low-identity reads produce low-identity assemblies and vice versa. That is mostly the case, with Albacore v0.9.1 being the most obvious exception. This suggests that while Albacore v0.9.1 produces reads with a large amount of total error, they have comparatively low systematic error. 
+You might expect that a basecaller's read and assembly identities would be tightly correlated: low-identity reads produce low-identity assemblies and vice versa. That is mostly the case, with Albacore v0.9.1 being the strongest exception. This suggests that while Albacore v0.9.1 produces reads with a large amount of total error, they have comparatively low systematic error. 
 
 
 
@@ -289,11 +300,34 @@ You might expect that a basecaller's read and assembly identities would be tight
 
 <p align="center"><img src="images/nanopolish_identity.png" width="90%"></p>
 
-This plot shows the assembly identity distributions after Nanopolish, with pre-Nanopolish assembly identity distributions lightly drawn underneath.
+This plot shows the assembly identity distributions after Nanopolish, with pre-Nanopolish assembly identity distributions lightly drawn underneath. In every case, Nanopolish improved the assembly accuracy, and most post-Nanopolish assemblies look quite similar to each other. The first exception is Nanonet, where I suspect the truncated reads may have caused problems. The low quality pre-Nanopolish assembly may have been an issue for Scrappie raw v1.0.0, basecRAWller and DeepNano. 
 
-In every case, Nanopolish improved the assembly accuracy, and with just two exceptions, all post-Nanopolish assemblies look quite similar. The first exception is Nanonet, where I suspect the truncated reads may have caused problems. The second is Scrappie raw v1.0.0, where the low quality pre-Nanopolish assembly may have been an issue.
+The upside seems to be that if you're planning to use Nanopolish, then your basecaller choice may not be very important. Any basecaller, as long as it isn't awful, should be fine. The downside is that Nanopolish makes a relatively small improvement to an already good assembly.
 
-The upside seems to be that if you're planning to use Nanopolish, then your basecaller choice may not be very important. Any basecaller, as long as it isn't awful, should be fine. The downside is that Nanopolish makes a relatively small improvement to the already good Albacore v2.0.2 assembly. What if a future basecaller can produce a pre-Nanopolish assembly of 99.7% identity or better? I fear that in such a case, Nanopolish may not be able to improve it at all.
+
+
+### Importance of training sets
+
+All supervised learning depends on a good training set, and basecalling is no exception. A nice example comes from the rgrgr_r94 model in Scrappie v1.1.0 and v1.1.1. The primary difference between these two versions is that in v1.1.0, only human DNA was used to train the basecaller, whereas v1.1.1 was training with a mixed set including bacterial DNA ([described here](https://github.com/rrwick/Basecalling-comparison/issues/1) by Scrappie author Tim Massingham). I didn't include v1.1.0 in the above plots because it's a superceded version – it's included here only to show the difference a training set makes. The difference in read identity is huge, but assembly identity had a more subtle improvement:
+
+<p align="center"><img src="images/scrappie_comparison.png" width="60%"></p>
+
+Methylation may also be an important factor, as a modified base would be expected to produce a different signal in the pore than its unmethylated counterpart. If a basecaller was trained with mostly or entirely unmethylated DNA, then we might expect it to give low accuracy on heavily methylated samples. This may explain much of the residual error I saw in my assemblies. If this is the case, two solutions jump to mind: 1) PCR your DNA before ONT sequencing, or 2) train the basecaller's neural network using native DNA which is more like your sample (_with_ methylation). I don't like the first solution (more wet lab work) but the second seems promising.
+
+Basecaller authors take note: are your models trained on native DNA to call modified bases? E.g. 5-mC is called as a C, 4-mC as a C, 6-mA as an A, etc. If not, this could be a major limiting factor in consensus sequence identity.
+
+
+
+### Combining different basecallers
+
+To continue with the theme of random vs systematic error: what if two different basecallers each have different types of systematic error? Could a combination of reads from these two assemblers result in an improved consensus sequence? Based on [Clive Brown's suggestion](https://twitter.com/Clive_G_Brown/status/908256098624446464), I tried this with Albacore v2.0.2 (the best performing ONT basecaller) and Chiron v0.2 (the best performing third-party basecaller). These two basecallers used different training sets, hopefully leading to different systematic error.
+
+Indeed, the combination did result in a considerably improved pre-Nanopolish assembly:
+
+<p align="center"><img src="images/albacore_chiron_combination.png" width="70%"></p>
+
+Running Nanopolish brings all of the assemblies up to an equivalent accuracy, so this experiment is purely academic. I.e. anybody interested in maximising assembly accuracy should just run Nanopolish, not waste time trying to combine reads from separate basecallers. It is interesting however, that the combined read set assembles to _nearly_ Nanopolish accuracy, and running Nanopolish on it gives very little improvement.
+
 
 
 
@@ -303,26 +337,28 @@ The upside seems to be that if you're planning to use Nanopolish, then your base
 
 ### Recommendations
 
-My current recommendation is simply to use the latest version of Albacore: v2.0.2. It does well on both read and assembly accuracy. Scrappie raw v1.1.0 also did well, especially with the rgr_r94 model. However, since Scrappie is a research product and labelled as a 'technology demonstrator', I think Albacore is a better choice for most users.
+My current recommendation is simply to use the latest version of Albacore: v2.0.2. It does well on both read and assembly accuracy. Scrappie raw v1.1.1 also did well, especially with the rgr_r94 and rgrgr_r94 models. However, since Scrappie is a research product and labelled as a 'technology demonstrator', I think Albacore is a better choice for most users.
 
-The recommendation would have been harder before Albacore v2.0.2 was released. Then, the basecaller with the best assembly accuracy had some of the _worst_ read accuracies: Albacore v0.9.1. Whether or not it would be good choice might depend on your analysis. We've dodged that tough decision for the moment (just use v2.0.2), but may someday be faced with a similar dilemma if a future basecaller excels at consensus accuracy over read accuracy or vice versa.
+Chiron v0.2 is by far the best performing third-party basecaller and might also be worth a try. Note, however, that it is _very_ slow to run on CPUs and is only a viable option if you have powerful GPUs to accelerate the process.
 
-Finally, Nanonet seems a bit dated and should probably be avoided. However, it does allow for custom training of the neural network and may therefore be of interest to power users interested in experimenting with their own training sets. That being said, ONT has open-sourced their [Sloika project](https://github.com/nanoporetech/sloika) for training Albacore/Scrappie neural nets, so users doing custom training may want to use that over Nanonet.
+Nanonet, basecRAWller and DeepNano should probably be avoided, but I'm happy to revisit them if they are updated/improved.
+
+The recommendation would have been harder a few months ago. Then, the basecaller with the best assembly accuracy had some of the _worst_ read accuracies: Albacore v0.9.1. Whether it would have been a good choice might depend on your analysis. We've dodged that tough decision for the moment, but may someday be faced with a similar dilemma if a future basecaller excels at consensus accuracy over read accuracy or vice versa.
 
 
 
-### Training and methylation
+### Nanopolish
 
-The training set used for any given basecaller may have a huge impact on the quality of the results. [Tim Massingham](https://github.com/tmassingham-ont) (the author of Scrappie) mentioned [here](https://github.com/rrwick/Basecalling-comparison/issues/1) that Albacore v2.0.2 and Scrappie raw v1.1.0 rgrgr_r94 are very similar. The key difference is that Scrappie was trained with a human-only dataset, which possibly explains why Albacore v2.0.2 did much better for my _Klebsiella_ sample.
+Any user interested in maximising assembly accuracy should definitely be using Nanopolish. It improved all assemblies and took most up to about 99.7% accuracy. If you only care about assembly identity, Nanopolish makes your basecaller choice relatively unimportant.
 
-Methylation may also be an important factor related to training, as a methylated base would be expected to produce a different signal in the pore than its unmethylated counterpart. If a basecaller was trained with mostly or entirely unmethylated DNA, then we might expect it to give low accuracy on heavily methylated samples. This may explain much of the residual error I saw in my assemblies. If this is the case, two solutions jump to mind: 1) PCR your DNA before ONT sequencing, or 2) train the basecaller's neural network using DNA (_with_ methylation) which is more like your sample. I don't like the first solution (more wet lab work), but the second seems promising. If it really is as simple as using a better training set, then significant basecaller improvements are potentially just around the corner.
+For most assemblies, the post-Nanopolish identity was independent of the pre-Nanopolish identity. What if a basecaller could produce a pre-Nanopolish assembly of 99.7% identity? Would Nanopolish be able to improve it at all? The combined Albacore+Chiron test got very close to this point. What if a basecaller could produce a pre-Nanopolish assembly of 99.9% identity? Would the post-Nanopolish identity still be 99.7%, making it _worse_ than before? If and when future basecallers get much better, we may find that Nanopolish (at least in its current form) is no longer recommended.
 
 
 
 ### Future work
 
-_My_ future work is easy: trying new versions and new basecallers as they are released and adding them to this analysis. Check back occasionally for new data!
+My future work is easy: trying new versions and new basecallers as they are released and adding them to this analysis. Check back occasionally for new data!
 
-The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies, even after Nanopolish. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). If systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true Illumina alternative.
+The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). If systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true Illumina alternative.
 
 Did I miss anything important? Can you shed any light on oddities that I couldn't explain? Please let me know through the [issue tracker](https://github.com/rrwick/Basecalling-comparison/issues)!

@@ -2,7 +2,7 @@ library(readr)
 library(reshape2)
 library(ggplot2)
 library(gridExtra)
-library(ggrepel)
+library(grid)
 
 basecaller_names <- c()
 basecaller_colours <- c()
@@ -13,20 +13,24 @@ basecaller_colours <- c(basecaller_colours, "#F0DF46")
 basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2")
 basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#DF5952", "#D53937", "#CB181D")
 
-basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.0")
+basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.1")
 basecaller_colours <- c(basecaller_colours, "#788CC8", "#6175B1")
 
-basecaller_names <- c(basecaller_names, "Scrappie raw v1.0.0", "Scrappie raw v1.1.0 raw_r94", "Scrappie raw v1.1.0 rgr_r94", "Scrappie raw v1.1.0 rgrgr_r94")
+basecaller_names <- c(basecaller_names, "Scrappie raw v1.0.0", "Scrappie raw v1.1.1 raw_r94", "Scrappie raw v1.1.1 rgr_r94", "Scrappie raw v1.1.1 rgrgr_r94")
 basecaller_colours <- c(basecaller_colours, "#C4B2C8", "#BA9AC0", "#AF83B9", "#A56BB1")
 
 basecaller_names <- c(basecaller_names, "basecRAWller v0.1")
-basecaller_colours <- c(basecaller_colours, "#7CB1A8")
-
-basecaller_names <- c(basecaller_names, "Chiron v0.2")
-basecaller_colours <- c(basecaller_colours, "#7CB184")
+basecaller_colours <- c(basecaller_colours, "#BCEBC2")
 
 basecaller_names <- c(basecaller_names, "DeepNano e8a621e")
-basecaller_colours <- c(basecaller_colours, "#9DB17C")
+basecaller_colours <- c(basecaller_colours, "#91CF99")
+
+basecaller_names <- c(basecaller_names, "Chiron v0.2")
+basecaller_colours <- c(basecaller_colours, "#6BB275")
+
+# basecaller_names <- c(basecaller_names, "Albacore and Chiron")
+# basecaller_colours <- c(basecaller_colours, "#777777")
+
 
 names(basecaller_colours) <- basecaller_names
 fill_scale <- scale_fill_manual(name = "Basecaller", values = basecaller_colours)
@@ -34,6 +38,7 @@ my_theme <- theme_bw() + theme(panel.grid.major.x = element_blank())
 
 basecaller_labels <- gsub(" ", "\n", basecaller_names, fixed=TRUE)
 basecaller_labels <- gsub("basecRAWller", "base-\ncRAWller", basecaller_labels, fixed=TRUE)
+basecaller_labels <- gsub("DeepNano", "Deep-\nNano", basecaller_labels, fixed=TRUE)
 
 
 load_tsv_data <- function(filename, column_names) {
@@ -48,8 +53,7 @@ load_tsv_data <- function(filename, column_names) {
 }
 
 
-
-all_reads <- data.frame(Name = character())
+all_reads <- load_tsv_data("results/read_data.tsv", column_names=c("Name", "Fast5_name", "Run_name", "Signal_length", "Start_time"))
 all_assemblies <- data.frame(Name = numeric())
 all_nanopolish <- data.frame(Name = numeric())
 basecaller_identities <- c()
@@ -178,7 +182,7 @@ ggsave(total_yield_plot, file='plots/total_yield.pdf', width = 10, height = 3)
 
 rel_read_length_plot <- ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
   geom_hline(yintercept = 100) + 
-  geom_violin(draw_quantiles = c(0.5)) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.25) +
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 4), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
@@ -188,36 +192,36 @@ rel_read_length_plot
 ggsave(rel_read_length_plot, file='plots/rel_read_length.pdf', width = 10, height = 4)
 
 assembly_identity_plot <- ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(draw_quantiles = c(0.5), bw=0.04) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
-  coord_cartesian(ylim=c(98, 100)) +
+  coord_cartesian(ylim=c(97.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 assembly_identity_plot
-ggsave(assembly_identity_plot, file='plots/assembly_identity.pdf', width = 10, height = 4)
+ggsave(assembly_identity_plot, file='plots/assembly_identity.pdf', width = 10, height = 5)
 
 rel_assembly_length_plot <- ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
   geom_hline(yintercept = 100) + 
-  geom_violin(draw_quantiles = c(0.5), adjust=2, width=1.1) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.06, width=1.1) +
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 0.5), minor_breaks = seq(0, 200, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
   coord_cartesian(ylim=c(98.75, 101.25)) +
   labs(title = "", x = "", y = "assembly length / reference length")
 rel_assembly_length_plot
-ggsave(rel_assembly_length_plot, file='plots/rel_assembly_length.pdf', width = 10, height = 3.5)
+ggsave(rel_assembly_length_plot, file='plots/rel_assembly_length.pdf', width = 10, height = 4)
 
 nanopolish_identity_plot <- ggplot(nanopolish_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(data = assembly_identities, draw_quantiles = c(0.5), bw=0.04, alpha=0.2, colour=NA) +
-  geom_violin(draw_quantiles = c(0.5), bw=0.04) +
+  geom_violin(data = assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
-  coord_cartesian(ylim=c(98, 100)) +
+  coord_cartesian(ylim=c(97.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 nanopolish_identity_plot
-ggsave(nanopolish_identity_plot, file='plots/nanopolish_identity.pdf', width = 10, height = 4)
+ggsave(nanopolish_identity_plot, file='plots/nanopolish_identity.pdf', width = 10, height = 5)
 
 
 # This code produces a single plot made of two violin plots:
@@ -260,10 +264,11 @@ p1 <- ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_iden
   labs(title = "", x = "read identity (%)", y = "assembly identity (%)")
 p2 <- ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_identity, fill = Basecaller)) + 
   geom_point(shape = 21, size = 3, stroke = 0.5, alpha = 0.85) +
-  fill_scale + theme_bw() + theme(aspect.ratio=1) + guides(fill=guide_legend(title="")) +
-  scale_x_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 1), minor_breaks = seq(0, 100, 0.5)) +
-  scale_y_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1)) +
-  coord_cartesian(xlim=c(79, 89), ylim=c(98.3, 99.7)) +
+  fill_scale + theme_bw() + theme(aspect.ratio=1) +
+  guides(fill=guide_legend(title="")) + theme(legend.key.size = unit(0.9, 'lines')) +
+  scale_x_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 2), minor_breaks = seq(0, 100, 0.5)) +
+  scale_y_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 0.4), minor_breaks = seq(0, 100, 0.1)) +
+  coord_cartesian(xlim=c(77, 89), ylim=c(97.1, 99.7)) +
   labs(title = "", x = "read identity (%)", y = "assembly identity (%)")
 read_assembly_scatter_plot <- grid.arrange(p1, p2, ncol=2, widths=c(2,3))
 ggsave(read_assembly_scatter_plot, file='plots/read_assembly_scatter.pdf', width = 9, height = 3.25)
@@ -298,3 +303,112 @@ ggsave(read_assembly_scatter_plot, file='plots/read_assembly_scatter.pdf', width
 #   scale_y_discrete(expand = c(0.05, 0)) +
 #   coord_cartesian(xlim=c(98, 100)) +
 #   labs(title = "Assembly identities (post-Nanopolish)", x = "", y = "")
+
+
+
+
+# Signal length vs read length plots
+for (basecaller in basecaller_names) {
+  no_spaces <- gsub(" ", "_", basecaller)
+  length_column <- paste("Length_", no_spaces, sep="")
+  read_vs_signal_plot <- ggplot(all_reads, aes_string(x = "Signal_length", y = length_column, color="Run_name")) +
+    geom_point(size = 0.25, alpha = 1, stroke = 0) +
+    scale_color_manual(values=c("#5268AB", "#AD5151", "#AD5151", "#5268AB"),
+                       breaks=c("klebs_033_sequencing_run", "klebs_033_restart_sequencing_run"),
+                       labels=c("Initial run", "Restart")) +
+    theme_bw() +
+    scale_x_continuous(expand = c(0, 0), labels=scales::unit_format("k", 1e-3, sep="")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    coord_cartesian(xlim=c(0, 700000), ylim=c(0, 70000)) +
+    labs(title = "", x = "signal length (samples)", y = paste(basecaller, "read length (bp)")) +
+    guides(colour = guide_legend(override.aes = list(size=5, alpha = 1))) +
+    theme(legend.title=element_blank())
+  print(read_vs_signal_plot)
+  png_filename =  paste("plots/read_vs_signal_", tolower(no_spaces), ".png", sep="")
+  ggsave(read_vs_signal_plot, file=png_filename, width = 6, height = 4)
+}
+
+
+
+
+
+
+
+# Scrappie v1.1.0 vs v1.1.1
+# Note: this section only works if both "Scrappie raw v1.1.0 rgrgr_r94" and
+# "Scrappie raw v1.1.1 rgrgr_r94" are included in basecaller_names at the
+# top of this script.
+scrappie_read_identities <- read_identities[read_identities$Basecaller == "Scrappie raw v1.1.0 rgrgr_r94" | read_identities$Basecaller == "Scrappie raw v1.1.1 rgrgr_r94",]
+scrappie_assembly_identities <- assembly_identities[assembly_identities$Basecaller == "Scrappie raw v1.1.0 rgrgr_r94" | assembly_identities$Basecaller == "Scrappie raw v1.1.1 rgrgr_r94",]
+
+scrappie_names <- c("Scrappie raw v1.1.0 rgrgr_r94", "Scrappie raw v1.1.1 rgrgr_r94")
+scrappie_labels <- gsub(" ", "\n", scrappie_names, fixed=TRUE)
+scrappie_colours <- c("#C4B2C8", "#A56BB1")
+names(scrappie_colours) <- scrappie_names
+scrappie_fill_scale <- scale_fill_manual(name = "Basecaller", values = scrappie_colours)
+
+p1 <- ggplot(scrappie_read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  geom_violin(draw_quantiles = c(0.5), bw=0.6) +
+  scrappie_fill_scale + my_theme + guides(fill=FALSE) + 
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=scrappie_labels) +
+  coord_cartesian(ylim=c(65.0, 100)) +
+  labs(title = "", x = "", y = "read identity")
+
+p2 <- ggplot(scrappie_assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  
+  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
+  scrappie_fill_scale + my_theme + guides(fill=FALSE) + 
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.05), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=scrappie_labels) +
+  coord_cartesian(ylim=c(99.0, 100)) +
+  labs(title = "", x = "", y = "assembly identity")
+
+blank <- rectGrob(gp=gpar(col="white"))
+scrappie_comparison_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.425, 0.15, 0.425))
+# ggsave(scrappie_comparison_plot, file='plots/scrappie_comparison.pdf', width = 6, height = 4)
+
+
+
+
+
+
+
+
+
+
+
+
+# Combined assembly
+# Note: this section only works if "Albacore and Chiron" is included in basecaller_names
+# at the top of this script.
+combined_assembly_identities <- assembly_identities[assembly_identities$Basecaller == "Albacore v2.0.2" | assembly_identities$Basecaller == "Chiron v0.2" | assembly_identities$Basecaller == "Albacore and Chiron",]
+combined_nanopolish_identities <- nanopolish_identities[nanopolish_identities$Basecaller == "Albacore v2.0.2" | nanopolish_identities$Basecaller == "Chiron v0.2" | nanopolish_identities$Basecaller == "Albacore and Chiron",]
+
+combined_names <- c("Albacore v2.0.2", "Chiron v0.2", "Albacore and Chiron")
+combined_labels <- gsub(" ", "\n", combined_names, fixed=TRUE)
+combined_colours <- c("#CB181D", "#6BB275", "#777777")
+names(combined_colours) <- combined_names
+combined_fill_scale <- scale_fill_manual(name = "Basecaller", values = combined_colours)
+
+p1 <- ggplot(combined_assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
+  combined_fill_scale + my_theme + guides(fill=FALSE) + 
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.05), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=combined_labels) +
+  coord_cartesian(ylim=c(99.0, 100)) +
+  labs(title = "", x = "", y = "assembly identity")
+
+p2 <- ggplot(combined_nanopolish_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  geom_violin(data = combined_assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
+  combined_fill_scale + my_theme + guides(fill=FALSE) + 
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.05), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=combined_labels) +
+  coord_cartesian(ylim=c(99.0, 100)) +
+  labs(title = "", x = "", y = "Nanopolish identity")
+
+blank <- rectGrob(gp=gpar(col="white"))
+albacore_chiron_combination_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.425, 0.15, 0.425))
+# ggsave(albacore_chiron_combination_plot, file='plots/albacore_chiron_combination.pdf', width = 7, height = 3.5)
+
