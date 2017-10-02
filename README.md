@@ -275,7 +275,7 @@ I found it curious that many basecallers had a distinctly bimodal distribution. 
 
 This analysis is my personal favourite: how accurate are the _consensus_ sequences? I don't particularly care if individual reads have low identity if they can produce an accurate assembly.
 
-Albacore v2.0.2 leads the pack with an accuracy of over 99.5% (less than one error per 200 bases). Most surprisingly, Albacore v0.9.1, which had very poor read identity, also did well. Scrappie raw v1.0.0, basecRAWller and DeepNano all performed poorly (BasecRAWller isn't missing from this plot, it's just off the bottom with a median value in the 80s).
+Albacore v2.0.2 leads the pack with an accuracy of over 99.5% (less than one error per 200 bases). Most surprisingly, Albacore v0.9.1, which had very poor read identity, also did well. Scrappie raw v1.0.0, basecRAWller and DeepNano all performed poorly (basecRAWller isn't missing from this plot, it's just off the bottom with a median value in the 80s).
 
 It's also interesting to look at the assembly relative length, like we did for reads:
 
