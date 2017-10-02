@@ -301,7 +301,7 @@ You might expect that a basecaller's read and assembly identities would be tight
 
 <p align="center"><img src="images/nanopolish_identity.png" width="90%"></p>
 
-This plot shows the assembly identity distributions after Nanopolish, with pre-Nanopolish assembly identity distributions lightly drawn underneath. In every case, Nanopolish improved the assembly accuracy, and most post-Nanopolish assemblies are quite similar to each other and near 99.7% accurate. In a few cases, Nanopolish resulted in a ~100 bp insertion, which caused the distribution to drop down to 98.5%. I'm not sure if this is an issue with Nanopolish (the insertion was erroneous) or with the reference sequence (the insertion was correct).
+This plot shows the assembly identity distributions after Nanopolish, with pre-Nanopolish assembly identity distributions lightly drawn underneath. In every case, Nanopolish improved the assembly accuracy, and most post-Nanopolish assemblies are quite similar to each other and near 99.7% accurate. In a few cases, Nanopolish resulted in a ~100 bp insertion, which caused the distribution to extend down to 98.5%. I'm not sure if this is an issue with Nanopolish (the insertion was erroneous) or with the reference sequence (the insertion was correct).
 
 Four of the 16 assemblies did not reach the 99.7% accuracy of the others. Nanonet's truncated reads may have caused problems for Nanopolish. Scrappie raw v1.0.0, basecRAWller and DeepNano probably suffered due to their low accuracy pre-Nanopolish assemblies.
 
@@ -327,7 +327,7 @@ While each basecaller suffers from systematic error, it seems plausible that the
 
 <p align="center"><img src="images/albacore_chiron_combination.png" width="70%"></p>
 
-Running Nanopolish brings all of the assemblies up to an equivalent accuracy, so this experiment is somewhat academic. I.e. anybody interested in maximising assembly accuracy should just run Nanopolish, not waste time combining reads from separate basecallers. It is interesting however, that the combined assembly nearly reaches the 99.7% accuracy we see in most post-Nanopolish assemblies, and running Nanopolish on it gives very little improvement.
+Running Nanopolish brings all of the assemblies up to an equivalent accuracy, so this experiment is somewhat academic. I.e. anybody interested in maximising assembly accuracy should just run Nanopolish, not waste time combining reads from separate basecallers. It is interesting however, that the combined assembly nearly reaches the 99.7% accuracy we see in most post-Nanopolish assemblies, and Nanopolish is barely able to improve it.
 
 
 
@@ -338,7 +338,7 @@ Running Nanopolish brings all of the assemblies up to an equivalent accuracy, so
 
 ### Recommendations
 
-My current recommendation is simply to use the latest version of Albacore: v2.0.2. It does well on read accuracy and had the best assembly accuracy. Scrappie raw v1.1.1 (rgr_r94 and rgrgr_r94 models) also did very well and had the highest read accuracy. However, Scrappie is a research product, labelled as a 'technology demonstrator' and lacks nice features present in Albacore, such as FASTQ output and barcode demultiplexing. I therefore Albacore is a better choice for most users.
+My current recommendation is simply to use the latest version of Albacore: v2.0.2. It does well on read accuracy and had the best assembly accuracy. Scrappie raw v1.1.1 (rgr_r94 and rgrgr_r94 models) also did quite well and had the highest read accuracy. However, Scrappie is a research product, labelled as a 'technology demonstrator' and lacks nice features present in Albacore, such as FASTQ output and barcode demultiplexing. I therefore Albacore is a better choice for most users.
 
 Chiron v0.2 is by far the best performing third-party basecaller and might also be worth a try. However, it is very slow on CPUs and therefore only a viable option if you have powerful GPUs to accelerate the process. Nanonet, basecRAWller and DeepNano should probably be avoided, but I'm happy to revisit them if they are updated/improved.
 
