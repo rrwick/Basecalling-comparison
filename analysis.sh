@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 
-# This script conducts read and assembly analysis on a set of ONT reads, comparing them to a
-# reference sequence. It is part of https://github.com/rrwick/Basecalling-comparison.
+# Copyright 2017 Ryan Wick (rrwick@gmail.com)
+# https://github.com/rrwick/Basecalling-comparison
 
-# This script expects to find the following in the directory where it's run:
+# This program is free software: you can redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version. This program is distributed in the hope that it
+# will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+# should have received a copy of the GNU General Public License along with this program. If not,
+# see <http://www.gnu.org/licenses/>.
+
+# This script conducts read and assembly analysis on a set of ONT reads, comparing them to a
+# reference sequence. It expects to find the following in the directory where it's run:
 #   * reference.fasta: the reference sequence
 #   * 01_raw_fast5 directory: has all fast5 files
 #   * 02_basecalled_reads directory: has one or more fastq.gz/fasta.gz read files
-#   * read_id_to_fast5: a file with two columns: read_ID in the first and fast5 filename in the second
+#   * read_id_to_fast5: a file with two columns: read_ID and fast5 filename
 #   * illumina_1.fastq.gz illumina_2.fastq.gz: Illumina reads for the same sample
 
 # Set this to the desired number of threads (for alignment and polishing).
