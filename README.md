@@ -10,7 +10,7 @@ __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 
 ## Abstract
 
-This repository uses a bacterial genome to assess the read accuracy and consensus sequence accuracy for Oxford Nanopore Technologies (ONT) basecallers. Albacore v2.0.2 and Scrappie raw v1.1.1 (both ONT-developed basecallers) were the best overall performers, and Chiron v0.2 was the best performing third-party basecaller. Assembly (consensus sequence) accuracies maxed out at about 99.5%, revealing that even the best basecallers still have systematic errors. For 12 out of the 16 basecallers, Nanopolish raised assembly accuracy to about 99.7%.
+This repository uses a bacterial genome to assess the read accuracy and consensus sequence accuracy for Oxford Nanopore Technologies (ONT) basecallers. Albacore v2.0.2 and Scrappie raw v1.1.1 (both developed by ONT) were the best overall performers, and Chiron v0.2 was the best performing third-party basecaller. Consensus sequence accuracies reached approximately 99.5%, revealing that even the best basecallers still have systematic errors. Nanopolish was usually able to raise consensus accuracy to about 99.7%.
 
 
 
