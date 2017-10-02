@@ -397,7 +397,7 @@ p1 <- ggplot(combined_assembly_identities, aes(x = Basecaller, y = Identity, wei
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.05), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=combined_labels) +
   coord_cartesian(ylim=c(99.0, 100)) +
-  labs(title = "", x = "", y = "assembly identity")
+  labs(title = "", x = "", y = "pre-Nanopolish assembly identity")
 
 p2 <- ggplot(combined_nanopolish_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(data = combined_assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
@@ -406,7 +406,7 @@ p2 <- ggplot(combined_nanopolish_identities, aes(x = Basecaller, y = Identity, w
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.05), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=combined_labels) +
   coord_cartesian(ylim=c(99.0, 100)) +
-  labs(title = "", x = "", y = "Nanopolish identity")
+  labs(title = "", x = "", y = "post-Nanopolish assembly identity")
 
 blank <- rectGrob(gp=gpar(col="white"))
 albacore_chiron_combination_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.425, 0.15, 0.425))
