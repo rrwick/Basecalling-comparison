@@ -31,6 +31,13 @@ def main():
     nanopolish_dir = os.path.abspath(sys.argv[5])
     threads = int(sys.argv[6])
 
+    methylation_aware = False
+    try:
+        if sys.argv[7].lower() == 'meth':
+            methylation_aware = True
+    except IndexError:
+        pass
+
     nanopolish_exec = os.path.join(nanopolish_dir, 'nanopolish')
     nanopolish_makerange = os.path.join(nanopolish_dir, 'scripts', 'nanopolish_makerange.py')
     nanopolish_merge = os.path.join(nanopolish_dir, 'scripts', 'nanopolish_merge.py')
@@ -39,6 +46,8 @@ def main():
     print('\nPreparing to run Nanopolish for ' + set_name)
 
     final_assembly = ('../' + set_name + '.fasta').replace('_assembly.fasta', '_nanopolish.fasta')
+    if methylation_aware:
+        final_assembly = final_assembly.replace('_nanopolish.fasta', '_nanopolish_meth.fasta')
 
     pid = str(os.getpid())
     temp_dir = os.path.join(output_dir, pid + '_temp_dir')
@@ -77,6 +86,8 @@ def main():
     for polish_range in polish_ranges:
         job_name = job_prefix + polish_range
         variants_command = nanopolish_exec + ' variants --consensus polished.' + polish_range + '.fa -w ' + polish_range + ' -r ' + read_filename + ' -b reads.sorted.bam -g ' + assembly_filename + ' -t 2 --min-candidate-frequency 0.1'
+        if methylation_aware:
+            variants_command += ' --methylation-aware=dcm,dam'
         sbatch_command = 'sbatch -p sysgen --nodes=1 --job-name=' + job_name + ' --ntasks=1 --cpus-per-task=2 --mem=4096 --time=0-4:0:00 --wrap "' + variants_command + '"'
         print(sbatch_command)
         subprocess.run(sbatch_command, shell=True, check=True)

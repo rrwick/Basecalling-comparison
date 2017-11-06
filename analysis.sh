@@ -46,6 +46,8 @@ mkdir -p 07_assemblies
 mkdir -p 08_assembly_data
 mkdir -p 09_nanopolish
 mkdir -p 10_nanopolish_data
+mkdir -p 11_nanopolish_meth
+mkdir -p 12_nanopolish_meth_data
 
 # Create a table of basic info about each read.
 python3 "$python_script_dir"/read_table.py 01_raw_fast5 > 04_read_data/read_data.tsv
@@ -71,6 +73,11 @@ for f in $read_files; do
     nanopolish_assembly_pieces=10_nanopolish_data/"$set"_nanopolish_pieces.fasta
     nanopolish_assembly_alignment=10_nanopolish_data/"$set"_nanopolish.paf
     nanopolish_assembly_data=10_nanopolish_data/"$set"_nanopolish.tsv
+    nanopolish_meth_assembly_dir=11_nanopolish_meth
+    nanopolish_meth_assembly=11_nanopolish_meth/"$set"_nanopolish_meth.fasta
+    nanopolish_meth_assembly_pieces=12_nanopolish_meth_data/"$set"_nanopolish_meth_pieces.fasta
+    nanopolish_meth_assembly_alignment=12_nanopolish_meth_data/"$set"_nanopolish_meth.paf
+    nanopolish_meth_assembly_data=12_nanopolish_meth_data/"$set"_nanopolish_meth.tsv
 
     printf "\n\n\n\n"
     echo "NORMALISE READ HEADERS: "$set
@@ -103,7 +110,7 @@ for f in $read_files; do
     echo "NANOPOLISH: "$set
     echo "--------------------------------------------------------------------------------"
     python3 "$python_script_dir"/nanopolish_slurm_wrapper.py $assembly $all_reads_fixed_names $raw_fast5_dir $nanopolish_assembly_dir $nanopolish_exec_dir $threads
-    rm "$all_reads_fixed_names".fa.gz*
+    rm "$all_reads_fixed_names".index*
     rm "$assembly".fai
 
     printf "\n\n\n\n"
@@ -113,5 +120,20 @@ for f in $read_files; do
     minimap2 -x map10k -t $threads -c reference.fasta $nanopolish_assembly_pieces > $nanopolish_assembly_alignment
     python3 "$python_script_dir"/read_length_identity.py $nanopolish_assembly_pieces $nanopolish_assembly_alignment > $nanopolish_assembly_data
     rm $nanopolish_assembly_pieces $nanopolish_assembly_alignment
+
+    printf "\n\n\n\n"
+    echo "NANOPOLISH (METHYLATION-AWARE): "$set
+    echo "--------------------------------------------------------------------------------"
+    python3 "$python_script_dir"/nanopolish_slurm_wrapper.py $assembly $all_reads_fixed_names $raw_fast5_dir $nanopolish_meth_assembly_dir $nanopolish_exec_dir $threads meth
+    rm "$all_reads_fixed_names".index*
+    rm "$assembly".fai
+
+    printf "\n\n\n\n"
+    echo "ASSESS NANOPOLISHED (METHYLATION-AWARE) ASSEMBLY: "$set
+    echo "--------------------------------------------------------------------------------"
+    python3 "$python_script_dir"/chop_up_assembly.py $nanopolish_meth_assembly 10000 > $nanopolish_meth_assembly_pieces
+    minimap2 -x map10k -t $threads -c reference.fasta $nanopolish_meth_assembly_pieces > $nanopolish_meth_assembly_alignment
+    python3 "$python_script_dir"/read_length_identity.py $nanopolish_meth_assembly_pieces $nanopolish_meth_assembly_alignment > $nanopolish_meth_assembly_data
+    rm $nanopolish_meth_assembly_pieces $nanopolish_meth_assembly_alignment
 
 done

@@ -10,8 +10,8 @@ basecaller_colours <- c()
 basecaller_names <- c(basecaller_names, "Nanonet v2.0.0")
 basecaller_colours <- c(basecaller_colours, "#F0DF46")
 
-basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2")
-basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#DF5952", "#D53937", "#CB181D")
+basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.1")
+basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F4A08B", "#EC8575", "#E46A5F", "#DB4E49", "#D33333", "#CB181D")
 
 basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.1")
 basecaller_colours <- c(basecaller_colours, "#788CC8", "#6175B1")
@@ -56,6 +56,7 @@ load_tsv_data <- function(filename, column_names) {
 all_reads <- load_tsv_data("results/read_data.tsv", column_names=c("Name", "Fast5_name", "Run_name", "Signal_length", "Start_time"))
 all_assemblies <- data.frame(Name = numeric())
 all_nanopolish <- data.frame(Name = numeric())
+all_nanopolish_meth <- data.frame(Name = numeric())
 basecaller_identities <- c()
 basecaller_rel_lengths <- c()
 
@@ -65,6 +66,7 @@ for (basecaller in basecaller_names) {
   read_data_filename <- paste("results/", tolower(no_spaces), "_reads.tsv", sep="")
   assembly_data_filename <- paste("results/", tolower(no_spaces), "_assembly.tsv", sep="")
   nanopolish_data_filename <- paste("results/", tolower(no_spaces), "_nanopolish.tsv", sep="")
+  nanopolish_meth_data_filename <- paste("results/", tolower(no_spaces), "_nanopolish_meth.tsv", sep="")
   
   length_column <- paste("Length_", no_spaces, sep="")
   identity_column <- paste("Identity_", no_spaces, sep="")
@@ -77,10 +79,12 @@ for (basecaller in basecaller_names) {
   read_data <- load_tsv_data(read_data_filename, column_names)
   assembly_data <- load_tsv_data(assembly_data_filename, column_names)
   nanopolish_data <- load_tsv_data(nanopolish_data_filename, column_names)
+  nanopolish_meth_data <- load_tsv_data(nanopolish_meth_data_filename, column_names)
 
   all_reads <- merge(all_reads, read_data, by=1, all=TRUE)
   all_assemblies <- merge(all_assemblies, assembly_data, by=1, all=TRUE)
   all_nanopolish <- merge(all_nanopolish, nanopolish_data, by=1, all=TRUE)
+  all_nanopolish_meth <- merge(all_nanopolish_meth, nanopolish_meth_data, by=1, all=TRUE)
 }
 
 
@@ -93,6 +97,9 @@ all_assemblies["Length"] <- round(apply(assembly_lengths, 1, median, na.rm = TRU
 
 nanopolish_lengths <- all_nanopolish[grepl("Length_", names(all_nanopolish))]
 all_nanopolish["Length"] <- round(apply(nanopolish_lengths, 1, median, na.rm = TRUE))
+
+nanopolish_meth_lengths <- all_nanopolish_meth[grepl("Length_", names(all_nanopolish_meth))]
+all_nanopolish_meth["Length"] <- round(apply(nanopolish_meth_lengths, 1, median, na.rm = TRUE))
 
 
 
@@ -134,6 +141,11 @@ nanopolish_identities <- all_nanopolish[,c("Name", "Length", basecaller_identiti
 colnames(nanopolish_identities) <- c("Name", "Length", basecaller_names)
 nanopolish_identities <- melt(nanopolish_identities, id=c("Name", "Length"))
 colnames(nanopolish_identities) <- c("Read_name", "Length", "Basecaller", "Identity")
+
+nanopolish_meth_identities <- all_nanopolish_meth[,c("Name", "Length", basecaller_identities)]
+colnames(nanopolish_meth_identities) <- c("Name", "Length", basecaller_names)
+nanopolish_meth_identities <- melt(nanopolish_meth_identities, id=c("Name", "Length"))
+colnames(nanopolish_meth_identities) <- c("Read_name", "Length", "Basecaller", "Identity")
 
 
 # Load the total bases called data frame.
@@ -222,6 +234,17 @@ nanopolish_identity_plot <- ggplot(nanopolish_identities, aes(x = Basecaller, y 
   labs(title = "", x = "", y = "assembly identity")
 nanopolish_identity_plot
 ggsave(nanopolish_identity_plot, file='plots/nanopolish_identity.pdf', width = 10, height = 5)
+
+nanopolish_meth_identity_plot <- ggplot(nanopolish_meth_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+  geom_violin(data = assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
+  fill_scale + my_theme + guides(fill=FALSE) + 
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=basecaller_labels) +
+  coord_cartesian(ylim=c(97.5, 100)) +
+  labs(title = "", x = "", y = "assembly identity")
+nanopolish_meth_identity_plot
+ggsave(nanopolish_meth_identity_plot, file='plots/nanopolish_meth_identity.pdf', width = 10, height = 5)
 
 
 # This code produces a single plot made of two violin plots:
@@ -382,10 +405,10 @@ scrappie_comparison_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.425, 
 # Combined assembly
 # Note: this section only works if "Albacore and Chiron" is included in basecaller_names
 # at the top of this script.
-combined_assembly_identities <- assembly_identities[assembly_identities$Basecaller == "Albacore v2.0.2" | assembly_identities$Basecaller == "Chiron v0.2" | assembly_identities$Basecaller == "Albacore and Chiron",]
-combined_nanopolish_identities <- nanopolish_identities[nanopolish_identities$Basecaller == "Albacore v2.0.2" | nanopolish_identities$Basecaller == "Chiron v0.2" | nanopolish_identities$Basecaller == "Albacore and Chiron",]
+combined_assembly_identities <- assembly_identities[assembly_identities$Basecaller == "Albacore v2.1.1" | assembly_identities$Basecaller == "Chiron v0.2" | assembly_identities$Basecaller == "Albacore and Chiron",]
+combined_nanopolish_meth_identities <- nanopolish_meth_identities[nanopolish_meth_identities$Basecaller == "Albacore v2.1.1" | nanopolish_meth_identities$Basecaller == "Chiron v0.2" | nanopolish_meth_identities$Basecaller == "Albacore and Chiron",]
 
-combined_names <- c("Albacore v2.0.2", "Chiron v0.2", "Albacore and Chiron")
+combined_names <- c("Albacore v2.1.1", "Chiron v0.2", "Albacore and Chiron")
 combined_labels <- gsub(" ", "\n", combined_names, fixed=TRUE)
 combined_colours <- c("#CB181D", "#6BB275", "#777777")
 names(combined_colours) <- combined_names
@@ -399,7 +422,7 @@ p1 <- ggplot(combined_assembly_identities, aes(x = Basecaller, y = Identity, wei
   coord_cartesian(ylim=c(99.0, 100)) +
   labs(title = "", x = "", y = "pre-Nanopolish assembly identity")
 
-p2 <- ggplot(combined_nanopolish_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
+p2 <- ggplot(combined_nanopolish_meth_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
   geom_violin(data = combined_assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
   geom_violin(draw_quantiles = c(0.5), bw=0.06) +
   combined_fill_scale + my_theme + guides(fill=FALSE) + 
