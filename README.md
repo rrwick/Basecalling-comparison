@@ -389,17 +389,17 @@ Did I miss anything important? Can you shed any light on oddities that I couldn'
 
 ## References
 
-[Boža, V., Brejová, B., & Vinař, T. (2017). DeepNano: Deep recurrent neural networks for base calling in MinION Nanopore reads. _PLoS ONE, 12_(6).](https://doi.org/10.1371/journal.pone.0178751)
+[**Boža V, Brejová B, Vinař T**. DeepNano: Deep recurrent neural networks for base calling in MinION Nanopore reads. _PLoS ONE_ 2017;12.](https://doi.org/10.1371/journal.pone.0178751)
 
-[Jain, M., Koren, S., Quick, J., Rand, A. C., Sasani, T. A., Tyson, J. R., … Loose, M. (2017). Nanopore sequencing and assembly of a human genome with ultra-long reads. _bioRxiv_.](https://doi.org/https://doi.org/10.1101/128835)
+[**Jain M, Koren S, Quick J, Rand AC, Sasani TA _et al._**. Nanopore sequencing and assembly of a human genome with ultra-long reads. _bioRxiv_ 2017.](https://doi.org/10.1101/128835)
 
-[Loman, N. J., Quick, J., & Simpson, J. T. (2015). A complete bacterial genome assembled _de novo_ using only nanopore sequencing data. _Nature Methods, 12_(8), 733–735.](https://doi.org/10.1038/nmeth.3444)
+[**Loman NJ, Quick J, Simpson JT**. A complete bacterial genome assembled _de novo_ using only nanopore sequencing data. _Nature Methods_ 2015;12:733–735.](https://doi.org/10.1038/nmeth.3444)
 
-[Stoiber, M., & Brown, J. (2017). BasecRAWller: Streaming Nanopore Basecalling Directly from Raw Signal. _bioRxiv_.](https://doi.org/10.1101/133058)
+[**Stoiber M, Brown J**. BasecRAWller: Streaming Nanopore Basecalling Directly from Raw Signal. _bioRxiv_ 2017.](https://doi.org/10.1101/133058)
 
-[Teng, H. H., Hall, M. B., Duarte, T., Cao, M. D., & Coin, L. J. M. (2017). Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning. _bioRxiv_.](https://doi.org/10.1101/179531)
+[**Teng HH, Hall MB, Duarte T, Cao MD, Coin LJM**. Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning. _bioRxiv_ 2017.](https://doi.org/10.1101/179531)
 
-[Wick, R. R., Judd, L. M., Gorrie, C. L., & Holt, K. E. (2017). Completing bacterial genome assemblies with multiplex MinION sequencing. _Microbial Genomics, 3_(10).](https://doi.org/10.1099/mgen.0.000132)
+[**Wick RR, Judd LM, Gorrie CL, Holt KE**. Completing bacterial genome assemblies with multiplex MinION sequencing. _Microbial Genomics_ 2017;3.](https://doi.org/10.1099/mgen.0.000132)
 
 
 
