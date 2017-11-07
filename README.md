@@ -329,7 +329,7 @@ The Nanopolish results show that, at least for this dataset, methylation is a ma
 ```
 assembly:   CCCGG   CCCGGG   CCGGG   CC-GG   CC-GG   CCA-G   CACGG   CCCGGG
 reference:  CCTGG   C-CAGG   CCAGG   CCAGG   CCTGG   CCAGG   CCTGG   C-CTGG
-              ^      ^ ^       ^       ^       ^       ^      ^^      ^ ^  
+              ^      ^ ^       ^       ^       ^        ^     ^^      ^ ^
 ```
 
 While Nanopolish can correct many of these errors, it would be better if the basecallers themselves could properly recognise modified bases. While calling modified bases _as modified bases_ would be fascinating and useful, a first step would be to call modified bases as their canonical base. E.g. 5-mC called as a C, 4-mC as a C, 6-mA as an A, etc. This could be a tricky problem, as different organisms have different enzymes which modify bases at different sequence motifs. Perhaps basecallers need very broad training sets which include as many such motifs as possible. Or perhaps each basecaller needs multiple trained models, each on different organisms, and an automatic method for choosing the appropriate one.
