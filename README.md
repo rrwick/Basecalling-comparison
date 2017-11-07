@@ -389,7 +389,7 @@ Did I miss anything important? Can you shed any light on oddities that I couldn'
 
 ## References
 
-[Boža, V., Brejová, B., & Vinař, T. (2017). DeepNano: Deep recurrent neural networks for base calling in MinION Nanopore reads. _PLoS ONE, 12_(6), 1–13.](https://doi.org/10.1371/journal.pone.0178751)
+[Boža, V., Brejová, B., & Vinař, T. (2017). DeepNano: Deep recurrent neural networks for base calling in MinION Nanopore reads. _PLoS ONE, 12_(6).](https://doi.org/10.1371/journal.pone.0178751)
 
 [Jain, M., Koren, S., Quick, J., Rand, A. C., Sasani, T. A., Tyson, J. R., … Loose, M. (2017). Nanopore sequencing and assembly of a human genome with ultra-long reads. _bioRxiv_.](https://doi.org/https://doi.org/10.1101/128835)
 
@@ -399,7 +399,7 @@ Did I miss anything important? Can you shed any light on oddities that I couldn'
 
 [Teng, H. H., Hall, M. B., Duarte, T., Cao, M. D., & Coin, L. J. M. (2017). Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning. _bioRxiv_.](https://doi.org/10.1101/179531)
 
-[Wick, R. R., Judd, L. M., Gorrie, C. L., & Holt, K. E. (2017). Completing bacterial genome assemblies with multiplex MinION sequencing. _Microbial Genomics_.](https://doi.org/10.1099/mgen.0.000132)
+[Wick, R. R., Judd, L. M., Gorrie, C. L., & Holt, K. E. (2017). Completing bacterial genome assemblies with multiplex MinION sequencing. _Microbial Genomics, 3_(10).](https://doi.org/10.1099/mgen.0.000132)
 
 
 
