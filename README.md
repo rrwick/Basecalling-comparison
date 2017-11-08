@@ -4,8 +4,10 @@ __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 <br>
 <sub>Department of Biochemistry and Molecular Biology, Bio21 Molecular Science and Biotechnology Institute, University of Melbourne, Australia</sub>
 
-
 <p align="center"><img src="images/logo.png" alt="logo" width="100%"></p>
+
+[![DOI](https://zenodo.org/badge/101518136.svg)](https://zenodo.org/badge/latestdoi/101518136)
+
 
 
 ## Abstract
