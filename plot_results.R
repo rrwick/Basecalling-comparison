@@ -10,7 +10,7 @@ basecaller_colours <- c()
 basecaller_names <- c(basecaller_names, "Nanonet v2.0.0")
 basecaller_colours <- c(basecaller_colours, "#F0DF46")
 
-basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.1")
+basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.2")
 basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F4A08B", "#EC8575", "#E46A5F", "#DB4E49", "#D33333", "#CB181D")
 
 basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.1")
@@ -405,10 +405,10 @@ scrappie_comparison_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.425, 
 # Combined assembly
 # Note: this section only works if "Albacore and Chiron" is included in basecaller_names
 # at the top of this script.
-combined_assembly_identities <- assembly_identities[assembly_identities$Basecaller == "Albacore v2.1.1" | assembly_identities$Basecaller == "Chiron v0.2" | assembly_identities$Basecaller == "Albacore and Chiron",]
-combined_nanopolish_meth_identities <- nanopolish_meth_identities[nanopolish_meth_identities$Basecaller == "Albacore v2.1.1" | nanopolish_meth_identities$Basecaller == "Chiron v0.2" | nanopolish_meth_identities$Basecaller == "Albacore and Chiron",]
+combined_assembly_identities <- assembly_identities[assembly_identities$Basecaller == "Albacore v2.1.2" | assembly_identities$Basecaller == "Chiron v0.2" | assembly_identities$Basecaller == "Albacore and Chiron",]
+combined_nanopolish_meth_identities <- nanopolish_meth_identities[nanopolish_meth_identities$Basecaller == "Albacore v2.1.2" | nanopolish_meth_identities$Basecaller == "Chiron v0.2" | nanopolish_meth_identities$Basecaller == "Albacore and Chiron",]
 
-combined_names <- c("Albacore v2.1.1", "Chiron v0.2", "Albacore and Chiron")
+combined_names <- c("Albacore v2.1.2", "Chiron v0.2", "Albacore and Chiron")
 combined_labels <- gsub(" ", "\n", combined_names, fixed=TRUE)
 combined_colours <- c("#CB181D", "#6BB275", "#777777")
 names(combined_colours) <- combined_names
@@ -423,7 +423,6 @@ p1 <- ggplot(combined_assembly_identities, aes(x = Basecaller, y = Identity, wei
   labs(title = "", x = "", y = "pre-Nanopolish\nassembly identity")
 
 p2 <- ggplot(combined_nanopolish_meth_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(data = combined_assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
   geom_violin(draw_quantiles = c(0.5), bw=0.06) +
   combined_fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
