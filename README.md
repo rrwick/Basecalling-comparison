@@ -316,9 +316,9 @@ Now here are the results _with_ the methylation-aware option:
 The improvement is huge! Most assemblies now reach about 99.9% accuracy. Most of the remaining errors are in homopolymers:
 
 ```
-assembly:   AACCGCTACCACTCATCTTCCCCCGCCTCGCGGG-GA-TTTTTTGCTTG
+assembly:   AACCGCTACCACTCATCTTCCCCCGCCTCGC-GGGGA-TTTTTTGCTTG
 reference:  AACCGCTACCACTCATCTTCCCCCGCCTCGCGGGGGATTTTTTTGCTTG
-                                              ^  ^           
+                                           ^     ^
 ```
 
 
@@ -365,13 +365,13 @@ My current recommendation is simply to use the latest version of Albacore: v2.1.
 
 Chiron v0.2 is by far the best performing third-party basecaller and might also be worth a try. However, it is very slow on CPUs and is only a viable option if you have a powerful GPU to accelerate the process. Nanonet, basecRAWller and DeepNano should probably be avoided, but I'm happy to revisit them if they are updated.
 
-My recommendation would have been harder a few months ago. Then, the basecaller with the best assembly accuracy had very poor read accuracies: Albacore v0.9.1. Whether it would have been a good choice might depend on your analysis. We've dodged that decision for the moment but may someday be faced with a similar dilemma if a future basecaller excels at consensus accuracy over read accuracy or vice versa.
+My recommendation would have been harder before Albacore v2 was released. Then, the basecaller with the best assembly accuracy had very poor read accuracies: Albacore v0.9.1. Whether it would have been a good choice might depend on your analysis. We've dodged that decision for the moment but may someday be faced with a similar dilemma if a future basecaller excels at consensus accuracy over read accuracy or vice versa.
 
 
 
 ### Nanopolish
 
-Any user interested in maximising assembly accuracy should be using Nanopolish. It improved all assemblies and took most up to about 99.9% (with the methylation-aware option). If you only care about assembly identity, Nanopolish makes your basecaller choice relatively unimportant.
+Anyone interested in maximising assembly accuracy should be using Nanopolish. It improved all assemblies and took most up to about 99.9% (with the methylation-aware option). If you only care about assembly identity, Nanopolish makes your basecaller choice relatively unimportant.
 
 Interestingly, Nanopolish may have some competition in the near future. ONT recently announced [Medaka](https://github.com/nanoporetech/medaka), a new consensus tool. In its current form, it operates on basecalled reads, not signal-level data like Nanopolish. However, [the 'Future directions' section of Medaka's documentation](https://nanoporetech.github.io/medaka/future.html) indicates that signal-level processing may be in its future. Furthermore, Medaka uses neural networks, unlike Nanopolish's HMMs. The authors suggest that just as neural networks have outperformed HMMs in basecallers, they will also prove superior in consensus algorithms. Watch this space!
 
@@ -381,7 +381,7 @@ Interestingly, Nanopolish may have some competition in the near future. ONT rece
 
 My future work is easy: trying new versions and new basecallers as they are released and adding them to this analysis. Check back occasionally for new data!
 
-The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies. Nanopolish mitigates this issue but does not eliminate it. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). If and when systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true Illumina alternative.
+The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies. Nanopolish mitigates this issue but does not eliminate it. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). If and when systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true alternative to Illumina.
 
 Did I miss anything important? Can you shed any light on oddities that I couldn't explain? Please let me know through the [issue tracker](https://github.com/rrwick/Basecalling-comparison/issues)!
 
