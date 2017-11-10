@@ -127,18 +127,6 @@ Unlike other basecallers, it focuses on _streaming_ basecalling. I.e. it can bas
 
 
 
-### Chiron
-
-[Chiron](https://github.com/haotianteng/chiron) is a third-party basecaller developed by [Haotian Teng](https://github.com/haotianteng) and others in [Lachlan Coin's group](https://imb.uq.edu.au/profile/647/lachlan-coin) at the University of Queensland and described in [this paper](https://www.biorxiv.org/content/early/2017/09/12/179531). Versions 0.1 and 0.1.4 had some bugs which caused issues with my data, so I only tested v0.2.
-
-```
-chiron call -i raw_fast5_dir -o chiron_v0.2 --batch_size 1000
-```
-
-While testing Chiron, I noticed a curious effect. The `--batch_size` parameter was described as controlling performance: a larger value runs faster but increases RAM requirements. While I found this to be true, I also saw another effect: larger `--batch_size` values improved the read accuracy. The default is 100 and I saw modest read accuracy improvements up to about 500, after which accuracy plateaued. I used `--batch_size 1000` to improve both performance and accuracy.
-
-
-
 ### DeepNano
 
 [DeepNano](https://bitbucket.org/vboza/deepnano) is developed by Vladimír Boža and colleagues at Comenius University and is described in [this paper](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178751). I could not find version numbers associated with DeepNano, so I used the current commit (at the time of this writing): [e8a621e](https://bitbucket.org/vboza/deepnano/commits/e8a621e17b9fb73c261e6ca041976440812bc75f).
@@ -149,6 +137,20 @@ python basecall.py --chemistry r9.4 --event-detect --max-events 1000000 --direct
 ```
 
 The `--max-events` parameter is important – without it DeepNano will use a default of 50000 which results in a maximum read length of about 30 kbp (longer reads are truncated). It's also worth noting that the basecalling script I ran was _not_ the `basecall.py` in the DeepNano base directory, but rather the `basecall.py` in the `r9` directory, which can handle R9.4 reads.
+
+
+
+### Chiron
+
+[Chiron](https://github.com/haotianteng/chiron) is a third-party basecaller developed by [Haotian Teng](https://github.com/haotianteng) and others in [Lachlan Coin's group](https://imb.uq.edu.au/profile/647/lachlan-coin) at the University of Queensland and described in [this paper](https://www.biorxiv.org/content/early/2017/09/12/179531). Versions 0.1 and 0.1.4 had some bugs which caused issues with my data, so I tested versions 0.2 and 0.3.
+
+```
+chiron call -i raw_fast5_dir -o output_dir --batch_size 1000
+```
+
+While testing Chiron, I noticed a curious effect. The `--batch_size` parameter was described as controlling performance: a larger value runs faster but increases RAM requirements. While I found this to be true, I also saw another effect: larger `--batch_size` values improved the read accuracy. The default is 100 and I saw modest read accuracy improvements up to about 500, after which accuracy plateaued. I used `--batch_size 1000` to improve both performance and accuracy.
+
+Version v0.3 added a beam search option (`--beam`) which improves accuracy but slows down the basecalling. The default value is 50, and setting that option to 0 turns off the beam search. In a brief test of different values, I found that read accuracy improved up to a beam search setting of about 25 to 50. Higher values failed to improve accuracy but resulted in worse performance, so I stuck with the default value of 50.
 
 
 
