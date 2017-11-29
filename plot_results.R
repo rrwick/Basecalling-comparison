@@ -10,8 +10,8 @@ basecaller_colours <- c()
 basecaller_names <- c(basecaller_names, "Nanonet v2.0.0")
 basecaller_colours <- c(basecaller_colours, "#F0DF46")
 
-basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.0.4", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.2")
-basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F4A08B", "#EC8575", "#E46A5F", "#DB4E49", "#D33333", "#CB181D")
+basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.3")
+basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#DF5952", "#D53937", "#CB181D")
 
 basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.1")
 basecaller_colours <- c(basecaller_colours, "#788CC8", "#6175B1")
@@ -27,9 +27,6 @@ basecaller_colours <- c(basecaller_colours, "#6BB275")
 
 basecaller_names <- c(basecaller_names, "Chiron v0.2", "Chiron v0.3")
 basecaller_colours <- c(basecaller_colours, "#7BB8B8", "#1DB2B2")
-
-# basecaller_names <- c(basecaller_names, "Albacore and Chiron")
-# basecaller_colours <- c(basecaller_colours, "#777777")
 
 
 names(basecaller_colours) <- basecaller_names
@@ -208,7 +205,7 @@ assembly_identity_plot <- ggplot(assembly_identities, aes(x = Basecaller, y = Id
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
-  coord_cartesian(ylim=c(97.5, 100)) +
+  coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 assembly_identity_plot
 ggsave(assembly_identity_plot, file='plots/assembly_identity.pdf', width = 11, height = 5)
@@ -230,7 +227,7 @@ nanopolish_identity_plot <- ggplot(nanopolish_identities, aes(x = Basecaller, y 
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
-  coord_cartesian(ylim=c(97.5, 100)) +
+  coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 nanopolish_identity_plot
 ggsave(nanopolish_identity_plot, file='plots/nanopolish_identity.pdf', width = 11, height = 5)
@@ -241,7 +238,7 @@ nanopolish_meth_identity_plot <- ggplot(nanopolish_meth_identities, aes(x = Base
   fill_scale + my_theme + guides(fill=FALSE) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.5), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
-  coord_cartesian(ylim=c(97.5, 100)) +
+  coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 nanopolish_meth_identity_plot
 ggsave(nanopolish_meth_identity_plot, file='plots/nanopolish_meth_identity.pdf', width = 11, height = 5)
@@ -251,7 +248,7 @@ ggsave(nanopolish_meth_identity_plot, file='plots/nanopolish_meth_identity.pdf',
 # * one for the majority of the read identity at the top of the range
 # * one for the unaligned reads at the bottom of the range
 p1 <- ggplot(read_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(draw_quantiles = c(0.5), width=1.1, bw=0.6) +
+  geom_violin(draw_quantiles = c(0.5), width=1.2, bw=0.6) +
   fill_scale + my_theme + guides(fill=FALSE) +
   theme(axis.ticks.x = element_blank()) + 
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 5), minor_breaks = seq(0, 100, 1), labels = scales::unit_format("%")) +
@@ -291,7 +288,7 @@ p2 <- ggplot(read_vs_assembly_identity, aes(x = Read_identity, y = Assembly_iden
   guides(fill=guide_legend(title="")) + theme(legend.key.size = unit(0.9, 'lines')) +
   scale_x_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 2), minor_breaks = seq(0, 100, 0.5)) +
   scale_y_continuous(expand = c(0.0, 0.0), breaks = seq(0, 100, 0.4), minor_breaks = seq(0, 100, 0.1)) +
-  coord_cartesian(xlim=c(82, 89), ylim=c(98.7, 99.7)) +
+  coord_cartesian(xlim=c(82, 89), ylim=c(98.7, 100.0)) +
   labs(title = "", x = "read identity (%)", y = "assembly identity (%)")
 read_assembly_scatter_plot <- grid.arrange(p1, p2, ncol=2, widths=c(2,3))
 ggsave(read_assembly_scatter_plot, file='plots/read_assembly_scatter.pdf', width = 9, height = 3.25)
@@ -390,47 +387,4 @@ p2 <- ggplot(scrappie_assembly_identities, aes(x = Basecaller, y = Identity, wei
 blank <- rectGrob(gp=gpar(col="white"))
 scrappie_comparison_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.425, 0.15, 0.425))
 # ggsave(scrappie_comparison_plot, file='plots/scrappie_comparison.pdf', width = 6, height = 4)
-
-
-
-
-
-
-
-
-
-
-
-
-# Combined assembly
-# Note: this section only works if "Albacore and Chiron" is included in basecaller_names
-# at the top of this script.
-combined_assembly_identities <- assembly_identities[assembly_identities$Basecaller == "Albacore v2.1.2" | assembly_identities$Basecaller == "Chiron v0.2" | assembly_identities$Basecaller == "Albacore and Chiron",]
-combined_nanopolish_meth_identities <- nanopolish_meth_identities[nanopolish_meth_identities$Basecaller == "Albacore v2.1.2" | nanopolish_meth_identities$Basecaller == "Chiron v0.2" | nanopolish_meth_identities$Basecaller == "Albacore and Chiron",]
-
-combined_names <- c("Albacore v2.1.2", "Chiron v0.2", "Albacore and Chiron")
-combined_labels <- gsub(" ", "\n", combined_names, fixed=TRUE)
-combined_colours <- c("#CB181D", "#6BB275", "#777777")
-names(combined_colours) <- combined_names
-combined_fill_scale <- scale_fill_manual(name = "Basecaller", values = combined_colours)
-
-p1 <- ggplot(combined_assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
-  combined_fill_scale + my_theme + guides(fill=FALSE) + 
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
-  scale_x_discrete(labels=combined_labels) +
-  coord_cartesian(ylim=c(99.0, 100)) +
-  labs(title = "", x = "", y = "pre-Nanopolish\nassembly identity")
-
-p2 <- ggplot(combined_nanopolish_meth_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) + 
-  geom_violin(draw_quantiles = c(0.5), bw=0.06) +
-  combined_fill_scale + my_theme + guides(fill=FALSE) + 
-  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.2), minor_breaks = seq(0, 100, 0.1), labels = scales::unit_format("%")) +
-  scale_x_discrete(labels=combined_labels) +
-  coord_cartesian(ylim=c(99.0, 100)) +
-  labs(title = "", x = "", y = "post-Nanopolish\n(methylation-aware)\nassembly identity")
-
-blank <- rectGrob(gp=gpar(col="white"))
-albacore_chiron_combination_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.45, 0.10, 0.45))
-ggsave(albacore_chiron_combination_plot, file='plots/albacore_chiron_combination.pdf', width = 7, height = 3.5)
 
