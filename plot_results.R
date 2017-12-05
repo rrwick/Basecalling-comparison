@@ -13,14 +13,14 @@ basecaller_colours <- c(basecaller_colours, "#F0DF46")
 basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.3")
 basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#DF5952", "#D53937", "#CB181D")
 
+basecaller_names <- c(basecaller_names, "Guppy v0.3.0")
+basecaller_colours <- c(basecaller_colours, "#D6934F")
+
 basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.1")
 basecaller_colours <- c(basecaller_colours, "#788CC8", "#6175B1")
 
 basecaller_names <- c(basecaller_names, "Scrappie raw v1.0.0", "Scrappie raw v1.1.1 raw_r94", "Scrappie raw v1.1.1 rgr_r94", "Scrappie raw v1.1.1 rgrgr_r94")
 basecaller_colours <- c(basecaller_colours, "#C4B2C8", "#BA9AC0", "#AF83B9", "#A56BB1")
-
-basecaller_names <- c(basecaller_names, "basecRAWller v0.1")
-basecaller_colours <- c(basecaller_colours, "#A3D9A9")
 
 basecaller_names <- c(basecaller_names, "DeepNano e8a621e")
 basecaller_colours <- c(basecaller_colours, "#6BB275")
