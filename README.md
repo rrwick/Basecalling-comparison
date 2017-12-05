@@ -313,7 +313,7 @@ First, here are the results _without_ that option. The plot shows the assembly i
 
 In most every case, Nanopolish improved the assembly accuracy, and most post-Nanopolish assemblies are quite similar to each other and near 99.7% accurate. Chiron v0.3 is the only case where Nanopolish failed to make a significant improvement, as its assembly already reached 99.7%.
 
-In a few cases, Nanopolish resulted in a ~100 bp insertion, which caused the distribution to extend down to 98.5%. I'm not sure if this is an issue with Nanopolish (the insertion was erroneous) or with the reference sequence (the insertion was correct). Four of the 16 assemblies did not reach the 99.7% accuracy of the others. Nanonet's truncated reads may have caused problems for Nanopolish. Scrappie raw v1.0.0 and DeepNano probably suffered due to the low accuracy of their pre-Nanopolish assemblies.
+In a few cases, Nanopolish resulted in a ~100 bp insertion, which caused the distribution to extend down to 98.5%. I'm not sure if this is an issue with Nanopolish (the insertion was erroneous) or with the reference sequence (the insertion was correct). Three of the assemblies did not reach the 99.7% accuracy of the others. Nanonet's truncated reads may have caused problems for Nanopolish. Scrappie raw v1.0.0 and DeepNano probably suffered due to the low accuracy of their pre-Nanopolish assemblies.
 
 The upside seems to be that if you're planning to use Nanopolish, then your basecaller choice may not be very important. Any basecaller, as long as it isn't awful, should be fine. The downside is that Nanopolish makes little to no improvement for an already good assembly.
 
