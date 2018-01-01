@@ -12,7 +12,7 @@ __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 
 ## Abstract
 
-This repository uses a bacterial genome to assess the read accuracy and consensus sequence accuracy for Oxford Nanopore Technologies (ONT) basecallers. Albacore v2.1.3, Guppy v0.3.0 and Scrappie raw v1.1.1 (all developed by ONT) were the best performers for read accuracy, and Chiron v0.3 produced the best assemblies. Consensus sequence accuracies reached approximately 99.75%, revealing that even the best basecallers still have systematic error. Nanopolish, used with its methylation-aware option, was able to raise consensus accuracy to about 99.9%. Most post-Nanopolish assemblies have similar accuracy, making basecaller choice relatively unimportant if Nanopolish is used.
+This repository uses a bacterial genome to assess the read accuracy and consensus sequence accuracy for Oxford Nanopore Technologies (ONT) basecallers. Albacore v2.1.3, Guppy v0.3.0 and Scrappie raw v1.3.0 (all developed by ONT) were the best performers for read accuracy, and Chiron v0.3 produced the best assemblies. Consensus sequence accuracies reached approximately 99.75%, revealing that even the best basecallers still have systematic error. Nanopolish, used with its methylation-aware option, was able to raise consensus accuracy to about 99.9%. Most post-Nanopolish assemblies have similar accuracy, making basecaller choice relatively unimportant if Nanopolish is used.
 
 
 
@@ -105,9 +105,9 @@ guppy --input_path raw_fast5_dir --config dna_r9.4_450bps.cfg --save_path output
 
 ### Scrappie
 
-[Scrappie](https://github.com/nanoporetech/scrappie) is ONT's research basecaller. Successful developments here seem to eventually work their way into Albacore. I tested versions 1.0.0 and 1.1.1. Version 1.2.0 was released with a new squiggle-generating function, but its basecalling appears unchanged so I've skipped it for my tests.
+[Scrappie](https://github.com/nanoporetech/scrappie) is ONT's research basecaller. Successful developments here seem to eventually work their way into Albacore. I tested versions 1.0.0 and 1.3.0, and I skipped v1.1.1 and v1.2.0 because they are functionally equivalent to v1.3.0 for the models they have in common.
 
-Scrappie can be run as `scrappie events` (basecalls from event segmentation) or as `scrappie raw` (basecalls directly from the raw signal). For Scrappie v1.0.0, running as `scrappie events` relies on pre-existing event data in the fast5s, so I used the fast5s produced by Albacore 1.2.6 (the last version to do event segmentation). In Scrappie v1.1.1, there are three different raw basecalling models to choose from (raw_r94, rgr_r94 and rgrgr_r94) and I tried each. As a side note, the rgr_r94 and rgrgr_r94 models are referred to as 'pirate' models, for reasons explained [here](https://github.com/rrwick/Basecalling-comparison/issues/1#issuecomment-330766633).
+Scrappie can be run as `scrappie events` (basecalls from event segmentation) or as `scrappie raw` (basecalls directly from the raw signal). For Scrappie v1.0.0, running as `scrappie events` relies on pre-existing event data in the fast5s, so I used the fast5s produced by Albacore 1.2.6 (the last version to do event segmentation). In Scrappie v1.3.0, there are four different raw basecalling models to choose from (raw_r94, rgr_r94, rgrgr_r94 and rnnrf_r94) and I tried each. As a side note, the rgr_r94 and rgrgr_r94 models are referred to as 'pirate' models, for reasons explained [here](https://github.com/rrwick/Basecalling-comparison/issues/1#issuecomment-330766633).
 
 
 ```
@@ -115,11 +115,12 @@ Scrappie can be run as `scrappie events` (basecalls from event segmentation) or 
 scrappie events --albacore --threads 40 albacore_v1.2.6_fast5 > scrappie_v1.0.0_events.fasta
 scrappie raw --threads 40 raw_fast5_dir > scrappie_v1.0.0_raw.fasta
 
-# Scrappie v1.1.1:
-scrappie events --threads 40 raw_fast5_dir > scrappie_v1.1.1_events.fasta
-scrappie raw --model raw_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.1_raw_raw_r94.fasta
-scrappie raw --model rgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.1_raw_rgr_r94.fasta
-scrappie raw --model rgrgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.1.1_raw_rgrgr_r94.fasta
+# Scrappie v1.3.0:
+scrappie events --threads 40 raw_fast5_dir > scrappie_v1.3.0_events.fasta
+scrappie raw --model raw_r94 --threads 40 raw_fast5_dir > scrappie_v1.3.0_raw_raw_r94.fasta
+scrappie raw --model rgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.3.0_raw_rgr_r94.fasta
+scrappie raw --model rgrgr_r94 --threads 40 raw_fast5_dir > scrappie_v1.3.0_raw_rgrgr_r94.fasta
+scrappie raw --model rnnrf_r94 --threads 40 raw_fast5_dir > scrappie_v1.3.0_raw_rnnrf_r94.fasta
 ```
 
 Unlike Albacore, Scrappie does not have fastq output, either directly or by writing it into the fast5 files – it only produces fasta reads.
@@ -239,7 +240,9 @@ Put all your resulting tsv files in a `results` directory and run [`plot_results
 
 ### Speed
 
-I did not quantify speed performance in this analysis, mainly because I ran different basecallers on different hardware, which makes a fair comparison hard. There are, however, a couple points worth making. Chiron was the slowest basecaller tested. When run on CPUs, it is so slow that it could only be used for very small datasets. It is much faster on GPUs (I ran it on a GTX 1070), but it still took Chiron v0.3 over two weeks to basecall my read set of 1.2 Gbp (~1 kb/sec). Guppy, on the other hand, is by far the fastest. On the same hardware (GTX 1070), it basecalled the read set in about 50 minutes (~400 kb/sec).
+I did not quantify speed performance in this analysis, mainly because I ran different basecallers on different hardware, which makes a fair comparison hard. There are, however, a couple points worth making.
+
+Chiron was the slowest basecaller tested. When run on CPUs, it is so slow that it could only be used for very small datasets. It is much faster on GPUs (I ran it on a GTX 1070), but it still took Chiron v0.3 over two weeks to basecall my read set of 1.2 Gbp (~1 kb/sec). Guppy, on the other hand, is by far the fastest. On the same hardware (GTX 1070), it basecalled the read set in about 50 minutes (~400 kb/sec). Running on CPUs, Scrappie had a mediocre performance of about 7 kb/sec for most of its available models, but the rnnrf_r94 model was much slower at about 1 kb/sec.
 
 
 
@@ -261,7 +264,7 @@ This addresses the most obvious question: how accurate are the basecalled reads?
 
 Nanonet performed poorly, with a low median and a significant proportion of unaligned reads. Its curiously high peak of about 99% results from the short output sequences discussed above. While a few Nanonet 'reads' did indeed align to the reference with up to 99% identity, these were actually just small fragments (hundreds of bp) of larger reads.
 
-Albacore v2.1.3, Guppy v0.3.0 and Scrappie v1.1.1 (with the rgrgr_94 model) performed the best overall. All three of these are developed by ONT and share much of their design, so similar performance makes sense. In particular, Albacore and Guppy produced nearly identical results, a trend that will continue in more analyses below.
+Albacore v2.1.3, Guppy v0.3.0 and Scrappie v1.3.0 performed the best overall. All three of these are developed by ONT and share much of their design, so similar performance makes sense. In particular, Albacore and Guppy produced nearly identical results, a trend that will continue in more analyses below. Scrappie's rnnrf_r94 model did the best overall, but only by a small margin, and it was very slow to run.
 
 
 
@@ -271,7 +274,7 @@ Albacore v2.1.3, Guppy v0.3.0 and Scrappie v1.1.1 (with the rgrgr_94 model) perf
 
 This plot shows the distribution of read length to reference length for each alignment. It shows whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions. Albacore v0.9.1 stands out with many overly-long reads, while Scrappie events tends to make short reads. This explains the total yield differences we saw earlier.
 
-I found it curious that many basecallers had a distinctly bimodal distribution (particularly pronounced for Chiron v0.3). I dug a bit deeper and found that it's related to the timing of this MinION run. It was started at about 4 pm and MinKNOW crashed at 10:30 pm, halting the run. Nobody was in the lab to notice, and the next day was a [public holiday](https://www.awm.gov.au/commemoration/anzac-day/traditions). Thankfully Louise came in that afternoon, saw the crashed run and restarted it at about 3 pm. That meant the flow cell sat for about 16.5 hours not being used. When I [plot read length against signal length and colour by the restart](images/read_vs_signal_albacore_v2.1.3.png), the effect is obvious. It's still not entirely clear _why_ the restart has resulted in shorter basecalled reads, but the effect is present in all basecallers. A possible clue is that the raw signal values are lower after the restart: with a median value of about 450 before and 370 after.
+I found it curious that many basecallers had a distinctly bimodal distribution (particularly pronounced for Chiron v0.3). This effect seems to be related to the timing of the MinION run. It was started at about 4 pm and MinKNOW crashed at 10:30 pm, halting the run. Nobody was in the lab to notice, and the next day was a [public holiday](https://www.awm.gov.au/commemoration/anzac-day/traditions). Thankfully Louise came in that afternoon, saw the crashed run and restarted it at about 3 pm. That meant the flow cell sat for about 16.5 hours not being used. When I [plot read length against signal length and colour by the restart](images/read_vs_signal_albacore_v2.1.3.png), the effect is obvious. It's still not entirely clear _why_ the restart has resulted in shorter basecalled reads, but the effect is present in all basecallers. A possible clue is that the raw signal values are lower after the restart: with a median value of about 450 before and 370 after.
 
 
 
@@ -372,7 +375,7 @@ The current version of Albacore (v2.1.3) is probably the best basecaller choice 
 
 My last recommendation, Chiron v0.3, is more complicated. Its pre-Nanopolish assembly accuracy is outstanding, and it also had the best post-Nanopolish (methylation-aware) assembly, though only by a small margin. It may therefore be the best choice when assembly accuracy is paramount. However, Chiron is much slower than Albacore and only a viable option if you have a powerful GPU to accelerate the process. Even with powerful GPUs, basecalling an entire MinION run could take a very long time. I would therefore only recommend Chiron to users with a small volume of reads.
 
-Scrappie raw v1.1.1 (rgr_r94 and rgrgr_r94 models) also did quite well and had the highest read accuracy. However, Scrappie is a research product, labelled as a 'technology demonstrator' and lacks nice features present in Albacore, such as FASTQ output and barcode demultiplexing. I therefore think Albacore is a better choice for most users. Nanonet and DeepNano should probably be avoided, but I'm happy to revisit them if they are updated.
+Scrappie raw v1.3.0 (rgr_r94, rgrgr_r94 and rnnrf_r94 models) also did quite well and had the highest read accuracy. However, Scrappie is a research product, labelled as a 'technology demonstrator' and lacks nice features present in Albacore, such as FASTQ output and barcode demultiplexing. I therefore think Albacore is a better choice for most users. Nanonet and DeepNano should probably be avoided, but I'm happy to revisit them if they are updated.
 
 
 

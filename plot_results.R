@@ -16,11 +16,11 @@ basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#D
 basecaller_names <- c(basecaller_names, "Guppy v0.3.0")
 basecaller_colours <- c(basecaller_colours, "#D6934F")
 
-basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.1.1")
+basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.3.0")
 basecaller_colours <- c(basecaller_colours, "#788CC8", "#6175B1")
 
-basecaller_names <- c(basecaller_names, "Scrappie raw v1.0.0", "Scrappie raw v1.1.1 raw_r94", "Scrappie raw v1.1.1 rgr_r94", "Scrappie raw v1.1.1 rgrgr_r94")
-basecaller_colours <- c(basecaller_colours, "#C4B2C8", "#BA9AC0", "#AF83B9", "#A56BB1")
+basecaller_names <- c(basecaller_names, "Scrappie raw v1.0.0", "Scrappie raw v1.3.0 raw_r94", "Scrappie raw v1.3.0 rgr_r94", "Scrappie raw v1.3.0 rgrgr_r94", "Scrappie raw v1.3.0 rnnrf_r94")
+basecaller_colours <- c(basecaller_colours, "#C4B2C8", "#BA9AC0", "#B38ABB", "#AC7BB6", "#A56BB1")
 
 basecaller_names <- c(basecaller_names, "DeepNano e8a621e")
 basecaller_colours <- c(basecaller_colours, "#6BB275")
@@ -191,7 +191,7 @@ ggsave(total_yield_plot, file='plots/total_yield.pdf', width = 11, height = 3)
 
 rel_read_length_plot <- ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) + 
   geom_hline(yintercept = 100) + 
-  geom_violin(draw_quantiles = c(0.5), bw=0.25) +
+  geom_violin(draw_quantiles = c(0.5), width=1.1, bw=0.25) +
   fill_scale + my_theme + guides(fill=FALSE) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 200, 4), minor_breaks = seq(0, 200, 1), labels = scales::unit_format("%")) +
   scale_x_discrete(labels=basecaller_labels) +
