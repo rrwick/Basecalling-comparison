@@ -28,6 +28,10 @@ python_script_dir=/path/to/python_scripts
 # Set the full path to Nanopolish here.
 nanopolish_exec_dir=/path/to/nanopolish
 
+# Set the paths to Medaka and Pomoxis venv activate files
+medaka=/path/to/medaka/venv/bin/activate
+pomoxis=/path/to/pomoxis/venv/bin/activate
+
 # If you want to run this script on all read files in the 02_basecalled_reads directory, leave
 # these lines uncommented:
 cd 02_basecalled_reads
@@ -48,6 +52,8 @@ mkdir -p 09_nanopolish
 mkdir -p 10_nanopolish_data
 mkdir -p 11_nanopolish_meth
 mkdir -p 12_nanopolish_meth_data
+mkdir -p 13_medaka
+mkdir -p 14_medaka_data
 
 # Create a table of basic info about each read.
 python3 "$python_script_dir"/read_table.py 01_raw_fast5 > 04_read_data/read_data.tsv
@@ -64,20 +70,29 @@ for f in $read_files; do
     read_data=04_read_data/"$set"_reads.tsv
     trimmed_reads=05_trimmed_reads/"$set".fastq.gz
     subsampled_reads=06_subsampled_reads/"$set".fastq.gz
+
     assembly=07_assemblies/"$set"_assembly.fasta
     assembly_pieces=08_assembly_data/"$set"_assembly_pieces.fasta
     assembly_alignment=08_assembly_data/"$set"_assembly.paf
     assembly_data=08_assembly_data/"$set"_assembly.tsv
+
     nanopolish_assembly_dir=09_nanopolish
     nanopolish_assembly=09_nanopolish/"$set"_nanopolish.fasta
     nanopolish_assembly_pieces=10_nanopolish_data/"$set"_nanopolish_pieces.fasta
     nanopolish_assembly_alignment=10_nanopolish_data/"$set"_nanopolish.paf
     nanopolish_assembly_data=10_nanopolish_data/"$set"_nanopolish.tsv
+
     nanopolish_meth_assembly_dir=11_nanopolish_meth
     nanopolish_meth_assembly=11_nanopolish_meth/"$set"_nanopolish_meth.fasta
     nanopolish_meth_assembly_pieces=12_nanopolish_meth_data/"$set"_nanopolish_meth_pieces.fasta
     nanopolish_meth_assembly_alignment=12_nanopolish_meth_data/"$set"_nanopolish_meth.paf
     nanopolish_meth_assembly_data=12_nanopolish_meth_data/"$set"_nanopolish_meth.tsv
+
+    medaka_assembly_dir=13_medaka
+    medaka_assembly=13_medaka/"$set"_medaka.fasta
+    medaka_assembly_pieces=14_medaka_data/"$set"_medaka_pieces.fasta
+    medaka_assembly_alignment=14_medaka_data/"$set"_medaka.paf
+    medaka_assembly_data=14_medaka_data/"$set"_medaka.tsv
 
     printf "\n\n\n\n"
     echo "NORMALISE READ HEADERS: "$set
@@ -135,5 +150,29 @@ for f in $read_files; do
     minimap2 -x map10k -t $threads -c reference.fasta $nanopolish_meth_assembly_pieces > $nanopolish_meth_assembly_alignment
     python3 "$python_script_dir"/read_length_identity.py $nanopolish_meth_assembly_pieces $nanopolish_meth_assembly_alignment > $nanopolish_meth_assembly_data
     rm $nanopolish_meth_assembly_pieces $nanopolish_meth_assembly_alignment
+
+    printf "\n\n\n\n"
+    echo "MEDAKA: "$set
+    echo "--------------------------------------------------------------------------------"
+    if [[ $all_reads_fixed_names = *"fastq.gz" ]]; then
+        temp_reads="$medaka_assembly_dir"/"$set".fastq
+    else
+        temp_reads="$medaka_assembly_dir"/"$set".fasta
+    fi
+    gunzip -c "$all_reads_fixed_names" > $temp_reads
+    source $medaka
+    medaka_consensus -i $temp_reads -d $assembly -o "$medaka_assembly_dir"/"$set"_medaka -p $pomoxis -t $threads
+    deactivate
+    cp "$medaka_assembly_dir"/"$set"_medaka/consensus.fasta "$medaka_assembly"
+    rm $temp_reads
+    rm -r "$medaka_assembly_dir"/"$set"_medaka
+
+    printf "\n\n\n\n"
+    echo "ASSESS MEDAKA ASSEMBLY: "$set
+    echo "--------------------------------------------------------------------------------"
+    python3 "$python_script_dir"/chop_up_assembly.py $medaka_assembly 10000 > $medaka_assembly_pieces
+    minimap2 -x map10k -t $threads -c reference.fasta $medaka_assembly_pieces > $medaka_assembly_alignment
+    python3 "$python_script_dir"/read_length_identity.py $medaka_assembly_pieces $medaka_assembly_alignment > $medaka_assembly_data
+    rm $medaka_assembly_pieces $medaka_assembly_alignment
 
 done
