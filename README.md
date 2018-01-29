@@ -12,7 +12,7 @@ __Ryan R. Wick, Louise M. Judd and Kathryn E. Holt__
 
 ## Abstract
 
-This repository uses a bacterial genome to assess the read accuracy and consensus sequence accuracy for Oxford Nanopore Technologies (ONT) basecallers. Albacore v2.1.7, Guppy v0.3.0 and Scrappie raw v1.3.0 (all developed by ONT) were the best performers for read accuracy, and Chiron v0.3 produced the best assemblies. Consensus sequence accuracies reached approximately 99.75%, revealing that even the best basecallers still have systematic error. Nanopolish, used with its methylation-aware option, was able to raise consensus accuracy to about 99.9%. Most post-Nanopolish assemblies have similar accuracy, making basecaller choice relatively unimportant if Nanopolish is used.
+This repository uses a bacterial genome to assess the read accuracy and consensus sequence accuracy for Oxford Nanopore Technologies (ONT) basecallers. Albacore v2.1.10, Guppy v0.3.0 and Scrappie raw v1.3.0 (all developed by ONT) were the best performers for read accuracy, and Chiron v0.3 produced the best assemblies. Consensus sequence accuracies reached approximately 99.75%, revealing that even the best basecallers still have systematic error. Nanopolish, used with its methylation-aware option, was able to raise consensus accuracy to about 99.9%. Most post-Nanopolish assemblies have similar accuracy, making basecaller choice relatively unimportant if Nanopolish is used.
 
 
 
@@ -74,7 +74,7 @@ I set the `--min_len` and `--max_len` options so Nanonet wouldn't skip any reads
 
 ### Albacore
 
-Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.1.2, 1.2.6, 2.0.2 and 2.1.7. I previously also tested v1.0.4, but its results were extremely similar to v1.1.2, so I've removed it from the analyses. All tested versions were released in 2017, which shows the rapid pace of basecaller development. The transducer basecaller (helps with homopolymers) was added in v1.0. Basecalling from raw signal (without segmenting the signal into events) first appears in v2.0. Albacore can be downloaded from the [Nanopore community](https://community.nanoporetech.com/downloads), but you'll need an account to log in.
+Albacore is ONT's official command-line basecaller. I tested versions 0.8.4, 0.9.1, 1.1.2, 1.2.6, 2.0.2 and 2.1.10. I previously also tested v1.0.4, but its results were extremely similar to v1.1.2, so I've removed it from the analyses. All tested versions were released in 2017, which shows the rapid pace of basecaller development. The transducer basecaller (helps with homopolymers) was added in v1.0. Basecalling from raw signal (without segmenting the signal into events) first appears in v2.0. Albacore can be downloaded from the [Nanopore community](https://community.nanoporetech.com/downloads), but you'll need an account to log in.
 
 ```
 # Albacore v0.8.4 and v0.9.1:
@@ -83,7 +83,7 @@ read_fast5_basecaller.py -c FLO-MIN106_LSK108_linear.cfg -i raw_fast5_dir -t 40 
 # Albacore v1.1.2 and v1.2.6:
 read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5_dir -t 40 -s output_dir -o fast5
 
-# Albacore v2.0.2 and v2.1.7:
+# Albacore v2.0.2 and v2.1.10:
 read_fast5_basecaller.py -f FLO-MIN106 -k SQK-LSK108 -i raw_fast5_dir -t 40 -s output_dir -o fast5 --disable_filtering
 ```
 
@@ -264,7 +264,7 @@ This addresses the most obvious question: how accurate are the basecalled reads?
 
 Nanonet performed poorly, with a low median and a significant proportion of unaligned reads. Its curiously high peak of about 99% results from the short output sequences discussed above. While a few Nanonet 'reads' did indeed align to the reference with up to 99% identity, these were actually just small fragments (hundreds of bp) of larger reads.
 
-Albacore v2.1.7, Guppy v0.3.0 and Scrappie v1.3.0 performed the best overall. All three of these are developed by ONT and share much of their design, so similar performance makes sense. In particular, Albacore and Guppy produced nearly identical results, a trend that will continue in more analyses below. Scrappie's rnnrf_r94 model did the best overall, but only by a small margin, and it was very slow to run.
+Albacore v2.1.10, Guppy v0.3.0 and Scrappie v1.3.0 performed the best overall. All three of these are developed by ONT and share much of their design, so similar performance makes sense. In particular, Albacore and Guppy produced nearly identical results, a trend that will continue in more analyses below. Scrappie's rnnrf_r94 model did the best overall, but only by a small margin, and it was very slow to run.
 
 
 
@@ -274,7 +274,7 @@ Albacore v2.1.7, Guppy v0.3.0 and Scrappie v1.3.0 performed the best overall. Al
 
 This plot shows the distribution of read length to reference length for each alignment. It shows whether the basecaller is more prone to insertions or deletions. 100% (same length) means that insertions and deletions are equally likely. <100% means that deletions are more common than insertions. >100% means that insertions are more common than deletions. Albacore v0.9.1 stands out with many overly-long reads, while Scrappie events tends to make short reads. This explains the total yield differences we saw earlier.
 
-I found it curious that many basecallers had a distinctly bimodal distribution (particularly pronounced for Chiron v0.3). This effect seems to be related to the timing of the MinION run. It was started at about 4 pm and MinKNOW crashed at 10:30 pm, halting the run. Nobody was in the lab to notice, and the next day was a [public holiday](https://www.awm.gov.au/commemoration/anzac-day/traditions). Thankfully Louise came in that afternoon, saw the crashed run and restarted it at about 3 pm. That meant the flow cell sat for about 16.5 hours not being used. When I [plot read length against signal length and colour by the restart](images/read_vs_signal_albacore_v2.1.7.png), the effect is obvious. It's still not entirely clear _why_ the restart has resulted in shorter basecalled reads, but the effect is present in all basecallers. A possible clue is that the raw signal values are lower after the restart: with a median value of about 450 before and 370 after.
+I found it curious that many basecallers had a distinctly bimodal distribution (particularly pronounced for Chiron v0.3). This effect seems to be related to the timing of the MinION run. It was started at about 4 pm and MinKNOW crashed at 10:30 pm, halting the run. Nobody was in the lab to notice, and the next day was a [public holiday](https://www.awm.gov.au/commemoration/anzac-day/traditions). Thankfully Louise came in that afternoon, saw the crashed run and restarted it at about 3 pm. That meant the flow cell sat for about 16.5 hours not being used. When I [plot read length against signal length and colour by the restart](images/read_vs_signal_albacore_v2.1.10.png), the effect is obvious. It's still not entirely clear _why_ the restart has resulted in shorter basecalled reads, but the effect is present in all basecallers. A possible clue is that the raw signal values are lower after the restart: with a median value of about 450 before and 370 after.
 
 
 
@@ -284,7 +284,7 @@ I found it curious that many basecallers had a distinctly bimodal distribution (
 
 This analysis is my personal favourite: how accurate are the _consensus_ sequences? I don't particularly care if individual reads have low identity if they can produce an accurate assembly.
 
-In previous versions of my analysis, Albacore consistently led the pack with consensus accuracy, but the newly released Chiron v0.3 produces the best consensus sequences by a huge margin. Its assemblies have approximately half the errors of the second-best assembly (Albacore v2.1.7). I'm not sure if this improvement is solely due to Chiron v0.3's new beam search functionality, but whatever the cause, kudos to the Chiron developers!
+In previous versions of my analysis, Albacore consistently led the pack with consensus accuracy, but the newly released Chiron v0.3 produces the best consensus sequences by a huge margin. Its assemblies have approximately half the errors of the second-best assembly (Albacore v2.1.10). I'm not sure if this improvement is solely due to Chiron v0.3's new beam search functionality, but whatever the cause, kudos to the Chiron developers!
 
 It's also interesting to look at the assembly relative length, like we did for reads:
 
@@ -369,9 +369,9 @@ I don't think this is relevant anymore, so I've removed it. You can see my earli
 
 ### Recommendations
 
-There are three obvious basecaller recommendations to make: Albacore v2.1.7, Guppy v0.3.0 and Chiron v0.3.
+There are three obvious basecaller recommendations to make: Albacore v2.1.10, Guppy v0.3.0 and Chiron v0.3.
 
-The current version of Albacore (v2.1.7) is probably the best basecaller choice for most users. It has very good read accuracy, produces decent assemblies, runs reasonably quickly, is easy to use and has many useful features such as barcode demultiplexing. If you have a GPU, Guppy v0.3.0 can produce essentially the same basecalls in much less time, but it is not yet publicly available and lacks barcode demultiplexing. I suspect there will come a day when Guppy is my definitive recommendation, but it's still early in its development.
+The current version of Albacore (v2.1.10) is probably the best basecaller choice for most users. It has very good read accuracy, produces decent assemblies, runs reasonably quickly, is easy to use and has many useful features such as barcode demultiplexing. If you have a GPU, Guppy v0.3.0 can produce essentially the same basecalls in much less time, but it is not yet publicly available and lacks barcode demultiplexing. I suspect there will come a day when Guppy is my definitive recommendation, but it's still early in its development.
 
 My last recommendation, Chiron v0.3, is more complicated. Its pre-Nanopolish assembly accuracy is outstanding, and it also had the best post-Nanopolish (methylation-aware) assembly, though only by a small margin. It may therefore be the best choice when assembly accuracy is paramount. However, Chiron is much slower than Albacore and only a viable option if you have a powerful GPU to accelerate the process. Even with powerful GPUs, basecalling an entire MinION run could take a very long time. I would therefore only recommend Chiron to users with a small volume of reads.
 

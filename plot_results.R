@@ -10,7 +10,7 @@ basecaller_colours <- c()
 basecaller_names <- c(basecaller_names, "Nanonet v2.0.0")
 basecaller_colours <- c(basecaller_colours, "#F0DF46")
 
-basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.3")
+basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.10")
 basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#DF5952", "#D53937", "#CB181D")
 
 basecaller_names <- c(basecaller_names, "Guppy v0.3.0")
