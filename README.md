@@ -426,8 +426,8 @@ Did I miss anything important? Can you shed any light on oddities that I couldn'
 
 [**Stoiber M, Brown J**. BasecRAWller: Streaming nanopore basecalling directly from raw signal. _bioRxiv_ 2017.](https://doi.org/10.1101/133058)
 
-[**Vaser R, Sovic I, Nagarajan N, Sikic M**. Fast and accurate _de novo_ genome assembly from long uncorrected reads. _Genome Res_ 2017;27(5):737–46.](https://doi.org/10.1101/gr.214270.116)
-
 [**Teng HH, Hall MB, Duarte T, Cao MD, Coin LJM**. Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning. _bioRxiv_ 2017.](https://doi.org/10.1101/179531)
+
+[**Vaser R, Sovic I, Nagarajan N, Sikic M**. Fast and accurate _de novo_ genome assembly from long uncorrected reads. _Genome Res_ 2017;27(5):737–46.](https://doi.org/10.1101/gr.214270.116)
 
 [**Wick RR, Judd LM, Gorrie CL, Holt KE**. Completing bacterial genome assemblies with multiplex MinION sequencing. _Microbial Genomics_ 2017;3.](https://doi.org/10.1099/mgen.0.000132)
