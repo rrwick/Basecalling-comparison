@@ -30,6 +30,7 @@ This repository uses a bacterial genome to assess the read accuracy and consensu
   * [Read vs assembly identity](#read-vs-assembly-identity)
   * [Nanopolish assembly identity](#nanopolish-assembly-identity)
   * [Methylation](#methylation)
+  * [Medaka](#medaka)
   * [Training sets](#training-sets)
   * [Combining different basecallers](#combining-different-basecallers)
 * [Conclusions](#conclusions)
@@ -175,7 +176,7 @@ If you'd like to try this analysis for yourself, here's what you need to do. I t
 You'll obviously need a set of ONT reads. Put them in a directory named `01_raw_fast5`. I used the same ones from our recent paper: [Completing bacterial genome assemblies with multiplex MinION
 sequencing](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132) (and [its corresponding repo](https://github.com/rrwick/Bacterial-genome-assemblies-with-multiplex-MinION-sequencing)). Check out that paper if you're interested in the wet lab side of things.
 
-You'll also need Illumina reads for the sample (named `illumina_1.fastq.gz` and `illumina_2.fastq.gz`) and a good reference sequence (named `reference.fasta`), e.g. a completed hybrid assembly. For the reference-based assembly step later, it's important that circular replicons in `reference.fasta` have `circular=true` in their FASTA header.
+You'll also need Illumina reads for the sample (named `illumina_1.fastq.gz` and `illumina_2.fastq.gz`) and a good reference sequence (named `reference.fasta`), e.g. a completed hybrid assembly. For the reference-based assembly step later, it's important that circular replicons in `reference.fasta` have `circular=true` in their fasta header.
 
 My reads came from a barcoded run, so I first had to collect only the fast5 files for my sample. I did this by analysing the fastq file of our confidently-binned reads (see [the paper](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132) for more info). This process should have excluded most of the very low-quality reads, because such reads would not have been confidently binned. I also discarded any fast5 files less than 100 kilobytes in size to remove shorter reads.
 
@@ -189,7 +190,7 @@ If you'd like to try this analysis using the same data I used, here are the rele
 ### Required tools
 
 The following tools must be installed and available in your `PATH`:<br>
-[minimap2](https://github.com/lh3/minimap2) v2.2, [Filtlong](https://github.com/rrwick/Filtlong) v0.1.1, [Porechop](https://github.com/rrwick/Porechop) v0.2.2, [Racon](https://github.com/isovic/racon) v0.5.0, [Rebaler](https://github.com/rrwick/Rebaler) v0.1.0, [Nanopolish](https://github.com/jts/nanopolish) v0.8.4 and [SAMtools](https://samtools.github.io/) v1.3.1.
+[minimap2](https://github.com/lh3/minimap2) v2.2, [Filtlong](https://github.com/rrwick/Filtlong) v0.1.1, [Porechop](https://github.com/rrwick/Porechop) v0.2.2, [Racon](https://github.com/isovic/racon) v0.5.0, [Rebaler](https://github.com/rrwick/Rebaler) v0.1.0, [Nanopolish](https://github.com/jts/nanopolish) v0.8.4, [Medaka](https://github.com/nanoporetech/medaka) v0.2.0 and [SAMtools](https://samtools.github.io/) v1.3.1.
 
 I've indicated the versions I used, but the exact versions may or may not be important (I haven't checked). However, it is necessary to use a recent version of Nanopolish. Since v0.8, Nanopolish can be run without event-data-containing fast5 files, which lets it work with any basecaller! However, for non-Albacore basecallers I did have to alter read names – more on that later.
 
@@ -337,6 +338,7 @@ reference:  AACCGCTACCACTCATCTTCCCCCGCCTCGCGGGGGATTTTTTTGCTTG
 ### Methylation
 
 The Nanopolish results show that, at least for this dataset, methylation is a major factor in consensus accuracy. For example, when a pre-Nanopolish assembly is aligned to the reference, many of the errors correspond to the Dcm motif (`CCAGG` / `CCTGG`):
+
 ```
 assembly:   CCCGG   CCCGGG   CCGGG   CC-GG   CC-GG   CCA-G   CACGG   CCCGGG
 reference:  CCTGG   C-CAGG   CCAGG   CCAGG   CCTGG   CCAGG   CCTGG   C-CTGG
@@ -344,6 +346,16 @@ reference:  CCTGG   C-CAGG   CCAGG   CCAGG   CCTGG   CCAGG   CCTGG   C-CTGG
 ```
 
 While Nanopolish can correct many of these errors, it would be better if the basecallers themselves could properly recognise modified bases. While calling modified bases _as modified bases_ would be fascinating and useful, a first step would be to call modified bases as their canonical base. E.g. 5-mC called as a C, 4-mC as a C, 6-mA as an A, etc. This could be a tricky problem, as different organisms have different enzymes which modify bases at different sequence motifs. Perhaps basecallers need very broad training sets which include as many such motifs as possible. Or perhaps each basecaller needs multiple trained models, each on different organisms, and an automatic method for choosing the appropriate one.
+
+
+
+# Medaka
+
+Medaka is trying to solve a similar problem to Nanopolish: improving the consensus sequence accuracy using the alignment of multiple reads. It differs from Nanopolish in two significant ways. First, Medaka uses neural networks where Nanopolish uses HMMs. Second, it uses basecalled reads, not the raw signal ([though this is likely to change in the future](https://nanoporetech.github.io/medaka/future.html)). Here I test Medaka v0.2.0:
+
+<p align="center"><img src="images/medaka_identity.png" width="95%"></p>
+
+While Medaka could improve most assemblies, it was overall less effective than Nanopolish. It particularly seemed to struggle with older basecallers that use event segmentation (as opposed to modern basecallers which call directly from the signal). Medaka crashed when working with a few read sets, which is why there are missing plots in the figure.
 
 
 
@@ -357,7 +369,7 @@ All supervised learning depends on a good training set, and basecalling is no ex
 
 ### Combining different basecallers
 
-This section previously looked at how well a combination of Albacore and Chiron reads assemble. The idea was that perhaps two different basecallers can somewhat 'cancel out' each other's systematic error, leading to a better assembly. This was in fact the case with Albacore and Chiron v0.2, but Chiron v0.3 reads assemble so well that combining them with Albacore reads gives no improvement (it actually makes the assembly a bit worse).
+This section previously looked at how well a combination of Albacore and Chiron reads assemble. The idea was that perhaps two different basecallers can somewhat 'cancel out' each other's systematic error, leading to a better assembly. This was the case with Albacore and Chiron v0.2, but Chiron v0.3 reads assemble so well that combining them with Albacore reads gives no improvement (it actually makes the assembly a bit worse).
 
 I don't think this is relevant anymore, so I've removed it. You can see my earlier results in [a past version of this repository](https://github.com/rrwick/Basecalling-comparison/tree/d5ce4455c5c57d15abec1e625cafa56a7eef1a6e) if you're still interested.
 
@@ -375,23 +387,23 @@ The current version of Albacore (v2.1.10) is probably the best basecaller choice
 
 My last recommendation, Chiron v0.3, is more complicated. Its pre-Nanopolish assembly accuracy is outstanding, and it also had the best post-Nanopolish (methylation-aware) assembly, though only by a small margin. It may therefore be the best choice when assembly accuracy is paramount. However, Chiron is much slower than Albacore and only a viable option if you have a powerful GPU to accelerate the process. Even with powerful GPUs, basecalling an entire MinION run could take a very long time. I would therefore only recommend Chiron to users with a small volume of reads.
 
-Scrappie raw v1.3.0 (rgr_r94, rgrgr_r94 and rnnrf_r94 models) also did quite well and had the highest read accuracy. However, Scrappie is a research product, labelled as a 'technology demonstrator' and lacks nice features present in Albacore, such as FASTQ output and barcode demultiplexing. I therefore think Albacore is a better choice for most users. Nanonet and DeepNano should probably be avoided, but I'm happy to revisit them if they are updated.
+Scrappie raw v1.3.0 (rgr_r94, rgrgr_r94 and rnnrf_r94 models) also did quite well and had the highest read accuracy. However, Scrappie is a research product, labelled as a 'technology demonstrator' and lacks nice features present in Albacore, such as fastq output and barcode demultiplexing. I therefore think Albacore is a better choice for most users. Nanonet and DeepNano should probably be avoided, but I'm happy to revisit them if they are updated.
 
 
 
-### Nanopolish
+### Polishing
 
 Anyone interested in maximising assembly accuracy should be using Nanopolish. It improved all assemblies and took most up to about 99.9% (with the methylation-aware option). If you only care about assembly identity, Nanopolish makes your basecaller choice relatively unimportant.
 
-Interestingly, Nanopolish may have some competition in the near future. ONT recently announced [Medaka](https://github.com/nanoporetech/medaka), a new consensus tool. In its current form, it operates on basecalled reads, not signal-level data like Nanopolish. However, [the 'Future directions' section of Medaka's documentation](https://nanoporetech.github.io/medaka/future.html) indicates that signal-level processing may be in its future. Furthermore, Medaka uses neural networks, unlike Nanopolish's HMMs. The authors suggest that just as neural networks have outperformed HMMs in basecallers, they will also prove superior in consensus algorithms. Watch this space!
+While Medaka does not improve assemblies as well as Nanopolish, it operates on basecalled reads and requires only a fasta/fastq file, not the raw fast5 files. It may therefore be the best choice for assembly polishing when raw reads are not available. However, [the 'Future directions' section of Medaka's documentation](https://nanoporetech.github.io/medaka/future.html) indicates that signal-level processing may be in its future. Furthermore, Medaka uses neural networks, unlike Nanopolish's HMMs. The authors suggest that just as neural networks have outperformed HMMs in basecallers, they will also prove superior in consensus algorithms. Watch this space!
 
 
 
 ### Future work
 
-My future work is easy: trying new versions and new basecallers as they are released and adding them to this analysis. Check back occasionally for new data!
+My future work is easy: trying new versions and new basecallers as they are released and adding them to this analysis. Check back occasionally for new data! The much harder task lies with the basecaller authors: reducing systematic error.
 
-The much harder task lies with the basecaller authors: reducing systematic error. As it currently stands, systematic basecalling errors lead to residual errors in assemblies. Nanopolish mitigates this issue but does not eliminate it. This makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). If and when systematic error can be eliminated, ONT-only assemblies will approach 100% accuracy, and then ONT will be a true alternative to Illumina.
+In my opinion, low consensus accuracy is ONT sequencing's biggest issue and the one area where PacBio still has a distinct advantage. It makes it hard to recommend an ONT-only approach for many types of genomics where accuracy matters (read more in [our paper on this topic](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000132)). One approach to improving consensus accuracy is with polishing tools such as Nanopolish and Medaka. Even better would be for the problem to be solved in the basecallers themselves: reads with a truly random error profile could yield exact consensus sequences. Either way, if and when assemblies approach 100% accuracy, ONT will be a true alternative to Illumina.
 
 Did I miss anything important? Can you shed any light on oddities that I couldn't explain? Please let me know through the [issue tracker](https://github.com/rrwick/Basecalling-comparison/issues)!
 
@@ -410,7 +422,3 @@ Did I miss anything important? Can you shed any light on oddities that I couldn'
 [**Teng HH, Hall MB, Duarte T, Cao MD, Coin LJM**. Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning. _bioRxiv_ 2017.](https://doi.org/10.1101/179531)
 
 [**Wick RR, Judd LM, Gorrie CL, Holt KE**. Completing bacterial genome assemblies with multiplex MinION sequencing. _Microbial Genomics_ 2017;3.](https://doi.org/10.1099/mgen.0.000132)
-
-
-
-
