@@ -409,3 +409,84 @@ blank <- rectGrob(gp=gpar(col="white"))
 scrappie_comparison_plot <- grid.arrange(p1, blank, p2, ncol=3, widths=c(0.425, 0.15, 0.425))
 # ggsave(scrappie_comparison_plot, file='plots/scrappie_comparison.pdf', width = 6, height = 4)
 
+
+
+
+
+
+
+
+
+
+
+# The following code is for a violin plot comparing different polishing strategies.
+basecaller <- "Albacore v2.1.10"
+no_spaces <- gsub(" ", "_", basecaller)
+
+polishing_names <- c(paste(basecaller, "(nopolishing)"),
+                     paste(basecaller, "+Medaka"),
+                     paste(basecaller, "+Nanopolish"),
+                     paste(basecaller, "+Medaka +Nanopolish"),
+                     paste(basecaller, "+Nanopolish +Medaka"))
+polishing_labels <- gsub(" ", "\n", polishing_names, fixed=TRUE)
+polishing_labels <- gsub("(nopolishing)", "(no polishing)", polishing_labels, fixed=TRUE)
+polishing_colours <- c("#CCCCCC", "#4F84CC", "#DD616C", "#846DC2", "#AB61BA")
+names(polishing_colours) <- polishing_names
+polishing_fill_scale <- scale_fill_manual(name = "Polishing", values = polishing_colours)
+
+no_polish_data_filename <- paste("results/", tolower(no_spaces), "_assembly.tsv", sep="")
+medaka_data_filename <- paste("results/", tolower(no_spaces), "_medaka.tsv", sep="")
+nanopolish_data_filename <- paste("results/", tolower(no_spaces), "_nanopolish_meth.tsv", sep="")
+medaka_nanopolish_data_filename <- paste("results/", tolower(no_spaces), "_medaka_nanopolish_meth.tsv", sep="")
+nanopolish_medaka_data_filename <- paste("results/", tolower(no_spaces), "_nanopolish_meth_medaka.tsv", sep="")
+
+length_column <- paste("Length_", no_spaces, sep="")
+rel_length_column <- paste("Rel_len_", no_spaces, sep="")
+
+basecaller_identities <- c()
+
+identity_column <- paste("Identity_", no_spaces, "_no_polish", sep="")
+no_polish_data <- load_tsv_data(no_polish_data_filename, c("Name", length_column, identity_column, rel_length_column))
+basecaller_identities <- c(basecaller_identities, identity_column)
+
+identity_column <- paste("Identity_", no_spaces, "_medaka", sep="")
+medaka_data <- load_tsv_data(medaka_data_filename, c("Name", length_column, identity_column, rel_length_column))
+basecaller_identities <- c(basecaller_identities, identity_column)
+
+identity_column <- paste("Identity_", no_spaces, "_nanopolish", sep="")
+nanopolish_data <- load_tsv_data(nanopolish_data_filename, c("Name", length_column, identity_column, rel_length_column))
+basecaller_identities <- c(basecaller_identities, identity_column)
+
+identity_column <- paste("Identity_", no_spaces, "_medaka_nanopolish", sep="")
+medaka_nanopolish_data <- load_tsv_data(medaka_nanopolish_data_filename, c("Name", length_column, identity_column, rel_length_column))
+basecaller_identities <- c(basecaller_identities, identity_column)
+
+identity_column <- paste("Identity_", no_spaces, "_nanopolish_medaka", sep="")
+nanopolish_medaka_data <- load_tsv_data(nanopolish_medaka_data_filename, c("Name", length_column, identity_column, rel_length_column))
+basecaller_identities <- c(basecaller_identities, identity_column)
+
+polish_data <- data.frame(Name = numeric())
+polish_data <- merge(polish_data, no_polish_data, by=1, all=TRUE)
+polish_data <- merge(polish_data, medaka_data, by=1, all=TRUE)
+polish_data <- merge(polish_data, nanopolish_data, by=1, all=TRUE)
+polish_data <- merge(polish_data, medaka_nanopolish_data, by=1, all=TRUE)
+polish_data <- merge(polish_data, nanopolish_medaka_data, by=1, all=TRUE)
+
+assembly_lengths <- polish_data[grepl("Length_", names(polish_data))]
+polish_data["Length"] <- round(apply(assembly_lengths, 1, median, na.rm = TRUE))
+
+polish_identities <- polish_data[,c("Name", "Length", basecaller_identities)]
+colnames(polish_identities) <- c("Name", "Length", polishing_names)
+polish_identities <- melt(polish_identities, id=c("Name", "Length"))
+colnames(polish_identities) <- c("Read_name", "Length", "Polishing", "Identity")
+
+polishing_plot <- ggplot(polish_identities, aes(x = Polishing, y = Identity, weight = Length, fill = Polishing)) +
+  geom_violin(draw_quantiles = c(0.5), bw=0.06, width=1.1) +
+  polishing_fill_scale + my_theme + guides(fill=FALSE) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 100, 0.1), minor_breaks = seq(0, 100, 0.05), labels = scales::unit_format("%")) +
+  scale_x_discrete(labels=polishing_labels) +
+  coord_cartesian(ylim=c(99.2, 100)) +
+  labs(title = "", x = "", y = "assembly identity")
+polishing_plot
+ggsave(polishing_plot, file='plots/polishing_methods.pdf', width = 4.75, height = 4)
+

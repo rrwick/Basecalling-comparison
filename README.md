@@ -22,17 +22,18 @@ This repository uses a bacterial genome to assess the read accuracy and consensu
 * [Basecallers tested](#basecallers-tested)
 * [Method](#method)
 * [Results/discussion](#resultsdiscussion)
-  * [Speed](#speed)
-  * [Total yield](#total-yield)
-  * [Read identity](#read-identity)
-  * [Relative read length](#relative-read-length)
-  * [Assembly identity](#assembly-identity)
-  * [Read vs assembly identity](#read-vs-assembly-identity)
-  * [Nanopolish assembly identity](#nanopolish-assembly-identity)
-  * [Methylation](#methylation)
-  * [Medaka](#medaka)
-  * [Training sets](#training-sets)
-  * [Combining different basecallers](#combining-different-basecallers)
+    * [Speed](#speed)
+    * [Total yield](#total-yield)
+    * [Read identity](#read-identity)
+    * [Relative read length](#relative-read-length)
+    * [Assembly identity](#assembly-identity)
+    * [Read vs assembly identity](#read-vs-assembly-identity)
+    * [Nanopolish assembly identity](#nanopolish-assembly-identity)
+    * [Methylation](#methylation)
+    * [Medaka](#medaka)
+    * [Combining different basecallers](#combining-different-basecallers)
+    * [Combining different polishers](#combining-different-polishers)
+    * [Training sets](#training-sets)
 * [Conclusions](#conclusions)
 * [References](#references)
 
@@ -349,21 +350,13 @@ While Nanopolish can correct many of these errors, it would be better if the bas
 
 
 
-# Medaka
+### Medaka
 
 Medaka is trying to solve a similar problem to Nanopolish: improving the consensus sequence accuracy using the alignment of multiple reads. It differs from Nanopolish in two significant ways. First, Medaka uses neural networks where Nanopolish uses HMMs. Second, it uses basecalled reads, not the raw signal ([though this is likely to change in the future](https://nanoporetech.github.io/medaka/future.html)). Here I test Medaka v0.2.0:
 
 <p align="center"><img src="images/medaka_identity.png" width="95%"></p>
 
 While Medaka could improve most assemblies, it was overall less effective than Nanopolish. It particularly seemed to struggle with older basecallers that use event segmentation (as opposed to modern basecallers which call directly from the signal). Medaka crashed when working with a few read sets, which is why there are missing plots in the figure.
-
-
-
-### Training sets
-
-All supervised learning depends on a good training set, and basecalling is no exception. A nice example comes from the rgrgr_r94 model in Scrappie v1.1.0 and v1.1.1. The primary difference between these two versions is that in v1.1.0, only human DNA was used to train the basecaller, whereas v1.1.1 was trained with a mixed set of genomes ([described here](https://github.com/rrwick/Basecalling-comparison/issues/1) by Scrappie author Tim Massingham). I didn't include v1.1.0 in the above plots because it's a superseded version – it's here only to show the difference a training set makes. The difference in read identity is huge, but assembly identity had a subtler improvement:
-
-<p align="center"><img src="images/scrappie_comparison.png" width="60%"></p>
 
 
 
@@ -374,6 +367,20 @@ This section previously looked at how well a combination of Albacore and Chiron 
 I don't think this is relevant anymore, so I've removed it. You can see my earlier results in [a past version of this repository](https://github.com/rrwick/Basecalling-comparison/tree/d5ce4455c5c57d15abec1e625cafa56a7eef1a6e) if you're still interested.
 
 
+
+### Combining different polishers
+
+I tried assembly polishing with both Medaka and Nanopolish (methylation-aware) to see if a joint approach could yield better accuracies. I tried both Medaka followed by Nanopolish and vice versa, but neither combination could improve upon Nanopolish alone:
+
+<p align="center"><img src="images/polishing_methods.png" width="35%"></p>
+
+
+
+### Training sets
+
+All supervised learning depends on a good training set, and basecalling is no exception. A nice example comes from the rgrgr_r94 model in Scrappie v1.1.0 and v1.1.1. The primary difference between these two versions is that in v1.1.0, only human DNA was used to train the basecaller, whereas v1.1.1 was trained with a mixed set of genomes ([described here](https://github.com/rrwick/Basecalling-comparison/issues/1) by Scrappie author Tim Massingham). I didn't include v1.1.0 in the above plots because it's a superseded version – it's here only to show the difference a training set makes. The difference in read identity is huge, but assembly identity had a subtler improvement:
+
+<p align="center"><img src="images/scrappie_comparison.png" width="50%"></p>
 
 
 
@@ -395,7 +402,7 @@ Scrappie raw v1.3.0 (rgr_r94, rgrgr_r94 and rnnrf_r94 models) also did quite wel
 
 Anyone interested in maximising assembly accuracy should be using Nanopolish. It improved all assemblies and took most up to about 99.9% (with the methylation-aware option). If you only care about assembly identity, Nanopolish makes your basecaller choice relatively unimportant.
 
-While Medaka does not improve assemblies as well as Nanopolish, it operates on basecalled reads and requires only a fasta/fastq file, not the raw fast5 files. It may therefore be the best choice for assembly polishing when raw reads are not available. However, [the 'Future directions' section of Medaka's documentation](https://nanoporetech.github.io/medaka/future.html) indicates that signal-level processing may be in its future. Furthermore, Medaka uses neural networks, unlike Nanopolish's HMMs. The authors suggest that just as neural networks have outperformed HMMs in basecallers, they will also prove superior in consensus algorithms. Watch this space!
+While Medaka does not improve assemblies as well as Nanopolish, it requires only a fasta/fastq file, not the raw fast5 files. It may therefore be the best choice for assembly polishing when raw reads are not available. However, the ['Future directions' section of Medaka's documentation](https://nanoporetech.github.io/medaka/future.html) indicates that signal-level processing may be in its future. Furthermore, Medaka uses neural networks, unlike Nanopolish's HMMs. The authors suggest that just as neural networks have outperformed HMMs in basecallers, they will also prove superior in consensus algorithms. Watch this space!
 
 
 

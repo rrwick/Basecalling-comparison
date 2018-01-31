@@ -54,6 +54,8 @@ mkdir -p 11_nanopolish_meth
 mkdir -p 12_nanopolish_meth_data
 mkdir -p 13_medaka
 mkdir -p 14_medaka_data
+mkdir -p 15_combined_polish
+mkdir -p 16_combined_polish_data
 
 # Create a table of basic info about each read.
 python3 "$python_script_dir"/read_table.py 01_raw_fast5 > 04_read_data/read_data.tsv
@@ -93,6 +95,18 @@ for f in $read_files; do
     medaka_assembly_pieces=14_medaka_data/"$set"_medaka_pieces.fasta
     medaka_assembly_alignment=14_medaka_data/"$set"_medaka.paf
     medaka_assembly_data=14_medaka_data/"$set"_medaka.tsv
+
+    medaka_nanopolish_assembly_dir=15_combined_polish
+    medaka_nanopolish_assembly=15_combined_polish/"$set"_medaka_nanopolish_meth.fasta
+    medaka_nanopolish_assembly_pieces=16_combined_polish_data/"$set"_medaka_nanopolish_meth_pieces.fasta
+    medaka_nanopolish_assembly_alignment=16_combined_polish_data/"$set"_medaka_nanopolish_meth.paf
+    medaka_nanopolish_assembly_data=16_combined_polish_data/"$set"_medaka_nanopolish_meth.tsv
+
+    nanopolish_medaka_assembly_dir=15_combined_polish
+    nanopolish_medaka_assembly=15_combined_polish/"$set"_nanopolish_meth_medaka.fasta
+    nanopolish_medaka_assembly_pieces=16_combined_polish_data/"$set"_nanopolish_meth_medaka_pieces.fasta
+    nanopolish_medaka_assembly_alignment=16_combined_polish_data/"$set"_nanopolish_meth_medaka.paf
+    nanopolish_medaka_assembly_data=16_combined_polish_data/"$set"_nanopolish_meth_medaka.tsv
 
     printf "\n\n\n\n"
     echo "NORMALISE READ HEADERS: "$set
@@ -174,5 +188,44 @@ for f in $read_files; do
     minimap2 -x map10k -t $threads -c reference.fasta $medaka_assembly_pieces > $medaka_assembly_alignment
     python3 "$python_script_dir"/read_length_identity.py $medaka_assembly_pieces $medaka_assembly_alignment > $medaka_assembly_data
     rm $medaka_assembly_pieces $medaka_assembly_alignment
+
+    # printf "\n\n\n\n"
+    # echo "NANOPOLISH (METHYLATION-AWARE) OF MEDAKA ASSEMBLY: "$set
+    # echo "--------------------------------------------------------------------------------"
+    # python3 "$python_script_dir"/nanopolish_slurm_wrapper.py $medaka_assembly $all_reads_fixed_names $raw_fast5_dir $medaka_nanopolish_assembly_dir $nanopolish_exec_dir $threads meth
+    # rm "$all_reads_fixed_names".index*
+    # rm "$medaka_assembly".fai
+
+    # printf "\n\n\n\n"
+    # echo "ASSESS MEDAKA THEN NANOPOLISH (METHYLATION-AWARE) ASSEMBLY: "$set
+    # echo "--------------------------------------------------------------------------------"
+    # python3 "$python_script_dir"/chop_up_assembly.py $medaka_nanopolish_assembly 10000 > $medaka_nanopolish_assembly_pieces
+    # minimap2 -x map10k -t $threads -c reference.fasta $medaka_nanopolish_assembly_pieces > $medaka_nanopolish_assembly_alignment
+    # python3 "$python_script_dir"/read_length_identity.py $medaka_nanopolish_assembly_pieces $medaka_nanopolish_assembly_alignment > $medaka_nanopolish_assembly_data
+    # rm $medaka_nanopolish_assembly_pieces $medaka_nanopolish_assembly_alignment
+
+    # printf "\n\n\n\n"
+    # echo "MEDAKA OF NANOPOLISH (METHYLATION-AWARE) ASSEMBLY: "$set
+    # echo "--------------------------------------------------------------------------------"
+    # if [[ $all_reads_fixed_names = *"fastq.gz" ]]; then
+    #     temp_reads="$nanopolish_medaka_assembly_dir"/"$set".fastq
+    # else
+    #     temp_reads="$nanopolish_medaka_assembly_dir"/"$set".fasta
+    # fi
+    # gunzip -c "$all_reads_fixed_names" > $temp_reads
+    # source $medaka
+    # medaka_consensus -i $temp_reads -d $assembly -o "$nanopolish_medaka_assembly_dir"/"$set"_nanopolish_medaka -p $pomoxis -t $threads
+    # deactivate
+    # cp "$nanopolish_medaka_assembly_dir"/"$set"_nanopolish_medaka/consensus.fasta "$nanopolish_medaka_assembly"
+    # rm $temp_reads
+    # rm -r "$nanopolish_medaka_assembly_dir"/"$set"_nanopolish_medaka
+
+    # printf "\n\n\n\n"
+    # echo "ASSESS MEDAKA ASSEMBLY: "$set
+    # echo "--------------------------------------------------------------------------------"
+    # python3 "$python_script_dir"/chop_up_assembly.py $nanopolish_medaka_assembly 10000 > $nanopolish_medaka_assembly_pieces
+    # minimap2 -x map10k -t $threads -c reference.fasta $nanopolish_medaka_assembly_pieces > $nanopolish_medaka_assembly_alignment
+    # python3 "$python_script_dir"/read_length_identity.py $nanopolish_medaka_assembly_pieces $nanopolish_medaka_assembly_alignment > $nanopolish_medaka_assembly_data
+    # rm $nanopolish_medaka_assembly_pieces $nanopolish_medaka_assembly_alignment
 
 done

@@ -45,7 +45,10 @@ def main():
     set_name = assembly_filename.split('/')[-1].split('.fasta')[0]
     print('\nPreparing to run Nanopolish for ' + set_name)
 
-    final_assembly = ('../' + set_name + '.fasta').replace('_assembly.fasta', '_nanopolish.fasta')
+    if assembly_filename.endswith('medaka.fasta'):
+        final_assembly = ('../' + set_name + '.fasta').replace('medaka.fasta', 'medaka_nanopolish.fasta')
+    else:
+        final_assembly = ('../' + set_name + '.fasta').replace('_assembly.fasta', '_nanopolish.fasta')
     if methylation_aware:
         final_assembly = final_assembly.replace('_nanopolish.fasta', '_nanopolish_meth.fasta')
 
