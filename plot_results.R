@@ -13,8 +13,8 @@ basecaller_colours <- c(basecaller_colours, "#F0DF46")
 basecaller_names <- c(basecaller_names, "Albacore v0.8.4", "Albacore v0.9.1", "Albacore v1.1.2", "Albacore v1.2.6", "Albacore v2.0.2", "Albacore v2.1.10")
 basecaller_colours <- c(basecaller_colours, "#FCBBA1", "#F29A87", "#E87A6C", "#DF5952", "#D53937", "#CB181D")
 
-basecaller_names <- c(basecaller_names, "Guppy v0.3.0")
-basecaller_colours <- c(basecaller_colours, "#D6934F")
+basecaller_names <- c(basecaller_names, "Guppy v0.3.0", "Guppy v0.5.1")
+basecaller_colours <- c(basecaller_colours, "#E39C54", "#CF7923")
 
 basecaller_names <- c(basecaller_names, "Scrappie events v1.0.0", "Scrappie events v1.3.0")
 basecaller_colours <- c(basecaller_colours, "#788CC8", "#6175B1")
@@ -198,7 +198,7 @@ total_yield_plot <- ggplot(total_bases, aes(x = Basecaller, y = Total_bases, fil
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 2000000000, 500000000), minor_breaks = seq(0, 2000000000, 100000000), labels = scales::unit_format("Mbp", 0.000001)) +
   coord_cartesian(ylim=c(0, 1500000000))
 total_yield_plot
-ggsave(total_yield_plot, file='plots/total_yield.pdf', width = 11, height = 3)
+ggsave(total_yield_plot, file='plots/total_yield.pdf', width = 12, height = 3)
 
 rel_read_length_plot <- ggplot(read_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) +
   geom_hline(yintercept = 100) +
@@ -209,7 +209,7 @@ rel_read_length_plot <- ggplot(read_rel_lengths, aes(x = Basecaller, y = Relativ
   coord_cartesian(ylim=c(88, 112)) +
   labs(title = "", x = "", y = "read length / reference length")
 rel_read_length_plot
-ggsave(rel_read_length_plot, file='plots/rel_read_length.pdf', width = 11, height = 4)
+ggsave(rel_read_length_plot, file='plots/rel_read_length.pdf', width = 12, height = 4)
 
 assembly_identity_plot <- ggplot(assembly_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) +
   geom_violin(draw_quantiles = c(0.5), bw=0.06) +
@@ -219,7 +219,7 @@ assembly_identity_plot <- ggplot(assembly_identities, aes(x = Basecaller, y = Id
   coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 assembly_identity_plot
-ggsave(assembly_identity_plot, file='plots/assembly_identity.pdf', width = 11, height = 5)
+ggsave(assembly_identity_plot, file='plots/assembly_identity.pdf', width = 12, height = 5)
 
 rel_assembly_length_plot <- ggplot(assembly_rel_lengths, aes(x = Basecaller, y = Relative_length, weight = Length, fill = Basecaller)) +
   geom_hline(yintercept = 100) +
@@ -230,7 +230,7 @@ rel_assembly_length_plot <- ggplot(assembly_rel_lengths, aes(x = Basecaller, y =
   coord_cartesian(ylim=c(98.75, 101.25)) +
   labs(title = "", x = "", y = "assembly length / reference length")
 rel_assembly_length_plot
-ggsave(rel_assembly_length_plot, file='plots/rel_assembly_length.pdf', width = 11, height = 4)
+ggsave(rel_assembly_length_plot, file='plots/rel_assembly_length.pdf', width = 12, height = 4)
 
 nanopolish_identity_plot <- ggplot(nanopolish_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) +
   geom_violin(data = assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
@@ -241,7 +241,7 @@ nanopolish_identity_plot <- ggplot(nanopolish_identities, aes(x = Basecaller, y 
   coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 nanopolish_identity_plot
-ggsave(nanopolish_identity_plot, file='plots/nanopolish_identity.pdf', width = 11, height = 5)
+ggsave(nanopolish_identity_plot, file='plots/nanopolish_identity.pdf', width = 12, height = 5)
 
 nanopolish_meth_identity_plot <- ggplot(nanopolish_meth_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) +
   geom_violin(data = assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
@@ -252,7 +252,7 @@ nanopolish_meth_identity_plot <- ggplot(nanopolish_meth_identities, aes(x = Base
   coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 nanopolish_meth_identity_plot
-ggsave(nanopolish_meth_identity_plot, file='plots/nanopolish_meth_identity.pdf', width = 11, height = 5)
+ggsave(nanopolish_meth_identity_plot, file='plots/nanopolish_meth_identity.pdf', width = 12, height = 5)
 
 medaka_identity_plot <- ggplot(medaka_identities, aes(x = Basecaller, y = Identity, weight = Length, fill = Basecaller)) +
   geom_violin(data = assembly_identities, draw_quantiles = c(0.5), bw=0.06, alpha=0.2, colour=NA) +
@@ -263,7 +263,7 @@ medaka_identity_plot <- ggplot(medaka_identities, aes(x = Basecaller, y = Identi
   coord_cartesian(ylim=c(98.5, 100)) +
   labs(title = "", x = "", y = "assembly identity")
 medaka_identity_plot
-ggsave(medaka_identity_plot, file='plots/medaka_identity.pdf', width = 11, height = 5)
+ggsave(medaka_identity_plot, file='plots/medaka_identity.pdf', width = 12, height = 5)
 
 
 # This code produces a single plot made of two violin plots:
@@ -290,7 +290,7 @@ maxWidth = grid::unit.pmax(gA$widths[2:3], gB$widths[2:3])
 gA$widths[2:3] <- as.list(maxWidth)
 gB$widths[2:3] <- as.list(maxWidth)
 read_identity_plot <- grid.arrange(gA, gB, ncol=1, heights=c(3, 1))
-ggsave(read_identity_plot, file='plots/read_identity.pdf', width = 11, height = 5.75)
+ggsave(read_identity_plot, file='plots/read_identity.pdf', width = 12, height = 5.75)
 
 
 
