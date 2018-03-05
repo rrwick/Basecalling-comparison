@@ -376,7 +376,7 @@ I don't think this is relevant anymore, so I've removed it. You can see my earli
 
 I tried assembly polishing with both Medaka and Nanopolish (methylation-aware) to see if a joint approach could yield better accuracies. I tried both Medaka followed by Nanopolish and vice versa, but neither combination could improve upon Nanopolish alone:
 
-<p align="center"><img src="images/polishing_methods.png" width="35%"></p>
+<p align="center"><img src="images/polishing_methods.png" width="40%"></p>
 
 
 
@@ -384,7 +384,7 @@ I tried assembly polishing with both Medaka and Nanopolish (methylation-aware) t
 
 All supervised learning depends on a good training set, and basecalling is no exception. A nice example comes from the rgrgr_r94 model in Scrappie v1.1.0 and v1.1.1. The primary difference between these two versions is that in v1.1.0, only human DNA was used to train the basecaller, whereas v1.1.1 was trained with a mixed set of genomes ([described here](https://github.com/rrwick/Basecalling-comparison/issues/1) by Scrappie author Tim Massingham). I didn't include v1.1.0 in the above plots because it's a superseded version – it's here only to show the difference a training set makes. The difference in read identity is huge, but assembly identity had a subtler improvement:
 
-<p align="center"><img src="images/scrappie_comparison.png" width="50%"></p>
+<p align="center"><img src="images/scrappie_comparison.png" width="52%"></p>
 
 
 
