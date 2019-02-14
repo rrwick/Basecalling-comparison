@@ -146,7 +146,7 @@ fi
 printf $set"\t" >> "$results_dir"/assembly_error_details
 nucmer --prefix="$prefix" reference.fasta $final_assembly
 delta-filter -r -q "$prefix".delta > "$prefix".filter
-# show-snps -ClrTH -x5 "$prefix".filter | python3 "$scripts_dir"/error_summary.py "$ref_contig" "$assembly_contig" >> "$results_dir"/assembly_error_details
+show-snps -ClrTH -x5 "$prefix".filter | python3 "$scripts_dir"/error_summary.py "$ref_contig" "$assembly_contig" >> "$results_dir"/assembly_error_details
 printf $set"\tassembly\t" >> "$results_dir"/substitution_counts
 show-snps -ClrTH "$prefix".filter | awk '$2 != "." && $3 != "."' | wc -l >> "$results_dir"/substitution_counts
 rm "$prefix".delta "$prefix".filter
