@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 """
+Copyright 2019 Ryan Wick (rrwick@gmail.com)
+https://github.com/rrwick/Basecalling-comparison
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version. This program is distributed in the hope that it
+will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
+have received a copy of the GNU General Public License along with this program. If not, see
+<http://www.gnu.org/licenses/>.
+
 This script takes MUMmer SNPs as input (via stdin) and outputs a summary of the assembly's errors.
 Use it like this:
 
@@ -13,14 +24,6 @@ nucmer --prefix="$prefix" "$ref_fasta" "$assembly_fasta"
 delta-filter -r -q "$prefix".delta > "$prefix".filter
 rm "$prefix".delta
 show-snps -ClrTH -x5 "$prefix".filter | python3 error_summary.py "$ref_contig" "$assembly_contig"
-
-This file is part of Nanobuff. Nanobuff is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version. Nanobuff is distributed in
-the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-details. You should have received a copy of the GNU General Public License along with Nanobuff. If
-not, see <http://www.gnu.org/licenses/>.
 """
 
 import collections

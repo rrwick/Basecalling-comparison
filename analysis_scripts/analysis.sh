@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2018 Ryan Wick (rrwick@gmail.com)
+# Copyright 2019 Ryan Wick (rrwick@gmail.com)
 # https://github.com/rrwick/Basecalling-comparison
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -18,12 +18,11 @@
 #   * expects the following in the directory in which it's run:
 #      * a reference.fasta file
 #   * expects the following tools in the PATH:
-#      * minimap2
-#      * rebaler
-#      * racon
-#      * nanopolish
-#      * nanopolish_makerange.py
-#      * MUMmer tools (nucmer, delta-filter, show-snps)
+#      * minimap2 (https://github.com/lh3/minimap2)
+#      * rebaler (https://github.com/rrwick/Rebaler)
+#      * racon (https://github.com/isovic/racon)
+#      * nanopolish and nanopolish_makerange.py (https://github.com/jts/nanopolish)
+#      * MUMmer tools: nucmer, delta-filter, show-snps (https://sourceforge.net/projects/mummer)
 
 
 # Some high-level settings for the script:
@@ -193,6 +192,13 @@ show-snps -ClrTH -x5 "$prefix".filter | python3 "$scripts_dir"/error_summary.py 
 printf $set"\tnanopolish\t" >> "$results_dir"/substitution_counts
 show-snps -ClrTH "$prefix".filter | awk '$2 != "." && $3 != "."' | wc -l >> "$results_dir"/substitution_counts
 rm "$prefix".delta "$prefix".filter
+
+
+
+
+# What follows are subsequent runs of Nanopolish. If you want to do them, comment out this exit
+# statement so the script can continue.
+exit 0
 
 
 

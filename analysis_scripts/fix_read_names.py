@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 """
-Copyright 2017 Ryan Wick (rrwick@gmail.com)
+Copyright 2019 Ryan Wick (rrwick@gmail.com)
 https://github.com/rrwick/Basecalling-comparison
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version. This program is distributed in the hope that it
+will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
+have received a copy of the GNU General Public License along with this program. If not, see
+<http://www.gnu.org/licenses/>.
 
 This script adjusts read headers to be consistent between basecallers and compatible with
 Nanopolish. After running, each read header should be in this format:
@@ -16,19 +24,10 @@ It can take either fasta or fastq input and will output in the same format.
 
 The read_id_to_fast5 file is a tab-delimited file with read IDs in the first column and fast5
 filenames in the second. For example:
-0000974e-e5b3-4fc2-8fa5-af721637e66c_Basecall_1D_template	5210_N125509_20170425_FN2002039725_MN19691_sequencing_run_klebs_033_restart_87298_ch173_read25236_strand.fast5
-00019174-2937-4e85-b104-0e524d8a7ba7_Basecall_1D_template	5210_N125509_20170424_FN2002039725_MN19691_sequencing_run_klebs_033_75349_ch85_read2360_strand.fast5
-000196f6-6041-49a5-9724-77e9d117edbe_Basecall_1D_template	5210_N125509_20170425_FN2002039725_MN19691_sequencing_run_klebs_033_restart_87298_ch200_read1975_strand.fast5
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU
-General Public License as published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version. This program is distributed in the hope that it
-will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
-have received a copy of the GNU General Public License along with this program. If not, see
-<http://www.gnu.org/licenses/>.
+00052d2b-be8b-4649-b6d5-9bdbd88a1ea5	5210_N128870_20170602_FN_MN20200_sequencing_run_sample_id_99953_ch225_read22973_strand.fast5
+0005323f-791d-4bd1-bd5f-3f110cb72b08	5210_N128870_20170602_FN_MN20200_sequencing_run_sample_id_99953_ch341_read18592_strand.fast5
+00077d28-f985-4800-898e-d4baede5d2aa	5210_N128870_20170602_FN_MN20200_sequencing_run_sample_id_99953_ch117_read27051_strand.fast5
 """
-
 
 import sys
 import os

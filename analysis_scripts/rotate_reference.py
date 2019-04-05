@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright 2018 Ryan Wick (rrwick@gmail.com)
+Copyright 2019 Ryan Wick (rrwick@gmail.com)
 https://github.com/rrwick/Basecalling-comparison
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -10,6 +10,9 @@ will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of M
 FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
 have received a copy of the GNU General Public License along with this program. If not, see
 <http://www.gnu.org/licenses/>.
+
+This script takes a one-contig circular assembly as input and produces a rotated version of the
+assembly (with a new starting point).
 """
 
 

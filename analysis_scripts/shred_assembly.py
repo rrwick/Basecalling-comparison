@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright 2018 Ryan Wick (rrwick@gmail.com)
+Copyright 2019 Ryan Wick (rrwick@gmail.com)
 https://github.com/rrwick/Basecalling-comparison
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -10,8 +10,11 @@ will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of M
 FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
 have received a copy of the GNU General Public License along with this program. If not, see
 <http://www.gnu.org/licenses/>.
-"""
 
+This script takes an assembly as input and produces an output of 'reads': the assembly chopped into
+overlapping pieces. It is used in assembly polishing to turn individual Racon-polished assemblies
+into 'reads' which can then be used as input for a final Racon polish.
+"""
 
 import random
 import sys
