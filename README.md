@@ -17,7 +17,7 @@ __Ryan R. Wick<sup>1</sup>, Louise M. Judd<sup>1</sup> and Kathryn E. Holt<sup>1
 This repository contains the scripts used in the preparation of our manuscript on basecalling performance:<br>
 [Performance of neural network basecalling tools for Oxford Nanopore sequencing](https://www.biorxiv.org/content/10.1101/543439v1).
 
-Previous versions of this repository contained the analysis results here in the README, but the current results are now in that manuscript and this repo just holds the scripts associated with the analysis. These scripts assume you're running on Ubuntu 16.04. They make work on other OSs, but no guarantees!
+Previous versions of this repository contained the analysis results here in the README, but the current results are now in that manuscript and this repo just holds the scripts associated with the analysis. These scripts assume you're running on Ubuntu 16.04. They may work on other OSs, but no guarantees!
 
 If you're still interested in the older results, here is a link to the earlier version of this repo: [Comparison of Oxford Nanopore basecalling tools](https://github.com/rrwick/Basecalling-comparison/tree/95bf07476f61cda79e6971f20f48c6ac83e634b3).
 
