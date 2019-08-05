@@ -17,6 +17,9 @@ __Ryan R. Wick<sup>1</sup>, Louise M. Judd<sup>1</sup> and Kathryn E. Holt<sup>1
 This repository contains the scripts used in the preparation of our manuscript on basecalling performance:<br>
 [Wick RR, Judd LM, Holt KE. Performance of neural network basecalling tools for Oxford Nanopore sequencing. Genome Biology. 2019;20(1):129.](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1727-y)
 
+In August 2019, I put a small addendum to this paper on GitHub which looks at a more recent version of Guppy as well as some different polishing strategies:<br>
+[github.com/rrwick/August-2019-consensus-accuracy-update](https://github.com/rrwick/August-2019-consensus-accuracy-update)
+
 Previous versions of this repository contained the analysis results here in the README, but the current results are now in that manuscript and this repo just holds the scripts associated with the analysis. These scripts assume you're running on Ubuntu 16.04. They make work on other OSs, but no guarantees!
 
 If you're still interested in the older results, here is a link to the earlier version of this repo: [Comparison of Oxford Nanopore basecalling tools](https://github.com/rrwick/Basecalling-comparison/tree/95bf07476f61cda79e6971f20f48c6ac83e634b3).
